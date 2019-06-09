@@ -1,0 +1,13 @@
+To install Doctor Who Game:
+
+1.  Set up a MySQL database with a user and a password.
+
+Import the .dat files in utils:
+
+e.g.
+
+mysql -u root -p drwho_game < users.dat
+
+2.  Place the contents of localfiles on your server somewhere inaccessible to web browsers.  Edit config.inc.php to contain the details of your database.
+
+3.  Place the contents of www in a suitable location under public_html.  Edit MySQL.php with the location of localfiles.

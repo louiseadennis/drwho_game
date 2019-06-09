@@ -1,0 +1,26 @@
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` char(50) NOT NULL,
+  `password` char(64) NOT NULL,
+  `salt` char(15) NOT NULL,
+  `email` varchar(60) DEFAULT NULL,
+  `location_id` smallint(6) NOT NULL DEFAULT '1',
+  `location_phase_list` text,
+  `char_id_list` text,
+  `monster_id_list` text,
+  `equipment_id_list` text,
+  `ally_id_list` text,
+  `hp` tinyint(4) NOT NULL DEFAULT '20',
+  `travel_type` char(50) DEFAULT 'start',
+  `uses` text,
+  `item_used` smallint(6) DEFAULT '0',
+  `new_character` char(50) DEFAULT NULL,
+  `last_action` char(50) DEFAULT 'start',
+  `log` text,
+  `recharge_start` datetime DEFAULT NULL,
+  `healing_start` datetime DEFAULT NULL,
+  `action_done` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+
