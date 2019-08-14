@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS `events`;
+CREATE TABLE `events` (
+  `event_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `fight` tinyint(4) DEFAULT NULL,
+  `critter` int(11) DEFAULT NULL,
+  `critter_hp` smallint(6) DEFAULT NULL,
+  `stunned` tinyint(4) DEFAULT NULL,
+  `resolved` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`event_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=latin1;

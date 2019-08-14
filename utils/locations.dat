@@ -1,0 +1,20 @@
+DROP TABLE IF EXISTS `locations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `locations` (
+  `location_id` int(11) NOT NULL AUTO_INCREMENT,
+  `planet` tinyint(4) DEFAULT NULL,
+  `century` tinyint(4) DEFAULT NULL,
+  `year` tinyint(4) DEFAULT NULL,
+  `day` tinyint(4) DEFAULT NULL,
+  `text` text,
+  `fight` tinyint(4) DEFAULT '0',
+  `critter` text,
+  `action_required` char(60) DEFAULT NULL,
+  `fight_chance` smallint(6) DEFAULT '0',
+  `name` char(60) DEFAULT '',
+  `clue` text,
+  PRIMARY KEY (`location_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
+
+INSERT INTO `locations` VALUES (1,1,1,1,1,'A Scrap Merchant',0,NULL,'',0,'I.M.Foreman, Scrap Merchant','No Clue');
