@@ -17,7 +17,7 @@
 ?>
 <html>
 <head>
-<title>Dr Who Game - Placeholder Locaion 1</title>
+<title>Dr Who Game - Placeholder Location 1</title>
 
 <link rel="stylesheet" href="../styles/default.css?v=12" type="text/css">
 
@@ -30,7 +30,8 @@
 <div class=main>
 
 <div class=location>
-<h2>Location 1</h2>
+<img src=../assets/locations/location1.png>
+<h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
 
 </div>
 </body>

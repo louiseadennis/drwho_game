@@ -31,10 +31,9 @@ if ($last_action == "item" || $last_action == "wait" ) {
             if ($action_required == '?') {
             }
         }
-      } else {
-      	update_users("action_done", 1, $db);
-      }
-   }
+    } else {
+        update_users("action_done", 1, $db);
+    }
 }
 
 if ($last_action == "travel") {
