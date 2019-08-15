@@ -42,7 +42,7 @@ function sessionAuthenticate()
  {
    // The resquest does not identify a session
    $message = "You are not authorized to access";
-   header("Location: login_form.php?msg=$message");
+   header("Location: ".$game_url."login_form.php?msg=$message");
    exit;
  }
 
@@ -54,7 +54,7 @@ function sessionAuthenticate()
   // that was used to create the session.
   // THIS IS PROBABLY A SESSION HIJACK ATTEMPT
   $message = "You are not authorized to acces the URL";
-  header("Location: login_form.php?msg=$message");
+  header("Location: ".$game_url."login_form.php?msg=$message");
   exit;
   }
 }

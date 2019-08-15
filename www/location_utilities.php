@@ -2,8 +2,8 @@
     function print_header($connection) {
         print "<div class=header>";
         collect_new_characters($connection);
-        print "<a href=profile.php>User Profile</a>";
-        print "&nbsp; &nbsp; &nbsp; <a href=logout.php>Log Out</a>";
+        print "<a href=../profile.php>User Profile</a>";
+        print "&nbsp; &nbsp; &nbsp; <a href=../logout.php>Log Out</a>";
         print "<hr>";
         print "</div>";
     }
@@ -15,6 +15,9 @@
         print_item_used($mysql);
         critter_attack($mysql);
         print_health($mysql);
+        print "</div>";
+        print "<div class=tardis>";
+        print_tardis($mysql);
         // print_wait($mysql);
         print "</div>";
         print "</div>";
@@ -107,6 +110,116 @@
             print "<p>You are OK, but not at full health.</p>";
         }
         
+    }
+    
+    function print_tardis($connection) {
+        $location_id = get_location($connection);
+        $tardis_location = get_tardis_location($connection);
+        if ($location_id == $tardis_location) {
+            $charge = get_value_from_users("charge", $connection);
+            
+            print "<h4>The Tardis</h4>";
+            if (is_null($charge)) {
+                $default_charge = default_charge();
+                update_users("charge", $default_charge, $connection);
+                $charge = $default_charge;
+            } else {
+                $recharge_start = get_value_from_users("recharge_start", $connection);
+                if (is_null($recharge_start)) {
+                    $recharge_start = now();
+                }
+                
+                $time_difference = check_charge($recharge_start, $connection);
+                if ($time_difference > 0) {
+                    if ($time_difference + $charge > default_charge()) {
+                        $charge = default_charge();
+                        update_users("charge", $charge, $connection);
+                    } else {
+                        $charge = $time_difference + $charge;
+                        $now = now();
+                        update_users("recharge_start", $now, $connection);
+                        update_users("charge", $charge, $connection);
+                    }
+                }
+            }
+            print "<p>Tardis Power Bank Level: " . $charge . "</p>";
+            print "<p><form method=\"POST\" action=\"main.php\">";
+            print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
+            print "<input type=\"hidden\" name=\"travel_type\" value=\"tardis\">";
+            print "<center><table>";
+            print "<tr>";
+            $coord1 = get_value_from_users("c1_prev", $connection);
+            print_dial(1, $connection);
+            print_dial(2, $connection);
+            print_dial(3, $connection);
+            print_dial(4, $connection);
+            print "</tr></table></center>";
+            
+            if ($charge > 0) {
+                $hp = get_value_from_users("hp", $connection);
+                $healing_start = get_value_from_users("healing_start", $connection);
+                if (!is_null($healing_start)) {
+                    $heals = check_healing($healing_start, $connection);
+                }
+                if ($hp > 0 ||  $heals > 0) {
+                    print "<input type=\"submit\" value=\"Fly Tardis\">";
+                } else {
+                    print "<p>You are unconscious and unable to use the Tardis.</p>";
+                }
+            } else {
+                print "<p>The Tardis is low on power.  It recharges at 1 unit per 30 minutes.  You will need to wait.</p>";
+            }
+            print "</form>";
+        }
+    }
+    
+    function print_dial($dial, $connection) {
+        $dial_prev = "c" . $dial . "_prev";
+        $c1 = get_value_from_users($dial_prev, $connection);
+        print "<td><select name=\"dial$dial\">";
+        $select0 = "";
+        $select1 = "";
+        $select2 = "";
+        $select3 = "";
+        $select4 = "";
+        $select5 = "";
+        $select6 = "";
+        $select7 = "";
+        $select8 = "";
+        $select9 = "";
+       
+        if ($c1 == '1') {
+            $select1 = 'selected';
+        } else if ($c1 == '2') {
+            $select2 = 'selected';
+        } else if ($c1 == '3') {
+            $select3 = 'selected';
+        } else if ($c1 == '4')    {
+            $select4 = 'selected';
+        } else if ($c1 == '5') {
+            $select5 = 'selected';
+        } else if ($c1 == '6') {
+            $select6 = 'selected';
+        } else if ($c1 == '7') {
+            $select7 = 'selected';
+        } else if ($c1 == '8') {
+            $select8 = 'selected';
+        } else if ($c1 == '9') {
+            $select9 = 'selected';
+        } else {
+            $select0 = 'selected';
+        }
+        print "<option $select0 value=\"0\">0</option>";
+        print "<option $select1 value=\"1\">1</option>";
+        print "<option $select2 value=\"2\">2</option>";
+        print "<option $select3 value=\"3\">3</option>";
+        print "<option $select4 value=\"4\">4</option>";
+        print "<option $select5 value=\"5\">5</option>";
+        print "<option $select6 value=\"5\">6</option>";
+        print "<option $select7 value=\"5\">7</option>";
+        print "<option $select8 value=\"5\">8</option>";
+        print "<option $select9 value=\"5\">9</option>";
+        print "</select> &nbsp; &nbsp; </td>";
     }
 
     function check_location($location, $connection) {

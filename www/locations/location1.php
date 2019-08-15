@@ -17,7 +17,7 @@
 ?>
 <html>
 <head>
-<title>Dr Who Game - Placeholder Location 1</title>
+<title>Dr Who Game - Totter's Lane 1963</title>
 
 <link rel="stylesheet" href="../styles/default.css?v=12" type="text/css">
 
@@ -25,14 +25,18 @@
 <body>
 <?php
     print_header($db);
+?>
+
+<div class=main>
+<?php
     print_standard_start($db);
 ?>
-<div class=main>
 
 <div class=location>
-<img src=../assets/locations/location1.png>
 <h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
+<img src=../assets/locations/location1.png>
 
+</div>
 </div>
 </body>
 </html>

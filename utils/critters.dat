@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS `critters`;
+CREATE TABLE `critters` (
+  `critter_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `hp` smallint(6) DEFAULT NULL,
+  `hit_percentage` int(11) DEFAULT NULL,
+  `damage` smallint(6) DEFAULT '1',
+  `icon` text,
+  PRIMARY KEY (`critter_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;

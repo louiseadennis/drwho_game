@@ -50,6 +50,10 @@
     function get_location($connection) {
         return get_value_from_users("location_id", $connection);
     }
+    
+    function get_tardis_location($connection) {
+        return get_value_from_users("tardis_location", $connection);
+    }
 
     function unresolved_event($connection) {
         $user_id = get_user_id($connection);
@@ -65,6 +69,14 @@
         }
     }
 
+    function critter_number($connection) {
+        $sql = "SELECT * FROM critters";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        return $result->num_rows;
+    }
 
     function connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database) {
         $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
