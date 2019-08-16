@@ -12,6 +12,7 @@ CREATE TABLE `users` (
   `hp` tinyint(4) NOT NULL DEFAULT '20',
   `healing_start` datetime DEFAULT NULL,
   `char_id_list` text,
+  `tardis_team` text,
   `monster_id_list` text,
   `equipment_id_list` text,
   `ally_id_list` text,

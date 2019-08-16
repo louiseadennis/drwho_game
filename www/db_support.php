@@ -8,6 +8,22 @@
         return 1;
     }
     
+    function get_value_for_name_from($column, $table, $name, $connection) {
+        $sql = "SELECT {$column} FROM {$table} WHERE name = '{$name}'";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            while ($row=$result->fetch_assoc()) {
+                $value = $row["$column"];
+                return $value;
+            }
+        }
+    }
+    
     function get_value_from_users($column, $connection) {
         $uname = $_SESSION["loginUsername"];
         
@@ -41,6 +57,23 @@
             }
         }
     }
+    
+    function get_value_for_char_id($column, $char_id, $connection) {
+        $sql = "SELECT {$column} FROM characters WHERE char_id = '{$char_id}'";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            while ($row=$result->fetch_assoc()) {
+                $value = $row["$column"];
+                return $value;
+            }
+        }
+    }
+
 
     function get_user_id($connection)
     {

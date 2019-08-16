@@ -10,9 +10,21 @@
 
     $db = connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
     check_location(1, $db);
-
+    
+    // Add the first Doctor and Susan at start.
+    $char_id_list = get_value_from_users("char_id_list", $db);
+    if ($char_id_list == 0 || $char_id_list == '') {
+        update_users("char_id_list", "1,15", $db);
+    }
+    
+    $tardis_team_list = get_value_from_users("tardis_team", $db);
+    if ($tardis_team_list == 0 || $tardis_team_list == '') {
+        update_users("tardis_team", "1,15", $db);
+    }
+    
+    $barbara_collected = check_for_character('barbara', $db);
 // $phase = get_user_phase($db);
-    $d100_roll = rand(1, 100);
+ //   $d100_roll = rand(1, 100);
 
 ?>
 <html>
@@ -34,7 +46,23 @@
 
 <div class=location>
 <h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
-<img src=../assets/locations/location1.png>
+<img src=../assets/locations/location1.png alt="Still of the Totter's Lane Junkyard Entrance in 1963.">
+
+<i><p>A foggy winter's night, in a London back street; the little road was empty and silent.  A tall figure loomed up out of the fog -- the helmeted, caped figure of a policeman patrolling his beat.</p>
+<p> He moved along the little street, trying shop doors, walked on past the shops to where the street ended in a high blank wall.  There were high wooden gates in the wall, with a smaller, entry-gate set into one of them.</p>
+<p>The policeman shone his torch onto the gates, holding the beam for a moment on a faded notice:<br>
+I. M. Foreman<br>
+Scrap Merchant.</p></i>
+<p align=right>- Terrance Dicks</p>
+
+<?php
+    if (!$barbara_collected) {
+        update_users("new_character", 'barbara', $db);
+        update_users("new_character", 'ian', $db);
+        print "<p>Two school teachers, Ian Chesterton and Barbara Wright, stumble into the Tardis in search of their mysterious pupil, Susan, an unearthly child.</p>";
+    }
+    print_tardis_team($db);
+?>
 
 </div>
 </div>

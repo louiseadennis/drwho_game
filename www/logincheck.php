@@ -23,7 +23,7 @@ if (authenticateUser($db, $loginUsername, $loginPassword))
   $_SESSION["loginIP"] = $_SERVER["REMOTE_ADDR"];
 
   // Relocate back to the first page
-  header("Location: main.php");
+  header("Location: ".$game_url."/main.php");
   exit;
 } else {
   // The authentication failed
@@ -31,7 +31,7 @@ if (authenticateUser($db, $loginUsername, $loginPassword))
     "Could not connect to 52 Weeks of Primeval Game as '{$loginUsername}'";
 
   // Relocate back to login page
-  header("Location: login_form.php?msg=$message");
+  header("Location: ".$game_url."/login_form.php?msg=$message");
   exit;
 }
 ?>

@@ -3,6 +3,7 @@
     require('defaults.php');
     require('db_support.php');
     require('location_utilities.php');
+    require('characters.php');
     require('tardis.php');
     require('combat_utilities.php')
 ?>

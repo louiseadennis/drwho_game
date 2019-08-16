@@ -58,7 +58,7 @@ if ($char_id_list != '') {
       	 print "<tr>";
       }
       $no_space_char_name = str_replace(" ", "_", $char_name);
-      print "<td><img src=assets/$no_space_char_name.png></td><td>$uchar</td>";
+      print "<td align=center><img src=assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
       if ($i == 5) {
       	 print "</tr>";
 	 $i = 0;

@@ -1,12 +1,10 @@
 DROP TABLE IF EXISTS `locations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `locations` (
   `location_id` int(11) NOT NULL AUTO_INCREMENT,
   `planet` tinyint(4) DEFAULT NULL,
   `century` tinyint(4) DEFAULT NULL,
-  `year` tinyint(4) DEFAULT NULL,
-  `day` tinyint(4) DEFAULT NULL,
+  `d1` tinyint(4) DEFAULT NULL,
+  `d2` tinyint(4) DEFAULT NULL,
   `text` text,
   `fight` tinyint(4) DEFAULT '0',
   `critter` text,

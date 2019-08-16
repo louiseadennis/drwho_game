@@ -3,6 +3,7 @@
         print "<div class=header>";
         collect_new_characters($connection);
         print "<a href=../profile.php>User Profile</a>";
+        print "&nbsp; &nbsp; &nbsp; <a href=../log.php>Location Log</a>";
         print "&nbsp; &nbsp; &nbsp; <a href=../logout.php>Log Out</a>";
         print "<hr>";
         print "</div>";
@@ -13,8 +14,7 @@
         print "<div class=\"action\">";
         print_character_joined($mysql);
         print_item_used($mysql);
-        critter_attack($mysql);
-        print_health($mysql);
+        // critter_attack($mysql);
         print "</div>";
         print "<div class=tardis>";
         print_tardis($mysql);
@@ -77,40 +77,6 @@
         }
     }
     
-    function print_health($mysql) {
-        $hp = get_value_from_users("hp", $mysql);
-        if ($hp < default_health()) {
-            $healing_start = get_value_from_users("healing_start", $mysql);
-            if (!is_null($healing_start)) {
-                $time_difference = check_healing($healing_start, $mysql);
-                if ($time_difference > 0) {
-                    if ($time_difference + $hp > default_health()) {
-                        $hp = default_health();
-                        update_users("hp", $hp, $mysql);
-                    } else {
-                        $hp = $time_difference + $hp;
-                        $now = now();
-                        update_users("healing_start", $now, $mysql);
-                        update_users("hp", $hp, $mysql);
-                    }
-                }
-            }
-        }
-        if ($hp == 0) {
-            print "<p><b>You are Unconscious!</b>  Check back in 1 hour.</p>";
-        } else if ($hp < 4) {
-            print "<p><b><font color=red>You are very badly hurt.</font></b></p>";
-        } else if ($hp < 8) {
-            print "<p><b>You are badly hurt.</b></p>";
-        } else if ($hp < 12) {
-            print "<p>You are hurt.</p>";
-        } else if ($hp < 16) {
-            print "<p>You are slightly hurt.</p>";
-        } else if ($hp < 20) {
-            print "<p>You are OK, but not at full health.</p>";
-        }
-        
-    }
     
     function print_tardis($connection) {
         $location_id = get_location($connection);
@@ -148,24 +114,18 @@
             print "<input type=\"hidden\" name=\"travel_type\" value=\"tardis\">";
             print "<center><table>";
             print "<tr>";
-            $coord1 = get_value_from_users("c1_prev", $connection);
-            print_dial(1, $connection);
-            print_dial(2, $connection);
-            print_dial(3, $connection);
-            print_dial(4, $connection);
+             $planet = get_value_for_location_id("planet", $location_id, $connection);
+            $century = get_value_for_location_id("century", $location_id, $connection);
+            $d1 = get_value_for_location_id("d1", $location_id, $connection);
+            $d2 = get_value_for_location_id("d2", $location_id, $connection);
+            print_dial(1, $connection, $planet);
+            print_dial(2, $connection, $century);
+            print_dial(3, $connection, $d1);
+            print_dial(4, $connection, $d2);
             print "</tr></table></center>";
             
             if ($charge > 0) {
-                $hp = get_value_from_users("hp", $connection);
-                $healing_start = get_value_from_users("healing_start", $connection);
-                if (!is_null($healing_start)) {
-                    $heals = check_healing($healing_start, $connection);
-                }
-                if ($hp > 0 ||  $heals > 0) {
-                    print "<input type=\"submit\" value=\"Fly Tardis\">";
-                } else {
-                    print "<p>You are unconscious and unable to use the Tardis.</p>";
-                }
+                print "<input type=\"submit\" value=\"Fly Tardis\">";
             } else {
                 print "<p>The Tardis is low on power.  It recharges at 1 unit per 30 minutes.  You will need to wait.</p>";
             }
@@ -173,9 +133,9 @@
         }
     }
     
-    function print_dial($dial, $connection) {
+    function print_dial($dial, $connection, $value) {
         $dial_prev = "c" . $dial . "_prev";
-        $c1 = get_value_from_users($dial_prev, $connection);
+        $c1 = $value;
         print "<td><select name=\"dial$dial\">";
         $select0 = "";
         $select1 = "";
@@ -220,6 +180,24 @@
         print "<option $select8 value=\"5\">8</option>";
         print "<option $select9 value=\"5\">9</option>";
         print "</select> &nbsp; &nbsp; </td>";
+    }
+    
+    function print_tardis_team($db) {
+        $tardis_team = get_value_from_users("tardis_team", $db);
+        if ($tardis_team != '') {
+            print "<h2>Tardis Crew</h2>";
+            print "<table>";
+            $char_id_array = explode(",", $tardis_team);
+            print "<tr>";
+            foreach ($char_id_array as $char_id) {
+                $char_name = get_value_for_char_id("name", $char_id, $db);
+                $uchar = ucfirst($char_name);
+                $no_space_char_name = str_replace(" ", "_", $char_name);
+                print "<td align=center><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+            }
+            print "</tr>";
+            print "</table>";
+        }
     }
 
     function check_location($location, $connection) {
