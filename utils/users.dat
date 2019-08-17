@@ -9,8 +9,6 @@ CREATE TABLE `users` (
   `tardis_location` smallint(6) NOT NULL DEFAULT '1',
   `charge` tinyint(4) DEFAULT NULL
   `recharge_start` datetime DEFAULT NULL,
-  `hp` tinyint(4) NOT NULL DEFAULT '20',
-  `healing_start` datetime DEFAULT NULL,
   `char_id_list` text,
   `tardis_team` text,
   `monster_id_list` text,

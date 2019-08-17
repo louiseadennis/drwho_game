@@ -41,7 +41,7 @@
 
 <div class=main>
 <?php
-    print_standard_start($db);
+   print_standard_start($db);
 ?>
 
 <div class=location>
@@ -57,8 +57,10 @@ Scrap Merchant.</p></i>
 
 <?php
     if (!$barbara_collected) {
-        update_users("new_character", 'barbara', $db);
-        update_users("new_character", 'ian', $db);
+        print_character_image('barbara', $db);
+        print_character_image('ian', $db);
+        encountered_new_character('barbara', $db);
+        encountered_new_character('ian', $db);
         print "<p>Two school teachers, Ian Chesterton and Barbara Wright, stumble into the Tardis in search of their mysterious pupil, Susan, an unearthly child.</p>";
     }
     print_tardis_team($db);

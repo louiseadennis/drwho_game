@@ -32,66 +32,32 @@ echo $location
 </form>
 </p>
 <h2>Log Book</h2>
-<h3>Device Notes</h3>
 <?php
 $log = get_value_from_users("log", $db);
 print "<table>";
-    print "<tr><th>Coordinates</th><th>Place</th><th></th></tr>";
-    if ($log != '') {
-   $log_array = explode(":", $log);
-   sort ($log_array);
-   $current_button1="Z";
-   $current_button2="Z";
-   $current_button3="Z";
-   foreach ($log_array as $entry) {
-      $entry_array = explode(',', $entry);
-      $button1 = substr($entry_array[0], 1);
-      $button2 = $entry_array[1];
-      $button3 = substr($entry_array[2], 0, -1);
-      $same_as_previous = 0;
-      $text = '';
+print "<tr><th>Coordinates</th><th>Place</th><th></th></tr>";
+if ($log != '') {
+    $log_array = explode(":", $log);
+    sort ($log_array);
+    foreach ($log_array as $entry) {
+        $entry_array = explode(',', $entry);
+        // removing the (
+        $button1 = substr($entry_array[0], 1);
+        $button2 = $entry_array[1];
+        $button3 = $entry_array[2];
+        // removing the )
+        $button4 = substr($entry_array[3], 0, -1);;
+        $location_id = get_location_from_coords($button1, $button2, $button3, $button4, $db);
 
-      if ($current_button1 == $button1 && $current_button2 == $button2 && $current_button3 == $button3) {
-         $same_as_previous = 1;
-      } else {
-          $current_button1 = $button1;
-          $current_button2 = $button2;
-          $current_button3 = $button3;
-      } 
-      $location_id = get_location_from_coords($button1, $button2, $button3, $db);
+        $text = get_value_for_location_id("text", $location_id, $db);
 
-      $text = get_value_for_location_id("text", $location_id, $db);
-
-       if ($current_button1 != 'Z') {
-           print "<tr><td>$current_button1, $current_button2, $current_button3</td>";
-           print "<td>$text</td>";
-           $era = get_value_for_location_id("era", $location_id, $db);
-           print "<td>$era</td></tr>";
-       }
-   }
+        print "<tr><td>$button1, $button2, $button3, $button4</td>";
+        print "<td>$text</td>";
+        $log_string = "location" . $location_id . "_log.png";
+        print "<td><img src=assets/locations/$log_string></td>";
+    }
 }
 print "</table>";
-
-print "<h3>Clues</h3>";
-$clues = get_value_from_users("locationclues", $db);
-if (!is_null($clues)) {
-   $clue_array = explode(",", $clues);
-   print "<ul>";
-   foreach ($clue_array as $clue_id) {
-   	   $clue = get_value_for_location_id("clue", $clue_id, $db);
-       $present_day = get_value_for_location_id("present_day", $clue_id, $db);
-       if ($present_day != 1) {
-           $d1 = get_value_for_location_id("tm_coord_1", $clue_id, $db);
-           $d2 = get_value_for_location_id("tm_coord_2", $clue_id, $db);
-           $d3 = get_value_for_location_id("tm_coord_3", $clue_id, $db);
-           print "<li>$clue ($d1, $d2, $d3)</li>";
-       } else {
-           $d1 = get_value_for_location_id("name", $clue_id, $db);
-           print "<li>$clue (Present Day: $d1)</li>";
-       }
-   }
-   print "</ul>";
-}
 
 
 ?>

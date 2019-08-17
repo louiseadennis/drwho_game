@@ -37,7 +37,7 @@ if ($last_action == "item" || $last_action == "wait" ) {
 }
 
 if ($last_action == "travel") {
-   resolve_events($db);
+   // resolve_events($db);
 
     if ($travel_type == "vehicle") {
     }
@@ -49,10 +49,11 @@ if ($travel_type == "tardis") {
    $dial1 = mysqlclean($_POST, "dial1", 10, $db);
    $dial2 = mysqlclean($_POST, "dial2", 10, $db);
    $dial3 = mysqlclean($_POST, "dial3", 10, $db);
-   $location_id = use_tardis($dial1, $dial2, $dial3, $db);
+   $dial4 = mysqlclean($_POST, "dial4", 10, $db);
+   $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
 }
     
-$hp = get_value_from_users("hp", $db);
+// $hp = get_value_from_users("hp", $db);
 
 if ($travel_type != '' && $travel_type != "none") {
     update_users("travel_type", $travel_type, $db);
@@ -77,7 +78,7 @@ if ($location_id=='') {
     update_users("location_id", $location_id, $db);
 }
 
-$location_string = "location" . $location_id;
+$location_string = "locations/location" . $location_id;
     
 header("Location: $location_string.php");
 exit;

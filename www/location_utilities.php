@@ -1,7 +1,7 @@
 <?php
     function print_header($connection) {
         print "<div class=header>";
-        collect_new_characters($connection);
+        // collect_new_characters($connection);
         print "<a href=../profile.php>User Profile</a>";
         print "&nbsp; &nbsp; &nbsp; <a href=../log.php>Location Log</a>";
         print "&nbsp; &nbsp; &nbsp; <a href=../logout.php>Log Out</a>";
@@ -27,34 +27,37 @@
     function print_character_joined($connection) {
         $last_action = get_value_from_users("last_action", $connection);
         if ($last_action == "travel") {
-            $new_character = get_value_from_users("new_character", $connection);
-            if ($new_character != '') {
-                $char_id_list = get_value_from_users("char_id_list", $connection);
-                $char_id = get_value_for_name_from("char_id", "characters", $new_character, $connection);
-                if ($char_id_list != 0 ) {
-                    $new_char_id_list = $char_id_list . "," . $char_id;
-                    update_users("new_character", '', $connection);
-                    if (!check_for_character($new_character, $connection)) {
-                        update_users("char_id_list", $new_char_id_list, $connection);
-                    }
-                } else {
-                    $char_id_array = explode(",", $char_id_list);
-                    if (!in_array($char_id, $char_id_array)) {
+            $new_characters = get_value_from_users("new_character", $connection);
+            if ($new_characters != '') {
+                $char_id_array = explode(",", $new_characters);
+                foreach ($char_id_array as $char_id) {
+                    $char_id_list = get_value_from_users("char_id_list", $connection);
+                    $char_name = get_value_for_char_id("name", $char_id, $connection);
+                    if ($char_id_list != 0 && $char_id_list != '') {
+                        $new_char_id_list = $char_id_list . "," . $char_id;
                         update_users("new_character", '', $connection);
-                        update_users("char_id_list", $char_id, $connection);
+                        if (!check_for_character($char_name, $connection)) {
+                            update_users("char_id_list", $new_char_id_list, $connection);
+                        }
+                    } else {
+                        $char_id_array = explode(",", $char_id_list);
+                        if (!in_array($char_id, $char_id_array)) {
+                            update_users("new_character", '', $connection);
+                            update_users("char_id_list", $char_id, $connection);
+                        }
                     }
-                }
-                $ucchar = ucfirst($new_character);
-                $sex = get_value_for_name_from("gender", "characters", $new_character, $connection);
-                $pronoun = "He";
-                if ($sex == 2) {
-                    $pronoun = "She";
-                }
-                if ($sex == 3) {
-                    $pronoun = "They";
-                }
+                    $ucchar = ucfirst($char_name);
+                    $sex = get_value_for_name_from("gender", "characters", $char_name, $connection);
+                    $pronoun = "He";
+                    if ($sex == 2) {
+                        $pronoun = "She";
+                    }
+                    if ($sex == 3) {
+                        $pronoun = "They";
+                    }
                 
-                print "<p>$ucchar has joined you on your travels.  $pronoun is stored in your user profile.</p>";
+                    print "<p>$ucchar has joined you on your travels.  $pronoun is stored in your user profile.</p>";
+                }
             }
         }
     }
@@ -109,7 +112,7 @@
                 }
             }
             print "<p>Tardis Power Bank Level: " . $charge . "</p>";
-            print "<p><form method=\"POST\" action=\"main.php\">";
+            print "<p><form method=\"POST\" action=\"../main.php\">";
             print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
             print "<input type=\"hidden\" name=\"travel_type\" value=\"tardis\">";
             print "<center><table>";
@@ -122,6 +125,7 @@
             print_dial(2, $connection, $century);
             print_dial(3, $connection, $d1);
             print_dial(4, $connection, $d2);
+            update_log($planet, $century, $d1, $d2, $connection);
             print "</tr></table></center>";
             
             if ($charge > 0) {
@@ -212,18 +216,6 @@
         }
     }
     
-    function collect_new_characters($connection) {
-        $new_character = get_value_from_users("new_character", $connection);
-        if ($new_character != "") {
-            $char_id_list = get_value_from_users("char_id_list", $connection);
-            if ($char_id_list == 0 || $char_id_list == '') {
-                update_users("char_id_list", $new_character, $connection);
-            } else {
-                $new_char_id_list = $char_id_list . "," . $new_character;
-            }
-        }
-    }
-    
     function item_used($fight, $equip_id, $connection) {
         $equip_id_list = get_value_from_users("equipment", $connection);
         $equip_id_array = explode(",", $equip_id_list);
@@ -262,6 +254,22 @@
                 }
             }
             $i++;
+        }
+    }
+    
+    function get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection) {
+        $sql = "SELECT location_id FROM locations WHERE planet = '{$dial1}' AND century = '{$dial2}' AND d1 = '{$dial3}' AND d2 = '{$dial4}'";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            while ($row=$result->fetch_assoc()) {
+                $value = $row["location_id"];
+                return $value;
+            }
         }
     }
 

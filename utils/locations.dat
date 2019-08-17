@@ -15,4 +15,5 @@ CREATE TABLE `locations` (
   PRIMARY KEY (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
-INSERT INTO `locations` VALUES (1,1,1,1,1,'A Scrap Merchant',0,NULL,'',0,'I.M.Foreman, Scrap Merchant','No Clue');
+INSERT INTO `locations` VALUES (1,1,1,1,1,'Totter\'s Lane, 1963',0,NULL,'',0,'I.M.Foreman, Scrap Merchant','No Clue');
+INSERT INTO `locations` VALUES (2,1,1,1,2,'Placeholder',0,NULL,'',0,'PlaceHolder','No Clue');

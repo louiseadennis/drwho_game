@@ -1,5 +1,6 @@
 <?php
-// Shamelessly stolen from PHP and MySQL by Hugh E. Williams and David Lane
+    require_once('/Users/louisedennis/Sites/drwho_game/localfiles/config.inc.php');
+    // Shamelessly stolen from PHP and MySQL by Hugh E. Williams and David Lane
 
 function authenticateUser($db, $username, $password)
 {
