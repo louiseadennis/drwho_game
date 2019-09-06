@@ -6,30 +6,17 @@
     // Set up/check session and get database password etc.
     require_once('../config/MySQL.php');
     session_start();
-    sessionAuthenticate();
+    sessionAuthenticate(default_url());
 
     $db = connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
     check_location(2, $db);
     
-    // Add the first Doctor and Susan at start.
-    $char_id_list = get_value_from_users("char_id_list", $db);
-    if ($char_id_list == 0 || $char_id_list == '') {
-        update_users("char_id_list", "1,15", $db);
-    }
-    
-    $tardis_team_list = get_value_from_users("tardis_team", $db);
-    if ($tardis_team_list == 0 || $tardis_team_list == '') {
-        update_users("tardis_team", "1,15", $db);
-    }
-    
-    $barbara_collected = check_for_character('barbara', $db);
-// $phase = get_user_phase($db);
- //   $d100_roll = rand(1, 100);
-
+    // This is Revenge of the Cybermen - Story 1.
+    start_story(1, $db);
 ?>
 <html>
 <head>
-<title>Dr Who Game - Placeholder</title>
+<title>Dr Who Game - Nerva Beacon, 2873</title>
 
 <link rel="stylesheet" href="../styles/default.css?v=12" type="text/css">
 
@@ -45,7 +32,8 @@
 ?>
 
 <div class=location>
-<h2>Placeholder</h2>
+<h2>Nerva Beacon, 2873</h2>
+<img src=../assets/locations/location2.png alt="Still of the Transmat Room in the Nerva Beacon.">
 
 <?php
     print_tardis_team($db);

@@ -6,7 +6,7 @@
     // Set up/check session and get database password etc.
     require_once('../config/MySQL.php');
     session_start();
-    sessionAuthenticate();
+    sessionAuthenticate(default_url());
 
     $db = connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
     check_location(1, $db);

@@ -50,6 +50,8 @@
         }
         $location_id = $dice;
         
+        
+        
         return $location_id;
     }
 ?>

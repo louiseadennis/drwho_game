@@ -45,6 +45,38 @@
         }
     }
     
+    function tardis_crew_member($char_id, $connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $crew_array = explode(",", $tardis_crew);
+        return (in_array($char_id, $crew_array));
+    }
+    
+    function tardis_crew_size($connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $crew_array = explode(",", $tardis_crew);
+        return count($crew_array);
+    }
+    
+    function join_crew($char_id, $connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $crew_array = explode(",", $tardis_crew);
+        if (!in_array($char_id, $crew_array)) {
+            $new_char_id_list = $tardis_crew . "," . $char_id;
+            update_users("tardis_team", $new_char_id_list, $connection);
+        }
+    }
+    
+    function leave_crew($char_id, $connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $crew_array = explode(",", $tardis_crew);
+        if (in_array($char_id, $crew_array)) {
+            $new_array = array_diff($crew_array, array($char_id));
+            $new_char_id_list = join(",", $new_array);
+            update_users("tardis_team", $new_char_id_list, $connection);
+        }
+    }
+
+    
     function print_character_image($char_name, $connection) {
         $uchar = ucfirst($char_name);
         $no_space_char_name = str_replace(" ", "_", $char_name);

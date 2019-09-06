@@ -6,7 +6,7 @@ require_once('./config/accesscontrol.php');
 require_once('./config/MySQL.php');
 require_once('utilities.php');
 session_start();
-sessionAuthenticate();
+sessionAuthenticate(default_url());
 
 $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
 if ($db -> connect_errno > 0) {
@@ -51,6 +51,7 @@ if ($travel_type == "tardis") {
    $dial3 = mysqlclean($_POST, "dial3", 10, $db);
    $dial4 = mysqlclean($_POST, "dial4", 10, $db);
    $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
+    update_users("tardis_location", $location_id, $db);
 }
     
 // $hp = get_value_from_users("hp", $db);

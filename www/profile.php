@@ -6,12 +6,22 @@ require_once('./config/accesscontrol.php');
 require_once('./config/MySQL.php');
 require_once('utilities.php');
 session_start();
-sessionAuthenticate();
+sessionAuthenticate(default_url());
 
 $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
 
 $uname = $_SESSION["loginUsername"];
 $location = get_location($db);
+    
+    $tardis_crew_change = $_POST['char_id'];
+    
+    if ($tardis_crew_change != "") {
+        if (tardis_crew_member($tardis_crew_change, $db)) {
+            leave_crew($tardis_crew_change, $db);
+        } else {
+            join_crew($tardis_crew_change, $db);
+        }
+    }
 ?>
 <html>
 <head>
@@ -58,7 +68,25 @@ if ($char_id_list != '') {
       	 print "<tr>";
       }
       $no_space_char_name = str_replace(" ", "_", $char_name);
-      print "<td align=center><img src=assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+       print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+       $max_size = max_tardis_crew();
+       if (tardis_crew_size($db) < $max_size) {
+           if (!tardis_crew_member($char_id, $db)) {
+               print "<form form method=\"POST\" action=\"profile.php\">";
+               print "<input type=\"hidden\" name=\"char_id\" value=\"";
+               print $char_id;
+               print "\"><input type=\"submit\" value=\"Add to Tardis Crew\"></form>";
+           }
+       }
+       
+       
+       if (tardis_crew_member($char_id, $db)) {
+           print "<form form method=\"POST\" action=\"profile.php\">";
+           print "<input type=\"hidden\" name=\"char_id\" value=\"";
+           print $char_id;
+           print "\"><input type=\"submit\" value=\"Remove from Tardis Crew\"></form>";
+       }
+      print "</p></td>";
       if ($i == 5) {
       	 print "</tr>";
 	 $i = 0;

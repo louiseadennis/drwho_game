@@ -1,5 +1,5 @@
 <?php
-    require_once('/Users/louisedennis/Sites/drwho_game/localfiles/config.inc.php');
+    // require_once('../defaults.php');
     // Shamelessly stolen from PHP and MySQL by Hugh E. Williams and David Lane
 
 function authenticateUser($db, $username, $password)
@@ -36,8 +36,9 @@ function authenticateUser($db, $username, $password)
 // Connects to a session and checks that the user has authenticated 
 // and that the remote IP address matches the address used to create
 // the session
-function sessionAuthenticate() 
+function sessionAuthenticate($game_url) 
 {
+   // $game_url = default_url();
  // Check if the user hasn't logged in
  if (!isset($_SESSION["loginUsername"]))
  {
@@ -55,7 +56,7 @@ function sessionAuthenticate()
   // that was used to create the session.
   // THIS IS PROBABLY A SESSION HIJACK ATTEMPT
   $message = "You are not authorized to acces the URL";
-  header("Location: ".$game_url."/login_form.php?msg=$message");
+  header("Location: ".$game_url."/login_form2.php?msg=$message");
   exit;
   }
 }

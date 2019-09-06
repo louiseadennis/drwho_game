@@ -9,4 +9,9 @@
     {
         return 30;
     }
+    
+    function max_tardis_crew()
+    {
+        return 4;
+    }
 ?>

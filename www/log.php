@@ -6,7 +6,7 @@ require_once('./config/accesscontrol.php');
 require_once('./config/MySQL.php');
 require_once('utilities.php');
 session_start();
-sessionAuthenticate();
+sessionAuthenticate(default_url());
 
 $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
 
