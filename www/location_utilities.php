@@ -16,10 +16,10 @@
         print_item_used($mysql);
         // critter_attack($mysql);
         print "</div>";
-        print "<div class=tardis>";
-        print_tardis($mysql);
+        // print "<div class=tardis>";
+        // print_tardis($mysql);
         // print_wait($mysql);
-        print "</div>";
+        // print "</div>";
         print "</div>";
         
     }
@@ -56,7 +56,7 @@
                         $pronoun = "They";
                     }
                 
-                    print "<p>$ucchar has joined you on your travels.  $pronoun is stored in your user profile.</p>";
+                    print "<p>$ucchar has joined you on your travels.  $pronoun is stored in your user profile where you can add them to the Tardis crew if you wish.</p>";
                 }
             }
         }
@@ -85,6 +85,7 @@
         $location_id = get_location($connection);
         $tardis_location = get_tardis_location($connection);
         if ($location_id == $tardis_location) {
+            print "<div class=tardis>";
             $charge = get_value_from_users("charge", $connection);
             
             print "<h4>The Tardis</h4>";
@@ -129,11 +130,12 @@
             print "</tr></table></center>";
             
             if ($charge > 0) {
-                print "<input type=\"submit\" value=\"Fly Tardis\">";
+                print "<input type=\"submit\" value=\"Fly Tardis\" style=\"font-size:1em\">";
             } else {
                 print "<p>The Tardis is low on power.  It recharges at 1 unit per 30 minutes.  You will need to wait.</p>";
             }
             print "</form>";
+            print "</div>";
         }
     }
     
@@ -271,6 +273,19 @@
                 return $value;
             }
         }
+    }
+    
+    function print_transmat($location_id, $db) {
+        print "<div class=transmat>";
+        print "<h4>Transmat</h4>";
+        print "<p><form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
+        print "<input type=\"hidden\" name=\"travel_type\" value=\"transmat\">";
+        print "<input type=\"hidden\" name=\"location\" value=\"$location_id\">";
+        $text = get_value_for_location_id("text", $location_id, $db);
+        print "<input type=\"submit\" value=\"Transmat to $text\" style=\"font-size:1em\">";
+        print "</form>";
+        print "</div>";
     }
 
 

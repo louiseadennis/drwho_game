@@ -8,8 +8,9 @@
     session_start();
     sessionAuthenticate(default_url());
 
-    $db = connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
-    check_location(2, $db);
+    $db = connect_to_db( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
+    check_location(3, $db);
+    // check_location(3, $db);
     
     // This is Revenge of the Cybermen - Story 1.
     start_story(1, $db);
@@ -34,14 +35,13 @@
 <div class=travel_sidebar>
 <?php
     print_tardis($db);
-    print_transmat(3, $db);
-?>
+    print_transmat(2, $db);
+    ?>
 </div>
 
 <div class=location>
-
-<h2>Nerva Beacon, 2873</h2>
-<img src=../assets/locations/location2.png alt="Still of the Transmat Room in the Nerva Beacon.">
+<h2>Voga, 2873</h2>
+<img src=../assets/locations/location3.png alt="Still of the Transmat Point on Voga - filmed at Wookey Hole.">
 
 <?php
     print_tardis_team($db);

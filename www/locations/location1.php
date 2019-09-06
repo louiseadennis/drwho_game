@@ -44,6 +44,13 @@
    print_standard_start($db);
 ?>
 
+<div class=travel_sidebar>
+<?php
+    print_tardis($db);
+    ?>
+</div>
+
+
 <div class=location>
 <h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
 <img src=../assets/locations/location1.png alt="Still of the Totter's Lane Junkyard Entrance in 1963.">
