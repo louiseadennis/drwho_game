@@ -4,7 +4,7 @@ CREATE TABLE `characters` (
   `name` text,
   `gender` int(11) NOT NULL DEFAULT 1,
   `combat` tinyint(4) NOT NULL,
-  `knowledge` tinyint(4) NOT NULL,
+  `tech` tinyint(4) NOT NULL,
   `observation` tinyint(4) NOT NULL,
   `empathy` tinyint(4) NOT NULL,
   `willpower` tinyint(4) NOT NULL,

@@ -61,8 +61,18 @@
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
         if (!in_array($char_id, $crew_array)) {
-            $new_char_id_list = $tardis_crew . "," . $char_id;
-            update_users("tardis_team", $new_char_id_list, $connection);
+            $is_doctor = get_value_for_char_id("doctor", $char_id, $connection);
+            if ($is_doctor) {
+                $current = current_doctor($connection);
+                if ($char_id != $current) {
+                     $new_char_id_list = $tardis_crew . "," . $char_id;
+                    update_users("tardis_team", $new_char_id_list, $connection);
+                    leave_crew($current, $connection);
+                }
+            } else {
+                $new_char_id_list = $tardis_crew . "," . $char_id;
+                update_users("tardis_team", $new_char_id_list, $connection);
+            }
         }
     }
     
@@ -85,11 +95,36 @@
     }
     
     function print_character_and_name($connection, $char_id) {
-        $char_name = get_value_for_char_id("name", $char_id, $db);
+        $char_name = get_value_for_char_id("name", $char_id, $connection);
         $uchar = ucfirst($char_name);
         $no_space_char_name = str_replace(" ", "_", $char_name);
         print_character_image($char_name, $connection);
         print "<p>$uchar";
+    }
+    
+    function get_doctors($db) {
+        $char_id_list = get_value_from_users("char_id_list", $db);
+        $char_id_array = explode(",", $char_id_list);
+        $doctor_array = [];
+        foreach ($char_id_array as $char_id) {
+            $is_doctor = get_value_for_char_id("doctor", $char_id, $db);
+            if ($is_doctor) {
+                array_push($doctor_array, $char_id);
+            }
+        }
+        return $doctor_array;
+    }
+    
+    function current_doctor($db) {
+        $char_id_list = get_value_from_users("tardis_team", $db);
+        $char_id_array = explode(",", $char_id_list);
+        foreach ($char_id_array as $char_id) {
+            $is_doctor = get_value_for_char_id("doctor", $char_id, $db);
+            if ($is_doctor) {
+                return $char_id;
+            }
+        }
+
     }
 
 ?>
