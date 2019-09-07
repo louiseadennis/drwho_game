@@ -18,7 +18,7 @@ $last_action = mysqlclean($_POST, "last_action", 10, $db);
 
 
 $travel_type = mysqlclean($_POST, "travel_type", 10, $db);
-$location_id = mysqlclean($_POST, "location", 10, $db);
+// $location_id = mysqlclean($_POST, "location", 10, $db);
 $start_story = mysqlclean($_POST, "start_story", 10, $db);
     
     if ($start_story != "") {
@@ -43,25 +43,50 @@ if ($last_action == "item" || $last_action == "wait" ) {
 
 if ($last_action == "travel") {
    // resolve_events($db);
+    $travellers = [];
+    
+    $traveller1 = mysqlclean($_POST, "person1", 10, $db);
+    if ($traveller1 != "") {
+        array_push($travellers, $traveller1);
+    }
+    $traveller2 = mysqlclean($_POST, "person2", 10, $db);
+    if ($traveller2 != "") {
+        array_push($travellers, $traveller2);
+    }
+    $traveller3 = mysqlclean($_POST, "person3", 10, $db);
+    if ($traveller3 != "") {
+        array_push($travellers, $traveller3);
+    }
+    $traveller4 = mysqlclean($_POST, "person4", 10, $db);
+    if ($traveller4 != "") {
+        array_push($travellers, $traveller4);
+    }
 
-    if ($travel_type == "vehicle") {
-    }
-    if ($travel_type == "transmat") {
-        $location_id = mysqlclean($_POST, "location", 10, $db);
+    if (!empty($travellers) || $travel_type = "pov_switch") {
+       
+        if ($travel_type == "transmat" || $travel_type == "pov_switch") {
+            $location_id = mysqlclean($_POST, "location", 10, $db);
         
-    }
+        }
     
-    if ($travel_type == "tardis") {
-        $dial1 = mysqlclean($_POST, "dial1", 10, $db);
-        $dial2 = mysqlclean($_POST, "dial2", 10, $db);
-        $dial3 = mysqlclean($_POST, "dial3", 10, $db);
-        $dial4 = mysqlclean($_POST, "dial4", 10, $db);
-        $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
-        update_users("tardis_location", $location_id, $db);
-    }
+        if ($travel_type == "tardis") {
+            $dial1 = mysqlclean($_POST, "dial1", 10, $db);
+            $dial2 = mysqlclean($_POST, "dial2", 10, $db);
+            $dial3 = mysqlclean($_POST, "dial3", 10, $db);
+            $dial4 = mysqlclean($_POST, "dial4", 10, $db);
+            $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
+            update_users("tardis_location", $location_id, $db);
+        }
     
-    update_users("travel_type", $travel_type, $db);
-    update_users("action_done", 0, $db);
+        update_users("travel_type", $travel_type, $db);
+        update_users("action_done", 0, $db);
+        
+        foreach($travellers as $char_id) {
+            update_character($char_id, "location_id", $location_id, $db);
+        }
+    } else {
+        $location_id = get_location($db);
+    }
 }
 
 update_users("last_action", $last_action, $db);

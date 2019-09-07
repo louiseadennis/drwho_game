@@ -126,5 +126,44 @@
         }
 
     }
+    
+    function character_location($char_id, $db) {
+        $location_id = get_value_for_char_in_play_id("location_id", $char_id, $db);
+        return $location_id;
+        //print $location_id;
+        //print "HELLO";
+        // return 2;
+    }
+    
+    function characters_at_location($location_id, $connection) {
+        $tardis_team = get_value_from_users("tardis_team", $connection);
+        $location_team = [];
+        $char_id_array = explode(",", $tardis_team);
+        foreach ($char_id_array as $char_id) {
+            $char_location = character_location($char_id, $connection);
+            if ($char_location == $location_id) {
+                array_push($location_team, $char_id);
+            }
+        }
+        return $location_team;
+    }
+    
+    function get_value_for_char_in_play_id($column, $char_id, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "SELECT {$column} FROM characters_in_play WHERE char_id = '{$char_id}' AND user_id = $user_id";
+        // print $sql;
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            while ($row=$result->fetch_assoc()) {
+                $value = $row["$column"];
+                return $value;
+            }
+        }
+    }
 
 ?>

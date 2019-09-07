@@ -130,6 +130,21 @@
             print "</tr></table></center>";
             
             if ($charge > 0) {
+                //$tardis_team = get_value_from_users("tardis_team", $connection);
+                $char_id_array = characters_at_location($location_id, $connection);
+                $to_transmat = 1;
+                foreach ($char_id_array as $char_id) {
+                    $char_name = get_value_for_char_id("name", $char_id, $connection);
+                    $uchar = ucfirst($char_name);
+                    print "<input type=checkbox name=\"person$to_transmat\" value=$char_id>$uchar<br>";
+                    $to_transmat++;
+                }
+                for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
+                    print "<input type=\"hidden\" name=\"person$to_transmat\" value=\"\">";
+                }
+                
+                $text = get_value_for_location_id("text", $location_id, $connection);
+                
                 print "<input type=\"submit\" value=\"Fly Tardis\" style=\"font-size:1em\">";
             } else {
                 print "<p>The Tardis is low on power.  It recharges at 1 unit per 30 minutes.  You will need to wait.</p>";
@@ -189,6 +204,7 @@
     }
     
     function print_tardis_team($db) {
+        $location_id = get_location($db);
         $tardis_team = get_value_from_users("tardis_team", $db);
         if ($tardis_team != '') {
             print "<h2>Tardis Crew</h2>";
@@ -196,10 +212,25 @@
             $char_id_array = explode(",", $tardis_team);
             print "<tr>";
             foreach ($char_id_array as $char_id) {
+                $char_location = character_location($char_id, $db);
                 $char_name = get_value_for_char_id("name", $char_id, $db);
                 $uchar = ucfirst($char_name);
-                $no_space_char_name = str_replace(" ", "_", $char_name);
-                print "<td align=center><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+                if ($char_location == $location_id) {
+                    $no_space_char_name = str_replace(" ", "_", $char_name);
+                    print "<td align=center><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+                } else {
+                    $location_name = get_value_for_location_id("name", $char_location, $db);
+                    print "<td align=center><form form method=\"POST\" action=\"../main.php\">";
+                    print "<input type=\"hidden\" name=\"location\" value=\"";
+                    print $char_location;
+                   print "\">";
+                    print $uchar;
+                    print "<br> is on <br>";
+                    print $location_name;
+                    print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
+                    print "<input type=\"hidden\" name=\"travel_type\" value=\"pov_switch\">";
+                    print "<br><input type=\"submit\" value=\"Switch to $location_name\" style=\"font-size:2em\"></form></td>";
+                }
             }
             print "</tr>";
             print "</table>";
@@ -276,14 +307,28 @@
     }
     
     function print_transmat($location_id, $db) {
+        $start = get_location($db);
         print "<div class=transmat>";
         print "<h4>Transmat</h4>";
         print "<p><form method=\"POST\" action=\"../main.php\">";
         print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
         print "<input type=\"hidden\" name=\"travel_type\" value=\"transmat\">";
         print "<input type=\"hidden\" name=\"location\" value=\"$location_id\">";
+        
+        $tardis_team = characters_at_location($start, $db);
+        $to_transmat = 1;
+        foreach ($tardis_team as $char_id) {
+            $char_name = get_value_for_char_id("name", $char_id, $db);
+            $uchar = ucfirst($char_name);
+            print "<input type=checkbox name=\"person$to_transmat\" value=$char_id>$uchar<br>";
+            $to_transmat++;
+        }
+        for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
+            print "<input type=\"hidden\" name=\"person$to_transmat\" value=\"\">";
+        }
+        
         $text = get_value_for_location_id("text", $location_id, $db);
-        print "<input type=\"submit\" value=\"Transmat to $text\" style=\"font-size:1em\">";
+        print "<br><input type=\"submit\" value=\"Transmat to $text\" style=\"font-size:1em\">";
         print "</form>";
         print "</div>";
     }

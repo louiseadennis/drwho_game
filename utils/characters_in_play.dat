@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS `characters_in_play`;
+CREATE TABLE `characters_in_play` (
+  `char_in_play_id` int(11) NOT NULL AUTO_INCREMENT,
+  `char_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  PRIMARY KEY (`char_in_play_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+

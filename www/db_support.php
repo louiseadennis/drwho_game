@@ -8,6 +8,16 @@
         return 1;
     }
     
+    function update_character($char_id, $column, $value, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "UPDATE characters_in_play SET {$column}='{$value}' WHERE user_id='$user_id' AND char_id='$char_id'";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
+        return 1;
+
+    }
+    
     function get_value_for_name_from($column, $table, $name, $connection) {
         $sql = "SELECT {$column} FROM {$table} WHERE name = '{$name}'";
         
