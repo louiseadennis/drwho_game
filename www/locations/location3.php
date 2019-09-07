@@ -12,8 +12,6 @@
     check_location(3, $db);
     // check_location(3, $db);
     
-    // This is Revenge of the Cybermen - Story 1.
-    start_story(1, $db);
 ?>
 <html>
 <head>
@@ -30,6 +28,8 @@
 <div class=main>
 <?php
    print_standard_start($db);
+    // This is Revenge of the Cybermen - Story 1.
+    start_story(1, $db);
 ?>
 
 <div class=travel_sidebar>

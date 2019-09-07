@@ -11,8 +11,6 @@
     $db = connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
     check_location(2, $db);
     
-    // This is Revenge of the Cybermen - Story 1.
-    start_story(1, $db);
 ?>
 <html>
 <head>
@@ -29,6 +27,8 @@
 <div class=main>
 <?php
    print_standard_start($db);
+    // This is Revenge of the Cybermen - Story 1.
+    start_story(1, $db);
 ?>
 
 <div class=travel_sidebar>

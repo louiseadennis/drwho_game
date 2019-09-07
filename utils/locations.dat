@@ -6,14 +6,10 @@ CREATE TABLE `locations` (
   `d1` tinyint(4) DEFAULT NULL,
   `d2` tinyint(4) DEFAULT NULL,
   `text` text,
-  `fight` tinyint(4) DEFAULT '0',
-  `critter` text,
-  `action_required` char(60) DEFAULT NULL,
-  `fight_chance` smallint(6) DEFAULT '0',
   `name` char(60) DEFAULT '',
   PRIMARY KEY (`location_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
-INSERT INTO `locations` VALUES (3,5,8,9,4,'Voga, 2873',0,NULL,'',0,'Voga, 2873');
-INSERT INTO `locations` VALUES (2,9,2,6,0,'Nerva Beacon, 2873',0,NULL,'',0,'Nerva Beacon, 2873');
-INSERT INTO `locations` VALUES (1,9,8,2,2,'Totter\'s Lane, 1963',0,NULL,'',0,'I.M.Foreman, Scrap Merchant');
+INSERT INTO `locations` VALUES (3,5,8,9,4,'Voga, 2873','Voga, 2873');
+INSERT INTO `locations` VALUES (2,9,2,6,0,'Nerva Beacon, 2873','Nerva Beacon, 2873');
+INSERT INTO `locations` VALUES (1,9,8,2,2,'Totter\'s Lane, 1963','I.M.Foreman, Scrap Merchant');

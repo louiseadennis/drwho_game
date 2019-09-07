@@ -19,6 +19,11 @@ $last_action = mysqlclean($_POST, "last_action", 10, $db);
 
 $travel_type = mysqlclean($_POST, "travel_type", 10, $db);
 $location_id = mysqlclean($_POST, "location", 10, $db);
+$start_story = mysqlclean($_POST, "start_story", 10, $db);
+    
+    if ($start_story != "") {
+        update_users("story", $start_story, $db);
+    }
 
 if ($last_action == "item" || $last_action == "wait" ) {
     $current_location = get_location($db);
