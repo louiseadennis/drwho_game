@@ -59,6 +59,9 @@ echo $location
 $char_id_list = get_value_from_users("char_id_list", $db);
 if ($char_id_list != '') {
    print "<h2>Characters</h2>";
+    print "<p>The Tardis crew can be changed in between Adventures.</p>";
+    $story = get_value_from_users("story", $db);
+    $between_adventures = ($story == "");
     print "<h3>Doctors</h3>";
     $doctor_array = get_doctors($db);
     $i = 0;
@@ -73,12 +76,14 @@ if ($char_id_list != '') {
         $no_space_char_name = str_replace(" ", "_", $char_name);
         print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
         
-        if (tardis_crew_member($doctor, $db)) {
-            print "<input type=\"radio\" name=\"char_id\" value=\"$doctor\" checked>";
-            print "Current Doctor";
-        } else {
-            print "<input type=\"radio\" name=\"char_id\" value=\"$doctor\">";
-            // print "Current Doctor";
+        if ($between_adventures) {
+            if (tardis_crew_member($doctor, $db)) {
+                print "<input type=\"radio\" name=\"char_id\" value=\"$doctor\" checked>";
+                print "Current Doctor";
+            } else {
+                print "<input type=\"radio\" name=\"char_id\" value=\"$doctor\">";
+                // print "Current Doctor";
+            }
         }
         
         print "</p></td>";
@@ -89,7 +94,11 @@ if ($char_id_list != '') {
             $i = $i + 1;
         }
     }
-    print "</table><input type=\"submit\" value=\"Change Current Doctor\" style=\"font-size:2em\"></form>";
+    print "</table>";
+    if ($between_adventures) {
+        print "<input type=\"submit\" value=\"Change Current Doctor\" style=\"font-size:2em\">";
+    }
+    print "</form>";
     print "<h3>Companions</h3>";
    print "<table>";
    $char_id_array = explode(",", $char_id_list);
@@ -104,22 +113,24 @@ if ($char_id_list != '') {
           }
           $no_space_char_name = str_replace(" ", "_", $char_name);
            print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
-           $max_size = max_tardis_crew();
-           if (tardis_crew_size($db) < $max_size) {
-               if (!tardis_crew_member($char_id, $db)) {
+           if ($between_adventures) {
+               $max_size = max_tardis_crew();
+               if (tardis_crew_size($db) < $max_size) {
+                   if (!tardis_crew_member($char_id, $db)) {
+                       print "<form form method=\"POST\" action=\"profile.php\">";
+                       print "<input type=\"hidden\" name=\"char_id\" value=\"";
+                       print $char_id;
+                       print "\"><input type=\"submit\" value=\"Add to Tardis Crew\" style=\"font-size:2em\"></form>";
+                   }
+               }
+               
+               
+               if (tardis_crew_member($char_id, $db)) {
                    print "<form form method=\"POST\" action=\"profile.php\">";
                    print "<input type=\"hidden\" name=\"char_id\" value=\"";
                    print $char_id;
-                   print "\"><input type=\"submit\" value=\"Add to Tardis Crew\" style=\"font-size:2em\"></form>";
+                   print "\"><input type=\"submit\" value=\"Remove from Tardis Crew\" style=\"font-size:2em\"></form>";
                }
-           }
-           
-           
-           if (tardis_crew_member($char_id, $db)) {
-               print "<form form method=\"POST\" action=\"profile.php\">";
-               print "<input type=\"hidden\" name=\"char_id\" value=\"";
-               print $char_id;
-               print "\"><input type=\"submit\" value=\"Remove from Tardis Crew\" style=\"font-size:2em\"></form>";
            }
           print "</p></td>";
           if ($i == 5) {

@@ -136,7 +136,7 @@
                 foreach ($char_id_array as $char_id) {
                     $char_name = get_value_for_char_id("name", $char_id, $connection);
                     $uchar = ucfirst($char_name);
-                    print "<input type=checkbox name=\"person$to_transmat\" value=$char_id>$uchar<br>";
+                    print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan></label><br>";
                     $to_transmat++;
                 }
                 for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
@@ -145,7 +145,7 @@
                 
                 $text = get_value_for_location_id("text", $location_id, $connection);
                 
-                print "<input type=\"submit\" value=\"Fly Tardis\" style=\"font-size:1em\">";
+                print "<input type=\"submit\" value=\"Fly Tardis\">";
             } else {
                 print "<p>The Tardis is low on power.  It recharges at 1 unit per 30 minutes.  You will need to wait.</p>";
             }
@@ -229,7 +229,7 @@
                     print $location_name;
                     print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
                     print "<input type=\"hidden\" name=\"travel_type\" value=\"pov_switch\">";
-                    print "<br><input type=\"submit\" value=\"Switch to $location_name\" style=\"font-size:2em\"></form></td>";
+                    print "<br><input type=\"submit\" value=\"Switch to $location_name\"></form></td>";
                 }
             }
             print "</tr>";
@@ -320,7 +320,7 @@
         foreach ($tardis_team as $char_id) {
             $char_name = get_value_for_char_id("name", $char_id, $db);
             $uchar = ucfirst($char_name);
-            print "<input type=checkbox name=\"person$to_transmat\" value=$char_id>$uchar<br>";
+            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan><br></label>";
             $to_transmat++;
         }
         for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
@@ -328,7 +328,7 @@
         }
         
         $text = get_value_for_location_id("text", $location_id, $db);
-        print "<br><input type=\"submit\" value=\"Transmat to $text\" style=\"font-size:1em\">";
+        print "<br><input type=\"submit\" value=\"Transmat to $text\">";
         print "</form>";
         print "</div>";
     }
