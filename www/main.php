@@ -13,7 +13,7 @@ if ($db -> connect_errno > 0) {
    die('Unable to connect to database [' . $mysql_host . $mysql_user .  $mysql_password . $mysql_database . $db->connect_error . ']');
    }
     
-$last_action = mysqlclean($_POST, "last_action", 10, $db);
+$last_action = mysqlclean($_POST, "last_action", 15, $db);
 //    print $last_action;
 
 
