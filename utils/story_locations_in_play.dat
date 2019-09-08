@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS `story_locations_in_play`;
+CREATE TABLE `story_locations_in_play` (
+  `story_location_in_play_id` int(11) NOT NULL AUTO_INCREMENT,
+  `story_location_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `story_path` text,
+  PRIMARY KEY (`story_location_in_play_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

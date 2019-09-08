@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS `story_transitions`;
+CREATE TABLE `story_transitions` (
+  `transition_id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) NOT NULL,
+  `modifiers` text,
+  `probability` tinyint NOT NULL,
+  `outcome` int(11),
+  `outcome_text` text,
+  `random_character_input` tinyint NOT NULL DEFAULT 0,
+  PRIMARY KEY (`transition_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

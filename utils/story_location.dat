@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS `story_locations`;
+CREATE TABLE `story_locations` (
+  `story_location_id` int(11) NOT NULL AUTO_INCREMENT,
+  `story_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `events` text,
+  PRIMARY KEY (`story_location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
