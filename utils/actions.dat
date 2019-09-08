@@ -11,8 +11,9 @@ CREATE TABLE `actions` (
 LOCK TABLES `actions` WRITE;
 INSERT INTO `actions` VALUES
 (1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
-(2, 'tech', 'The Doctor builds a machine out of string, a cork and a spoon he finds in his pockets.  It doesn\'t work.', 'There is no need for improvisation at the moment.',0),
+(2, 'tech', 'The Doctor builds a machine out of string, a cork and a spoon he finds in his pockets.  It doesn\'t work.', 'There is no need for science or technology at the moment.',0),
 (3, 'running', 'There is nothing here to run away from.', 'There is nothing here to run away from.',0),
 (4, 'combat', 'There is nothing here to fight.', 'There is nothing here to fight.',0),
-(5, 'willpower', 'The Doctor reaches out with his mind but senses nothing.', 'closes their eyes and thinks hard but nothing happens',1);
+(5, 'willpower', 'The Doctor reaches out with his mind but senses nothing.', 'closes their eyes and thinks hard but nothing happens',1),
+(6, 'observation', 'There is nothing of note in your surroundings.', 'There is nothing of note in your surroundings.',0);
 UNLOCK TABLES;

@@ -222,10 +222,13 @@
         print "<input type=\"submit\" value=\"Talk to People\"></form>";
         print "<form method=\"POST\" action=\"../main.php\">";
         print "<input type=\"hidden\" name=\"last_action\" value=\"tech\">";
-        print "<input type=\"submit\" value=\"Improvise\"></form>";
+        print "<input type=\"submit\" value=\"Use Science/Technology\"></form>";
         print "<form method=\"POST\" action=\"../main.php\">";
         print "<input type=\"hidden\" name=\"last_action\" value=\"running\">";
         print "<input type=\"submit\" value=\"Run Away\"></form>";
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"observation\">";
+        print "<input type=\"submit\" value=\"Observe your surroundings\"></form>";
         print "<form method=\"POST\" action=\"../main.php\">";
         print "<input type=\"hidden\" name=\"last_action\" value=\"combat\">";
         print "<input type=\"submit\" value=\"Fight\"></form>";
