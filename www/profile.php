@@ -35,31 +35,35 @@ $location = get_location($db);
 <link rel="stylesheet" href="./styles/default.css?v=1" type="text/css">
 </head>
 <body>
-<div class=main>
-<dl>
-<dt>Username:</dt>
-<dd>
 <?php
-echo $uname;
-?>
-</dd>
-</dl>
-<p><form method="POST" action="main.php">
+    print_header($db);
+    ?>
+<form method="POST" action="main.php">
 <input type="hidden" name="location_id" value="
 <?php
-echo $location
-?>
+    echo $location
+    ?>
 ">
 <input type="hidden" name="last_action" value="profile_check">
 <input type="submit" value="Back to Game" style="font-size:2em">
 </form>
-</p>
+
+<div class=main style="padding:1em">
+
+<h1>User Profile</h1>
+
+<h2>User Details</h2>
+Username:
+<?php
+echo $uname;
+?>
+
 
 <?php
 $char_id_list = get_value_from_users("char_id_list", $db);
 if ($char_id_list != '') {
    print "<h2>Characters</h2>";
-    print "<p>The Tardis crew can be changed in between Adventures.</p>";
+    print "<p>The Tardis crew can be changed in between adventures.</p>";
     $story = get_value_from_users("story", $db);
     $between_adventures = ($story == 0);
     print "<h3>Doctors</h3>";
