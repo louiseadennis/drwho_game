@@ -254,9 +254,10 @@
                     print "<td align=center><form method=\"POST\" action=\"../main.php\">";
                     print "<input type=\"hidden\" name=\"location\" value=\"";
                     print $char_location;
-                   print "\">";
+                    print "\">";
                     print $uchar;
-                    print "<br> is on <br>";
+                    $preposition = get_value_for_location_id("preposition", $char_location, $db);
+                    print "<br> is $preposition <br>";
                     print $location_name;
                     print "<input type=\"hidden\" name=\"last_action\" value=\"travel\">";
                     print "<input type=\"hidden\" name=\"travel_type\" value=\"pov_switch\">";
