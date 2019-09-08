@@ -45,8 +45,15 @@
 ?>
 
 <div class=travel_sidebar>
+<h2>Travel</h2>
 <?php
     print_tardis($db);
+    ?>
+</div>
+<div class=action_sidebar>
+<h2>Actions</h2>
+<?php
+    print_default_actions($db);
     ?>
 </div>
 

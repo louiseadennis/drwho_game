@@ -39,6 +39,37 @@
     function use_tardis($dial1, $dial2, $dial3, $dial4, $connection) {
         $desired_location_id = get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection);
         $current_location_id = get_location($connection);
+        $story = get_value_from_users("story", $connection);
+        $char_locations = character_locations($connection);
+        if ($story != 0) {
+            $dice = rand(1,2);
+            if ($dice == 1) {
+                $story_locations = get_value_for_story_id("locations", $story, $connection);
+                $locations = explode(',',$story_locations);
+                $location_num = count($locations);
+                $dice = rand(1, $location_num-1);
+                $temp_loc = $locations[$dice];
+                while ($temp_loc == $current_location_id) {
+                    $dice = rand(0, $location_num-1);
+                    $temp_loc = $locations[$dice];
+                }
+                $location_id = $temp_loc;
+                return $location_id;
+            }
+        } else if (count($char_locations) > 1) {
+            $dice = rand(1,2);
+            if ($dice == 1) {
+                $location_num = count($char_locations);
+                $dice = rand(1, $location_num-1);
+                $temp_loc = $char_locations[$dice];
+                while ($temp_loc == $current_location_id) {
+                    $dice = rand(0, $location_num-1);
+                    $temp_loc = $char_locations[$dice];
+                }
+                $location_id = $temp_loc;
+                return $location_id;
+            }
+        }
         $sql = "select * from locations";
         if (!$result = $connection->query($sql)) {
             showerror($connection);

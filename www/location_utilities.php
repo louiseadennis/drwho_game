@@ -13,7 +13,7 @@
         print "<div class=\"dynamic\">";
         print "<div class=\"action\">";
         print_character_joined($mysql);
-        print_item_used($mysql);
+        print_action($mysql);
         // critter_attack($mysql);
         print "</div>";
         // print "<div class=tardis>";
@@ -21,6 +21,13 @@
         // print_wait($mysql);
         // print "</div>";
         print "</div>";
+        $story = get_value_from_users("story", $mysql);
+        if ($story != '0') {
+            $story_name = get_value_for_story_id("title", $story, $mysql);
+            print "<u>$story_name</u>";
+            print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
+            print "<input type=submit value=\"Abandon Adventure\"></form>";
+        }
         
     }
     
@@ -62,21 +69,27 @@
         }
     }
     
-    function print_item_used($connection) {
+    function print_action($connection) {
         $last_action = get_value_from_users("last_action", $connection);
-        $item_used = get_value_from_users("item_used", $connection);
         
-        if ($item_used != 0 & $last_action == "item") {
-            $can_use = item_used($fight, $item_used, $connection);
-            if ($can_use) {
-                if (!$fight || !is_weapon($item_used, $connection)) {
-                    $default_message = get_value_for_equip_id("use_message", $item_used, $connection);
-                    print "<p>$default_message</p>";
-                }
+        if (is_action($last_action, $connection)) {
+            if (doctor_here($connection)) {
+                $message = get_value_for_name_from("default_message_doctor", "actions", $last_action, $connection);
+                    print "<p>$message</p>";
             } else {
-                print "<p>You can no longer use this item</p>";
+                $location_id = get_location($connection);
+                $characters = characters_at_location($location_id, $connection);
+                $needs_name = get_value_for_name_from("needs_name", "actions", $last_action, $connection);
+                $message = get_value_for_name_from("default_message_no_doctor", "actions", $last_action, $connection);
+                if ($needs_name == 0) {
+                    print "<p>$message</p>";
+                } else {
+                    $char_num = count($characters);
+                    $dice = rand(0, $char_num - 1);
+                    $char_name = get_value_for_char_id("name", $characters[$dice], $connection);
+                    print "<p>$char_name $message</p>";
+                }
             }
-            update_users("item_used", 0, $connection);
         }
     }
     
@@ -203,6 +216,24 @@
         print "</select> &nbsp; &nbsp; </td>";
     }
     
+    function print_default_actions($db) {
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"empathy\">";
+        print "<input type=\"submit\" value=\"Talk to People\"></form>";
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"tech\">";
+        print "<input type=\"submit\" value=\"Improvise\"></form>";
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"running\">";
+        print "<input type=\"submit\" value=\"Run Away\"></form>";
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"combat\">";
+        print "<input type=\"submit\" value=\"Fight\"></form>";
+        print "<form method=\"POST\" action=\"../main.php\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"willpower\">";
+        print "<input type=\"submit\" value=\"Use Mental Strength\"></form>";
+    }
+    
     function print_tardis_team($db) {
         $location_id = get_location($db);
         $tardis_team = get_value_from_users("tardis_team", $db);
@@ -220,7 +251,7 @@
                     print "<td align=center><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
                 } else {
                     $location_name = get_value_for_location_id("name", $char_location, $db);
-                    print "<td align=center><form form method=\"POST\" action=\"../main.php\">";
+                    print "<td align=center><form method=\"POST\" action=\"../main.php\">";
                     print "<input type=\"hidden\" name=\"location\" value=\"";
                     print $char_location;
                    print "\">";
@@ -249,46 +280,6 @@
         }
     }
     
-    function item_used($fight, $equip_id, $connection) {
-        $equip_id_list = get_value_from_users("equipment", $connection);
-        $equip_id_array = explode(",", $equip_id_list);
-        $i = 0;
-        foreach ($equip_id_array as $equip) {
-            if ($equip == $equip_id) {
-                if (is_weapon($equip_id, $connection)) {
-                    $weapon_id = get_weapon_id($equip_id, $connection);
-                    if ($fight) {
-                        player_attack($weapon_id, $connection);
-                    }
-                } else {
-                    $equip_name = get_value_for_equip_id("name", $equip_id, $connection);
-                    if ($equip_name == "first aid kit") {
-                        $hp = get_value_from_users("hp", $connection);
-                        if ($hp < default_health()) {
-                            $hp = $hp + 3;
-                            update_users("hp", $hp, $connection);
-                        }
-                    }
-                }
-                
-                $uses_list = get_value_from_users("uses", $connection);
-                $uses_array = explode(",", $uses_list);
-                $use = $uses_array[$i];
-                if ($use > 0 && $use < 500) {
-                    $use2 = $use - 1;
-                    $uses_array[$i] = $use2;
-                    $new_uses_list =  join(",", $uses_array);
-                    update_users("uses", $new_uses_list, $connection);
-                    return 1;
-                } else if ($use > 500) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-            $i++;
-        }
-    }
     
     function get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection) {
         $sql = "SELECT location_id FROM locations WHERE planet = '{$dial1}' AND century = '{$dial2}' AND d1 = '{$dial3}' AND d2 = '{$dial4}'";
@@ -320,7 +311,7 @@
         foreach ($tardis_team as $char_id) {
             $char_name = get_value_for_char_id("name", $char_id, $db);
             $uchar = ucfirst($char_name);
-            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan><br></label>";
+            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan></label><br>";
             $to_transmat++;
         }
         for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {

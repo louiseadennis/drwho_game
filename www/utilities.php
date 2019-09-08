@@ -7,4 +7,5 @@
     require('tardis.php');
     require('combat_utilities.php');
     require('story_utilities.php');
+    require('action_utilities.php');
 ?>

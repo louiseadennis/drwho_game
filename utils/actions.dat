@@ -1,0 +1,18 @@
+DROP TABLE IF EXISTS `actions`;
+CREATE TABLE `actions` (
+  `action_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `default_message_doctor` text,
+  `default_message_no_doctor` text,
+  `needs_name` int(4) DEFAULT 0,
+  PRIMARY KEY (`action_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `actions` WRITE;
+INSERT INTO `actions` VALUES
+(1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
+(2, 'tech', 'The Doctor builds a machine out of string, a cork and a spoon he finds in his pockets.  It doesn\'t work.', 'There is no need for improvisation at the moment.',0),
+(3, 'running', 'There is nothing here to run away from.', 'There is nothing here to run away from.',0),
+(4, 'combat', 'There is nothing here to fight.', 'There is nothing here to fight.',0),
+(5, 'willpower', 'The Doctor reaches out with his mind but senses nothing.', 'closes their eyes and thinks hard but nothing happens',1);
+UNLOCK TABLES;

@@ -61,7 +61,7 @@ if ($char_id_list != '') {
    print "<h2>Characters</h2>";
     print "<p>The Tardis crew can be changed in between Adventures.</p>";
     $story = get_value_from_users("story", $db);
-    $between_adventures = ($story == "");
+    $between_adventures = ($story == 0);
     print "<h3>Doctors</h3>";
     $doctor_array = get_doctors($db);
     $i = 0;

@@ -32,12 +32,18 @@
 ?>
 
 <div class=travel_sidebar>
+<h2>Travel</h2>
 <?php
     print_tardis($db);
     print_transmat(3, $db);
 ?>
 </div>
-
+<div class=action_sidebar>
+<h2>Actions</h2>
+<?php
+    print_default_actions($db);
+    ?>
+</div>
 <div class=location>
 
 <h2>Nerva Beacon, 2873</h2>

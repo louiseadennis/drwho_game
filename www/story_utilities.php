@@ -2,14 +2,11 @@
     
     function start_story($story_id, $db) {
         $story = get_value_from_users("story", $db);
-        if ($story == null) {
+        if ($story == '0') {
             $story_name = get_value_for_story_id("title", $story_id, $db);
             print "<u>$story_name</u>";
             print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"start_story\", value=\"$story_id\">";
-            print "<input type=submit value=\"Start Adventure\" style=\"font-size:2em\"></form>";
-        } else {
-            $story_name = get_value_for_story_id("title", $story_id, $db);
-            print "<u>$story_name</u>";
+            print "<input type=submit value=\"Start Adventure\"></form>";
         }
     }
     
@@ -28,5 +25,7 @@
             }
         }
     }
+    
+    
 
     ?>

@@ -1,6 +1,6 @@
 To install Doctor Who Game:
 
-1.  Set up a MySQL database with a user and a password.
+1.  Set up a MySQL database with a user and a password.  User should have permissions SELECT, INSERT, UPDATE, CREATE, DROP, DELETE on drwho_game
 
 Import the .dat files in utils:
 

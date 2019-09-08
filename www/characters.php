@@ -60,6 +60,8 @@
     function join_crew($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
+        $user_id = get_user_id($connection);
+        $location_id = get_location($connection);
         if (!in_array($char_id, $crew_array)) {
             $is_doctor = get_value_for_char_id("doctor", $char_id, $connection);
             if ($is_doctor) {
@@ -68,10 +70,19 @@
                      $new_char_id_list = $tardis_crew . "," . $char_id;
                     update_users("tardis_team", $new_char_id_list, $connection);
                     leave_crew($current, $connection);
+                    
+                    $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id) VALUES ('$char_id', '$user_id', '$location_id')";
+                    if (!$connection->query($sql)) {
+                        showerror($connection);
+                    }
                 }
             } else {
                 $new_char_id_list = $tardis_crew . "," . $char_id;
                 update_users("tardis_team", $new_char_id_list, $connection);
+                $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id) VALUES ('$char_id', '$user_id', '$location_id')";
+                if (!$connection->query($sql)) {
+                    showerror($connection);
+                }
             }
         }
     }
@@ -83,6 +94,11 @@
             $new_array = array_diff($crew_array, array($char_id));
             $new_char_id_list = join(",", $new_array);
             update_users("tardis_team", $new_char_id_list, $connection);
+            $user_id = get_user_id($connection);
+            $sql = "DELETE FROM characters_in_play where char_id = '$char_id' AND user_id = '$user_id'";
+            if (!$connection->query($sql)) {
+                showerror($connection);
+            }
         }
     }
 
@@ -146,6 +162,31 @@
             }
         }
         return $location_team;
+    }
+    
+    function doctor_here($connection) {
+        $location_id = get_location($connection);
+        $characters = characters_at_location($location_id, $connection);
+        foreach ($characters as $char_id) {
+            $is_doctor = get_value_for_char_id("doctor", $char_id, $connection);
+            if ($is_doctor)
+                return true;
+        }
+        return false;
+    }
+    
+    function character_locations($connection) {
+        $tardis_team = get_value_from_users("tardis_team", $connection);
+        $locations = [];
+        $char_id_array = explode(",", $tardis_team);
+        foreach ($char_id_array as $char_id) {
+            $char_location = character_location($char_id, $connection);
+            if (!in_array($char_location, $locations)) {
+                array_push($locations, $char_location);
+            }
+        }
+        return $locations;
+
     }
     
     function get_value_for_char_in_play_id($column, $char_id, $connection) {
