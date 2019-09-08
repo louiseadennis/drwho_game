@@ -36,17 +36,9 @@ $location = get_location($db);
 </head>
 <body>
 <?php
-    print_header($db);
+    print_header_info_pages($db);
     ?>
-<form method="POST" action="main.php">
-<input type="hidden" name="location_id" value="
-<?php
-    echo $location
-    ?>
-">
-<input type="hidden" name="last_action" value="profile_check">
-<input type="submit" value="Back to Game" style="font-size:2em">
-</form>
+
 
 <div class=main style="padding:1em">
 

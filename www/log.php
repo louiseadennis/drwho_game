@@ -20,17 +20,10 @@ $location = get_location($db);
 <link rel="stylesheet" href="./styles/default.css" type="text/css">
 </head>
 <body>
-<div class="main">
-<p><form method="POST" action="main.php">
-<input type="hidden" name="location_id" value="
 <?php
-echo $location
-?>
-">
-<input type="hidden" name="last_action" value="profile_check">
-<input type="submit" value="Back to Game">
-</form>
-</p>
+    print_header_info_pages($db);
+    ?>
+<div class="main">
 <h2>Log Book</h2>
 <?php
 $log = get_value_from_users("log", $db);

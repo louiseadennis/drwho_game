@@ -9,6 +9,23 @@
         print "</div>";
     }
     
+    function print_header_info_pages($connection) {
+        print "<div class=header>";
+        // collect_new_characters($connection);
+        print "<form method=\"POST\" action=\"main.php\">";
+        $location = get_location($connection);
+        print "<input type=\"hidden\" name=\"location_id\" value=\"$location\">";
+        print "<input type=\"hidden\" name=\"last_action\" value=\"profile_check\">";
+        print "<input type=\"submit\" value=\"Back to Game\">";
+        print "</form>";
+        print "<a href=profile.php>User Profile</a>";
+        print "&nbsp; &nbsp; &nbsp; <a href=log.php>Location Log</a>";
+        print "&nbsp; &nbsp; &nbsp; <a href=logout.php>Log Out</a>";
+        print "<hr>";
+        print "</div>";
+    }
+
+    
     function print_standard_start($mysql) {
         print "<div class=\"dynamic\">";
         print "<div class=\"action\">";
