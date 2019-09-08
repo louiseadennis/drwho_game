@@ -166,7 +166,7 @@
                 foreach ($char_id_array as $char_id) {
                     $char_name = get_value_for_char_id("name", $char_id, $connection);
                     $uchar = ucfirst($char_name);
-                    print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan></label><br>";
+                    print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
                     $to_transmat++;
                 }
                 for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
@@ -332,7 +332,7 @@
         foreach ($tardis_team as $char_id) {
             $char_name = get_value_for_char_id("name", $char_id, $db);
             $uchar = ucfirst($char_name);
-            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id><labelspan>$uchar</labelspan></label><br>";
+            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
             $to_transmat++;
         }
         for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
