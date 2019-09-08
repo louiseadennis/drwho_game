@@ -3,8 +3,8 @@
         print "<div class=header>";
         // collect_new_characters($connection);
         print "<a href=../profile.php>User Profile</a>";
-        print "&nbsp; &nbsp; &nbsp; <a href=../log.php>Location Log</a>";
-        print "&nbsp; &nbsp; &nbsp; <a href=../logout.php>Log Out</a>";
+        print "<a href=../log.php>Location Log</a>";
+        print "<a href=../logout.php>Log Out</a>";
         print "<hr>";
         print "</div>";
     }
@@ -19,8 +19,8 @@
         print "<input type=\"submit\" value=\"Back to Game\">";
         print "</form>";
         print "<a href=profile.php>User Profile</a>";
-        print "&nbsp; &nbsp; &nbsp; <a href=log.php>Location Log</a>";
-        print "&nbsp; &nbsp; &nbsp; <a href=logout.php>Log Out</a>";
+        print "<a href=log.php>Location Log</a>";
+        print "<a href=logout.php>Log Out</a>";
         print "<hr>";
         print "</div>";
     }
@@ -29,22 +29,30 @@
     function print_standard_start($mysql) {
         print "<div class=\"dynamic\">";
         print "<div class=\"action\">";
+        $story = get_value_from_users("story", $mysql);
+        if ($story != '0') {
+            $story_name = get_value_for_story_id("title", $story, $mysql);
+            // print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
+            print "<b style=\"font-size:1.5em\">$story_name</b>";
+            // print "<input type=submit value=\"Abandon Adventure\"></form>";
+        } else {
+            print "<b style=\"font-size:1.5em\">&nbsp;</b>";
+        }
         print_character_joined($mysql);
         print_action($mysql);
         // critter_attack($mysql);
-        print "</div>";
+        if ($story != '0') {
+            $story_name = get_value_for_story_id("title", $story, $mysql);
+            print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
+            // print "<u style=\"font-size:2em;padding-top:2em\"><b>$story_name</b></u> &nbsp;";
+            print "<input type=submit value=\"Abandon $story_name\"></form>";
+        }
+       print "</div>";
         // print "<div class=tardis>";
         // print_tardis($mysql);
         // print_wait($mysql);
         // print "</div>";
         print "</div>";
-        $story = get_value_from_users("story", $mysql);
-        if ($story != '0') {
-            $story_name = get_value_for_story_id("title", $story, $mysql);
-            print "<u>$story_name</u>";
-            print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
-            print "<input type=submit value=\"Abandon Adventure\"></form>";
-        }
         
     }
     
@@ -107,6 +115,8 @@
                     print "<p>$char_name $message</p>";
                 }
             }
+        } else {
+            print "<p>  &nbsp;</p>";
         }
     }
     
@@ -268,7 +278,7 @@
                 $uchar = ucfirst($char_name);
                 if ($char_location == $location_id) {
                     $no_space_char_name = str_replace(" ", "_", $char_name);
-                    print "<td align=center><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+                    print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
                 } else {
                     $location_name = get_value_for_location_id("name", $char_location, $db);
                     print "<td align=center><form method=\"POST\" action=\"../main.php\">";

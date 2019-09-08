@@ -25,35 +25,43 @@
 ?>
 
 <div class=main>
+<div class=top_matter>
 <?php
    print_standard_start($db);
     // This is Revenge of the Cybermen - Story 1.
-    start_story(1, $db);
-?>
-
-<div class=travel_sidebar>
-<h2>Travel</h2>
-<?php
-    print_tardis($db);
-    print_transmat(3, $db);
+   start_story(1, $db);
 ?>
 </div>
-<div class=action_sidebar>
-<h2>Actions</h2>
-<?php
-    print_default_actions($db);
-    ?>
-</div>
+<hr>
+
 <div class=location>
-
+<center>
 <h2>Nerva Beacon, 2873</h2>
-<img src=../assets/locations/location2.png alt="Still of the Transmat Room in the Nerva Beacon.">
+<img src=../assets/locations/location2.png align=center alt="Still of the Transmat Room in the Nerva Beacon.">
+</center>
 
 <?php
     print_tardis_team($db);
 ?>
 
 </div>
+
+<div class=travel_sidebar>
+<h2>Travel</h2>
+
+<?php
+    print_tardis($db);
+    print_transmat(3, $db);
+    ?>
+</div>
+<div class=action_sidebar>
+<h2>Actions</h2>
+
+<?php
+    print_default_actions($db);
+    ?>
+</div>
+
 </div>
 </body>
 </html>

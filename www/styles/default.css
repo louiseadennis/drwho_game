@@ -26,6 +26,7 @@ input[type=text],[type=password] {
 
 input[type=checkbox] {
     vertical-align: middle;
+    font-size: 2em;
 }
 
 select {
@@ -47,6 +48,9 @@ labelspan {
 	font-size: 1em;
 	line-height: 1.3em;
 	color: #333333;
+	padding: 5px;
+	margin: 0 auto;
+	width: 92%
 }
 
 .equipment {
@@ -68,6 +72,13 @@ labelspan {
 	color: #333333;
 }
 
+.travel_sidebar {
+    float: left;
+    padding: 5px;
+    text-align: center;
+    width: 23%;
+}
+
 .tardis {
     background-color: #262DFA;
     font-family: sans-serif;
@@ -76,7 +87,6 @@ labelspan {
     color: #FFFFFF;
     text-align: center;
     padding: 5px;
-    width: 250;
 }
 
 .transmat {
@@ -87,22 +97,14 @@ labelspan {
     color: #333333;
     text-align: center;
     padding: 5px;
-    width: 250;
 }
 
-.travel_sidebar {
-    float: right;
-    text-align: center;
-    padding: 1em;
-}
 
 .action_sidebar {
-    float: right;
-    padding: 1em;
-}
-
-.action_sidebar.h2 {
-    text-align: center;
+    float: left;
+    padding-left: 55px;
+    padding-top: 5px;
+    width:23%
 }
 
 .location {
@@ -112,8 +114,8 @@ labelspan {
 	line-height: 1.3em;
 	color: #333333;
 	float: left;
-	padding: 1em;
-	width: 600px;
+	padding: 5px;
+	width: 46%;
 }
 
 .header {
@@ -122,6 +124,35 @@ labelspan {
 	font-size: 1em;
 	line-height: 1.3em;
 	color: #333333;
+    padding:5px;
+    text-align:center;
+}
+
+.header a:link, .header a:visited {
+    background-color: #262DFA;
+    color: white;
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    display:inline-block;
+    border: 2px solid white;
+}
+
+.header a:hover, .header a:active {
+    background-color: #6699ff;
+}
+
+.top_matter {
+    float:clear;
+    padding:5px;
+    text-align:center;
+    height: 100px;
+}
+
+@media screen and (max-width: 1200px) {
+  .action_sidebar, .travel_sidebar, .location {
+    width: 100%;
+  }
 }
 
 -->

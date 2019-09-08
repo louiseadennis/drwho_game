@@ -40,28 +40,18 @@
 ?>
 
 <div class=main>
+<div class=top_matter>
 <?php
    print_standard_start($db);
+   start_story(0, $db);
 ?>
-
-<div class=travel_sidebar>
-<h2>Travel</h2>
-<?php
-    print_tardis($db);
-    ?>
 </div>
-<div class=action_sidebar>
-<h2>Actions</h2>
-<?php
-    print_default_actions($db);
-    ?>
-</div>
-
+<hr>
 
 <div class=location>
 <center>
 <h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
-<img src=../assets/locations/location1.png alt="Still of the Totter's Lane Junkyard Entrance in 1963.">
+<img src=../assets/locations/location1.png alt="Still of the Totter's Lane Junkyard Entrance in 1963." align=center>
 </center>
 
 <i><p>A foggy winter's night, in a London back street; the little road was empty and silent.  A tall figure loomed up out of the fog -- the helmeted, caped figure of a policeman patrolling his beat.</p>
@@ -83,6 +73,20 @@ Scrap Merchant.</p></i>
 ?>
 
 </div>
+
+<div class=travel_sidebar>
+<h2>Travel</h2>
+<?php
+    print_tardis($db);
+    ?>
+</div>
+<div class=action_sidebar>
+<h2>Actions</h2>
+<?php
+    print_default_actions($db);
+    ?>
+</div>
+
 </div>
 </body>
 </html>
