@@ -1,11 +1,12 @@
 <html>
 <head>
-<title>Log In</title>
+<title>Log in to Doctor Who Game</title>
 <link rel="stylesheet" href="styles/default.css" type="text/css">
 </head>
 <body>
-  <div class=main>
-<h1>Log In</h1>
+<div class=main>
+<center>
+<h1 style="padding-top:10em">Log in to Doctor Who Game</h1>
 <form method="POST" action="logincheck.php">
 <?php
   if (isset($_GET['msg'])) {
@@ -26,7 +27,8 @@
 <p><input type="submit" value="Log In">
 </form>
 
-<p>Or <a href=signup_form.php>Sign Up</a></p>
+<p>or <a href=signup_form.php>Sign Up</a></p>
+</center>
 </div>
 </body>
 </html>
