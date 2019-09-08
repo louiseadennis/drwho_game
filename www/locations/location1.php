@@ -59,8 +59,10 @@
 
 
 <div class=location>
+<center>
 <h2>I. M. Foreman, Scrapyard, Totter's Lane, 1963</h2>
 <img src=../assets/locations/location1.png alt="Still of the Totter's Lane Junkyard Entrance in 1963.">
+</center>
 
 <i><p>A foggy winter's night, in a London back street; the little road was empty and silent.  A tall figure loomed up out of the fog -- the helmeted, caped figure of a policeman patrolling his beat.</p>
 <p> He moved along the little street, trying shop doors, walked on past the shops to where the street ended in a high blank wall.  There were high wooden gates in the wall, with a smaller, entry-gate set into one of them.</p>
