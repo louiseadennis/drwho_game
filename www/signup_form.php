@@ -1,11 +1,12 @@
 <html>
 <head>
-<title>Register</title>
+<title>Register for Doctor Who Game</title>
 <link rel="stylesheet" href="styles/default.css" type="text/css">
 </head>
 <body>
   <div class=main>
-<h1>Register</h1>
+<center>
+<h1 style="padding-top:10em">Register for Doctor Who Game</h1>
 <form method="POST" action="signup.php">
 <?php
   if (isset($_GET['msg'])) {
