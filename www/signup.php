@@ -36,7 +36,7 @@ if ($uname=='' or $email=='' or $pwd == '' or $cpwd == '') {
 	// Update: apparently not.  or at least salt is appended to password, not stored separatedy.
 	$pass = crypt($pwd);
 
-	$sql = "INSERT INTO users (name,email,password,salt) VALUES ('$uname', '$email', '$pass','kjhasfo2AWU')";
+	$sql = "INSERT INTO users (name,email,password,salt,last_action) VALUES ('$uname', '$email', '$pass','kjhasfo2AWU',\"travel\")";
 	if (!$db->query($sql)) {
             $message = "Database Error: " . $db->errno . " : " . $db->error;
 	    header("Location: signup_form.php?msg=$message");
