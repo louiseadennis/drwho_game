@@ -4,3 +4,14 @@ CREATE TABLE `story_events` (
   `text` text,
   PRIMARY KEY (`story_event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `story_events` WRITE;
+INSERT INTO story_events VALUES
+(1, 'A Cybermat Attacks!'),
+(2, 'Cybermat Victim'),
+(3, 'Cybermen Attack'),
+(4, 'Cybermen Attack'),
+(5, 'Rigged with Bombs'),
+(6, 'With the Vogans'),
+(7, 'Cybermen Attack Vogans');
+UNLOCK TABLES;
