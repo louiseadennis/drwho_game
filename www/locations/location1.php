@@ -19,7 +19,9 @@
     
     $tardis_team_list = get_value_from_users("tardis_team", $db);
     if ($tardis_team_list == 0 || $tardis_team_list == '') {
-        update_users("tardis_team", "1,15", $db);
+        // update_users("tardis_team", "1,15", $db);
+        join_crew(1, $db);
+        join_crew(15, $db);
     }
     
     $barbara_collected = check_for_character('barbara', $db);
@@ -37,6 +39,7 @@
 <body>
 <?php
     print_header($db);
+    print "ttlist: $tardis_team_list";
 ?>
 
 <div class=main>
