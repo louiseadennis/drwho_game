@@ -24,13 +24,10 @@ $quit_story = mysqlclean($_POST, "quit_story", 10, $db);
 
 // Handle Story Events
 if ($start_story != "") {
-    update_users("story", $start_story, $db);
+    begin_story($start_story, $db);
 } else if ($quit_story != "") {
-    update_users("story", 0, $db);
+    quit_story($quit_story, $db);
 }
-
-// Handle Actions
-// ??
     
 // Handle Travel
 if ($last_action == "travel") {
