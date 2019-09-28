@@ -30,7 +30,7 @@
         print "<div class=\"dynamic\">";
         print "<div class=\"action\">";
         $story = get_value_from_users("story", $mysql);
-        if ($story != '0') {
+        if ($story != '0' && $story != '') {
             $story_name = get_value_for_story_id("title", $story, $mysql);
             print "<b style=\"font-size:1.5em\">$story_name</b>";
          } else {
@@ -39,7 +39,7 @@
         print_character_joined($mysql);
         print_action($mysql);
         // critter_attack($mysql);
-        if ($story != '0') {
+        if ($story != '0' && $story != '') {
             $story_name = get_value_for_story_id("title", $story, $mysql);
             print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
             // print "<u style=\"font-size:2em;padding-top:2em\"><b>$story_name</b></u> &nbsp;";

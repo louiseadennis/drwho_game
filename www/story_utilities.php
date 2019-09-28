@@ -13,7 +13,7 @@
         } else {
             $story = get_value_from_users("story", $db);
             if ($story == '0') {
-                print "<form></form>";
+                print "Hello";
             }
         }
     }

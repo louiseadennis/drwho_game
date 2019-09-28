@@ -39,7 +39,6 @@
 <body>
 <?php
     print_header($db);
-    print "ttlist: $tardis_team_list";
 ?>
 
 <div class=main>
