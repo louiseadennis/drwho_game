@@ -41,6 +41,15 @@
 </center>
 
 <?php
+    $event = get_current_event($db);
+    if ($event == 1) {
+        ?>
+        <i><p>The Nerva Beacon is an eerie place full of dead bodies from a mysterious plague that has infected the inhabitants.</p>
+        
+        <p>As the crew explore a Cybermat suddenly attacks!</p></i>
+<?php
+    }
+    
     print_tardis_team($db);
 ?>
 

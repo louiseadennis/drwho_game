@@ -146,7 +146,7 @@ labelspan {
     float:clear;
     padding:5px;
     text-align:center;
-    height: 100px;
+    height: 150px;
 }
 
 @media screen and (max-width: 1200px) {

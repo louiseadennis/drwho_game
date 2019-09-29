@@ -38,6 +38,7 @@
         }
         print_character_joined($mysql);
         print_action($mysql);
+        print_event($mysql);
         // critter_attack($mysql);
         if ($story != '0' && $story != '') {
             $story_name = get_value_for_story_id("title", $story, $mysql);
@@ -351,6 +352,16 @@
         print "<br><input type=\"submit\" value=\"Transmat to $text\">";
         print "</form>";
         print "</div>";
+    }
+    
+    function print_event($db) {
+        $event = get_current_event($db);
+        $text = get_event_text($event, $db);
+        if ($text != '') {
+            print $text;
+        } else {
+            print "<br>";
+        }
     }
 
 
