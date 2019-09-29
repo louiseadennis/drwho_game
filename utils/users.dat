@@ -10,6 +10,7 @@ CREATE TABLE `users` (
   `charge` tinyint(4) DEFAULT NULL,
   `recharge_start` datetime DEFAULT NULL,
   `char_id_list` text,
+  `critter_id_list` text,
   `tardis_team` text,
   `monster_id_list` text,
   `equipment_id_list` text,

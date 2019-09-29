@@ -153,15 +153,14 @@ while ($j <= critter_number($db)) {
     if (in_array($j, $critter_id_array)) {
         $icon = get_value_for_critter_id("icon", $j, $db);
     } else {
-        $icon = 'assets/unknown_critter.png';
+        $icon = 'unknown_critter.png';
     }
-    $era = get_value_for_critter_id("era", $j, $db);
-
+ 
     if (!is_null($icon)) {
-        print "<td><img src=$icon title=\"$era\"></td>";
+        print "<td><img src=assets/$icon></td>";
     } else {
         $critter_name = get_value_for_critter_id("name", $j, $db);
-	print "<td>$critter_name<br>Sorry no icon!</td>";
+        print "<td>$critter_name<br>Sorry no icon!</td>";
     }
     if ($i == 7) {
     	 print "</tr>";

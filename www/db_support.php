@@ -120,6 +120,55 @@
         
         return $result->num_rows;
     }
+    
+    function add_critter($critter_id, $connection) {
+          $uname = $_SESSION["loginUsername"];
+
+          $critter_id_list = get_value_from_users("critter_id_list", $connection);
+          $critter_id_array = explode(",", $critter_id_list);
+
+          if (is_null($critter_id_list)) {
+             update_users("critter_id_list", $critter_id, $connection);
+          } else {
+                if (!in_array($critter_id, $critter_id_array)) {
+                     $new_critter_id_list = $critter_id_list . "," . $critter_id;
+             update_users("critter_id_list", $new_critter_id_list, $connection);
+            }
+          }
+    }
+    
+    function met_critter($critter_id, $connection) {
+        $uname = $_SESSION["loginUsername"];
+        
+        $critter_id_list = get_value_from_users("critter_id_list", $connection);
+        $critter_id_array = explode(",", $critter_id_list);
+        
+        if (is_null($critter_id_list)) {
+            return 0;
+        } else {
+            if (!in_array($critter_id, $critter_id_array)) {
+                return 0;
+            }
+            return 1;
+        }
+    }
+
+    function get_value_for_critter_id($column, $critter_id, $connection) {
+      $sql = "SELECT {$column} FROM critters WHERE critter_id = '{$critter_id}'";
+
+      if (!$result = $connection->query($sql))
+          showerror($connection);
+      
+      if ($result->num_rows != 1)
+          return 0;
+      else {
+         while ($row=$result->fetch_assoc()) {
+               $value = $row["$column"];
+           return $value;
+         }
+      }
+    }
+
 
     function connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database) {
         $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);

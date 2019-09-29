@@ -43,6 +43,13 @@
 <?php
     $event = get_current_event($db);
     if ($event == 1) {
+        $critter_id = get_value_for_name_from("critter_id", "critters", "Cybermat", $db);
+        
+        add_critter($critter_id, $db);
+        
+        $icon = get_value_for_critter_id("icon", $critter_id, $db);
+        
+        print("<br><img src=../assets/$icon align=left>")
         ?>
         <i><p>The Nerva Beacon is an eerie place full of dead bodies from a mysterious plague that has infected the inhabitants.</p>
         
