@@ -57,6 +57,13 @@
         return count($crew_array);
     }
     
+    function conscious_tardis_crew_size($connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $crew_array = explode(",", $tardis_crew);
+        return count($crew_array);
+    }
+
+    
     function join_crew($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
@@ -194,17 +201,8 @@
         $sql = "SELECT {$column} FROM characters_in_play WHERE char_id = '{$char_id}' AND user_id = $user_id";
         // print $sql;
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, $column, $connection);
+
     }
 
 ?>

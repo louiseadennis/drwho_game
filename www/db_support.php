@@ -21,17 +21,7 @@
     function get_value_for_name_from($column, $table, $name, $connection) {
         $sql = "SELECT {$column} FROM {$table} WHERE name = '{$name}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, $column, $connection);
     }
     
     function get_value_from_users($column, $connection) {
@@ -39,49 +29,19 @@
         
         $sql = "SELECT {$column}  FROM users WHERE name = '{$uname}'";
         
-        if (!$result = $connection->query($sql))
-            return 0;
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
-    }
+        return select_sql_column($sql, $column, $connection);
+     }
     
     function get_value_for_location_id($column, $location_id, $connection) {
         $sql = "SELECT {$column} FROM locations WHERE location_id = '{$location_id}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
-    }
+        return select_sql_column($sql, $column, $connection);
+     }
     
     function get_value_for_char_id($column, $char_id, $connection) {
         $sql = "SELECT {$column} FROM characters WHERE char_id = '{$char_id}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, $column, $connection);
     }
 
 
@@ -156,17 +116,7 @@
     function get_value_for_critter_id($column, $critter_id, $connection) {
       $sql = "SELECT {$column} FROM critters WHERE critter_id = '{$critter_id}'";
 
-      if (!$result = $connection->query($sql))
-          showerror($connection);
-      
-      if ($result->num_rows != 1)
-          return 0;
-      else {
-         while ($row=$result->fetch_assoc()) {
-               $value = $row["$column"];
-           return $value;
-         }
-      }
+        return select_sql_column($sql, $column, $connection);
     }
 
 
@@ -182,5 +132,19 @@
     function showerror($mysql)
     {
         die("Error " . mysqli_errno($mysql) . " : " . mysqli_error($mysql));
+    }
+    
+    function select_sql_column($sql, $column, $connection) {
+       if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            while ($row=$result->fetch_assoc()) {
+                $value = $row["$column"];
+                return $value;
+            }
+        }
     }
 ?>

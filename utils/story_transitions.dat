@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS `story_transitions`;
 CREATE TABLE `story_transitions` (
   `transition_id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_id` int(11) NOT NULL,
   `action_id` int(11) NOT NULL,
   `modifiers` text,
   `probability` tinyint NOT NULL,
@@ -8,20 +9,21 @@ CREATE TABLE `story_transitions` (
   `outcome_text` text,
   `random_character_input` tinyint NOT NULL DEFAULT 0,
   `item_character_input` tinyint NOT NULL DEFAULT 0,
+  `doctor` tinyint NOT NULL DEFAULT 0,
   PRIMARY KEY (`transition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `story_transitions` WRITE;
 INSERT INTO `story_transitions` VALUES
-(1, 1, '', 100, 2, ' is bitten by the cybermat.', 1, 0),
-(2, 2, '', 50, 2, ' is bitten by the cybermat.', 1, 0),
-(3, 2, '', 50, 3, ' de-activates the cybermat with an electric pulse.', 1, 0),
-(4, 2, 'sonic_screwdriver', 25, 2, ' is bitten by the cybermat.', 1, 0),
-(5, 2, 'sonic_screwdriver', 75, 2, ' de-activates the cybermat with a sonic pulse', 0, 1),
-(6, 3, '', 50, 2, ' is bitten by the cybermat.', 1, 0),
-(7, 3, '', 50, 3, 'The Tardis crew dodge the cybermat.', 0, 0),
-(8, 4, '', 80, 2, ' is bitten by the cybermat.', 1, 0),
-(9, 4, '', 20, 3, 'The Tardis crew smash the cybermat.', 0, 0),
-(10, 5, '', 100, 2, ' is bitten by the cybermat.', 1, 0),
-(11, 6, '', 100, 2, ' is bitten by the cybermat.', 1, 0);
+(1, 1, 1, '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(2, 1, 2, '', 50, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(3, 1, 2, '', 50, 3, ' de-activates the cybermat with an electric pulse.', 1, 0, 0),
+(4, 1, 2, 'sonic_screwdriver', 25, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(5, 1, 2, 'sonic_screwdriver', 75, 2, ' de-activates the cybermat with a sonic pulse', 0, 1, 0),
+(6, 1, 3, '', 50, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(7, 1, 3, '', 50, 3, 'The Tardis crew dodge the cybermat.', 0, 0, 0),
+(8, 1, 4, '', 80, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(9, 1, 4, '', 20, 3, 'The Tardis crew smash the cybermat.', 0, 0, 0),
+(10, 1, 5, '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0),
+(11, 1, 6, '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0);
 UNLOCK TABLES;

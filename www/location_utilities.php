@@ -97,22 +97,10 @@
         $last_action = get_value_from_users("last_action", $connection);
         
         if (is_action($last_action, $connection)) {
-            if (doctor_here($connection)) {
-                $message = get_value_for_name_from("default_message_doctor", "actions", $last_action, $connection);
-                    print "<p>$message</p>";
+            if (having_adventure($connection)) {
+                story_transition($last_action, $connection);
             } else {
-                $location_id = get_location($connection);
-                $characters = characters_at_location($location_id, $connection);
-                $needs_name = get_value_for_name_from("needs_name", "actions", $last_action, $connection);
-                $message = get_value_for_name_from("default_message_no_doctor", "actions", $last_action, $connection);
-                if ($needs_name == 0) {
-                    print "<p>$message</p>";
-                } else {
-                    $char_num = count($characters);
-                    $dice = rand(0, $char_num - 1);
-                    $char_name = get_value_for_char_id("name", $characters[$dice], $connection);
-                    print "<p>$char_name $message</p>";
-                }
+                print_action_default($last_action, $connection);
             }
         } else {
             print "<p>  &nbsp;</p>";
@@ -314,17 +302,7 @@
     function get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection) {
         $sql = "SELECT location_id FROM locations WHERE planet = '{$dial1}' AND century = '{$dial2}' AND d1 = '{$dial3}' AND d2 = '{$dial4}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["location_id"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, "location_id", $connection);
     }
     
     function print_transmat($location_id, $db) {

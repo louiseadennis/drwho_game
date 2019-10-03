@@ -10,12 +10,12 @@
                 print "New Adventure: ";
                 print "<input type=submit value=\"Start $story_name\"></form>";
             }
-        } else {
-            $story = get_value_from_users("story", $db);
-            if ($story == '0') {
-                print "Hello";
-            }
-        }
+        } //else {
+            // $story = get_value_from_users("story", $db);
+            //if ($story == '0') {
+            //    print "Hello";
+            //}
+       // }
     }
     
     function begin_story($story_id, $db) {
@@ -55,50 +55,22 @@
     
     function get_value_for_story_id($column, $story_id, $connection) {
         $sql = "SELECT {$column} FROM stories WHERE story_id = '{$story_id}'";
+        // print $sql;
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["$column"];
-                return $value;
-            }
-        }
-    }
+        $value = select_sql_column($sql, "$column", $connection);
+         return $value;
+     }
     
     function get_story_events($story_id, $location_id, $connection) {
         $sql = "SELECT events from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["events"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, "events", $connection);
     }
     
     function get_initial_event($story_id, $location_id, $connection) {
         $sql = "SELECT default_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["default_initial"];
-                return $value;
-            }
-        }
+        return select_sql_column($sql, "default_initial", $connection);
     }
     
     function get_current_event($connection) {
@@ -109,36 +81,115 @@
             
             $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}'";
             
+            return select_sql_column($sql, "event_id", $connection);
+        }
+    }
+    
+    function having_adventure($connection) {
+        $story = get_value_from_users("story", $connection);
+        if ($story != 0 && $story != '') {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    
+    function story_transition($action, $connection) {
+        if (having_adventure($connection)) {
+            $event = get_current_event($connection);
+            $action_id = get_value_for_name_from("action_id", "actions", $action, $connection);
+            
+            // Work out which transition we are on
+            $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and action_id = '{$action_id}'";
+            // print $sql;
             if (!$result = $connection->query($sql))
                 showerror($connection);
             
-            if ($result->num_rows != 1)
-                return 0;
-            else {
-                while ($row=$result->fetch_assoc()) {
-                    $value = $row["event_id"];
-                    return $value;
+            $probability = 0;
+            $dice = rand(0, 100);
+            while ($row=$result->fetch_assoc()) {
+                $probability = $probability + $row["probability"];
+                if ($dice <= $probability) {
+                    $transition_id = $row["transition_id"];
+                    break;
                 }
             }
+            
+            // Update story_locations_in_play
+            $new_event = get_value_for_transition_id("outcome", $transition_id, $connection);
+            // $location_id = get_location($connection);
+            $user_id = get_user_id($connection);
+         
+            $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id'";
+            if (!$connection->query($sql)) {
+                showerror($connection);
+            }
+            
+            $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}'";
+            $story_path = select_sql_column($sql, "story_path", $connection);
+            
+            $story_path = $story_path . "," . $new_event;
+
+            $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id'";
+            if (!$connection->query($sql)) {
+                showerror($connection);
+            }
+            
+            // Print action
+            
+            $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
+            $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
+            if ($random_character) {
+                $tardis_crew_size = conscious_tardis_crew_size($connection);
+                $dice = rand(0, $tardis_crew_size - 1);
+                $tardis_crew = get_value_from_users("tardis_team", $connection);
+                $crew_array = explode(",", $tardis_crew);
+                $char = $crew_array[$dice];
+                $char_name = get_value_for_char_id("name", $char, $connection);
+                $outcome_text = $char_name . $outcome_text;
+                
+                $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
+                // print $sql;
+                if (!$connection->query($sql)) {
+                    showerror($connection);
+                }
+            }
+            
+            print("<p>$outcome_text</p>");
         }
+    }
+    
+    function get_value_for_transition_id($column, $transition_id, $connection) {
+        $sql = "SELECT {$column} from story_transitions where transition_id = '{$transition_id}'";
+        
+        return select_sql_column($sql, $column, $connection);
     }
     
     function get_event_text($event_id, $connection) {
         $sql = "SELECT text from story_events where story_event_id = '{$event_id}'";
         
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            while ($row=$result->fetch_assoc()) {
-                $value = $row["text"];
-                return $value;
+        return select_sql_column($sql, "text", $connection);
+    }
+    
+    function print_action_default($action, $connection) {
+        if (doctor_here($connection)) {
+            $message = get_value_for_name_from("default_message_doctor", "actions", $action, $connection);
+                print "<p>$message</p>";
+        } else {
+            $location_id = get_location($connection);
+            $characters = characters_at_location($location_id, $connection);
+            $needs_name = get_value_for_name_from("needs_name", "actions", $action, $connection);
+            $message = get_value_for_name_from("default_message_no_doctor", "actions", $action, $connection);
+            if ($needs_name == 0) {
+                print "<p>$message</p>";
+            } else {
+                $char_num = count($characters);
+                $dice = rand(0, $char_num - 1);
+                $char_name = get_value_for_char_id("name", $characters[$dice], $connection);
+                print "<p>$char_name $message</p>";
             }
         }
     }
-    
     
 
     ?>
