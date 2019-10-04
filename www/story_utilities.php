@@ -171,6 +171,13 @@
         return select_sql_column($sql, "text", $connection);
     }
     
+    function get_event_character($connection) {
+        $user_id = get_user_id($connection);
+        $sql = "SELECT event_character from story_locations_in_play WHERE user_id = '$user_id'";
+        
+        return select_sql_column($sql, "event_character", $connection);
+    }
+    
     function print_action_default($action, $connection) {
         if (doctor_here($connection)) {
             $message = get_value_for_name_from("default_message_doctor", "actions", $action, $connection);

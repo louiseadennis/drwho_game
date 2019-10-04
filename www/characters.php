@@ -204,5 +204,5 @@
         return select_sql_column($sql, $column, $connection);
 
     }
-
+    
 ?>

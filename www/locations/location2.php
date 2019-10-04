@@ -55,6 +55,20 @@
         
         <p>As the crew explore a Cybermat suddenly attacks!</p></i>
 <?php
+    } else if ($event == 2) {
+        $bitten = get_event_character($db);
+        $name = get_value_for_char_id("name", $bitten, $db);
+        
+        $gender = get_value_for_char_id("gender", $bitten, $db);
+        
+        $pronoun = "She";
+        $pronoun2 = "her";
+        if ($gender == 1) {
+            $pronoun = "He";
+            $pronoun2 = "his";
+        }
+        
+        print("<i><p>$name has been bitten by a cybermat.  $pronoun is unconscious with black lines growing across $pronoun2 face.<p></i>");
     }
     
     print_tardis_team($db);
