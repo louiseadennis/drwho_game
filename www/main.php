@@ -54,17 +54,21 @@ if ($last_action == "travel") {
     if (!empty($travellers) || $travel_type = "pov_switch") {
        
         if ($travel_type == "transmat" || $travel_type == "pov_switch") {
-            $location_id = mysqlclean($_POST, "location", 10, $db);
+            if (! empty($travellers)) {
+                $location_id = mysqlclean($_POST, "location", 10, $db);
+            }
         
         }
     
         if ($travel_type == "tardis") {
-            $dial1 = mysqlclean($_POST, "dial1", 10, $db);
-            $dial2 = mysqlclean($_POST, "dial2", 10, $db);
-            $dial3 = mysqlclean($_POST, "dial3", 10, $db);
-            $dial4 = mysqlclean($_POST, "dial4", 10, $db);
-            $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
-            update_users("tardis_location", $location_id, $db);
+            if (! empty($travellers)) {
+                $dial1 = mysqlclean($_POST, "dial1", 10, $db);
+                $dial2 = mysqlclean($_POST, "dial2", 10, $db);
+                $dial3 = mysqlclean($_POST, "dial3", 10, $db);
+                $dial4 = mysqlclean($_POST, "dial4", 10, $db);
+                $location_id = use_tardis($dial1, $dial2, $dial3, $dial4, $db);
+                update_users("tardis_location", $location_id, $db);
+            }
         }
     
         update_users("travel_type", $travel_type, $db);
