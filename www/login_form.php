@@ -1,12 +1,14 @@
 <html>
 <head>
-<title>Log in to Doctor Who Game</title>
+<title>Log in to Explore the Whoniverse</title>
 <link rel="stylesheet" href="styles/default.css" type="text/css">
 </head>
 <body>
 <div class=main>
-<center>
-<h1 style="padding-top:10em">Log in to Doctor Who Game</h1>
+<center style="padding-top:10em">
+<img src=assets/logo.png alt="Explore the Whoniverse Logo">
+
+<h1>Log in to Explore the Whoniverse</h1>
 <form method="POST" action="logincheck.php">
 <?php
   if (isset($_GET['msg'])) {

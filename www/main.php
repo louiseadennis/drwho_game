@@ -31,6 +31,8 @@ if ($start_story != "") {
     
 // Handle Travel
 if ($last_action == "travel") {
+    $location_id = get_location($db);
+    update_users("prev_location", $location_id, $db);
    // resolve_events($db);
     $travellers = [];
     

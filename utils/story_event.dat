@@ -2,17 +2,19 @@ DROP TABLE IF EXISTS `story_events`;
 CREATE TABLE `story_events` (
   `story_event_id` int(11) NOT NULL AUTO_INCREMENT,
   `text` text,
+  `event_location` int(11) NOT NULL,
   PRIMARY KEY (`story_event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `story_events` WRITE;
 INSERT INTO story_events VALUES
-(1, 'A Cybermat Attacks!'),
-(2, 'Cybermat Victim'),
-(3, 'Cybermen Attack'),
-(4, 'Cybermen Attack'),
-(5, 'Rigged with Bombs'),
-(6, 'With the Vogans'),
-(7, 'Cybermen Attack Vogans');
-(8, 'The cybermen have been defeated');
+(1, 'A Cybermat Attacks!', 2),
+(2, 'Cybermat Victim', 2),
+(3, 'Cybermen Attack', 2),
+(4, 'Cybermen Attack', 3),
+(5, 'Rigged with Bombs', 3),
+(6, 'With the Vogans', 3),
+(7, 'Cybermen Attack Vogans', 3),
+(8, 'The cybermen have been defeated', 2),
+(9, 'The cybermen have been defeated', 3);
 UNLOCK TABLES;

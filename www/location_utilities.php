@@ -2,6 +2,7 @@
     function print_header($connection) {
         print "<div class=header>";
         // collect_new_characters($connection);
+        print "<img align=left src=\"../assets/logo.png\" alt=\"Explore the Whoniverse Logo\" width=80>";
         print "<a href=../profile.php>User Profile</a>";
         print "<a href=../log.php>Location Log</a>";
         print "<a href=../logout.php>Log Out</a>";
@@ -96,14 +97,14 @@
     function print_action($connection) {
         $last_action = get_value_from_users("last_action", $connection);
         
-        if (is_action($last_action, $connection)) {
-            if (having_adventure($connection)) {
-                story_transition($last_action, $connection);
-            } else {
-                print_action_default($last_action, $connection);
-            }
+        if (having_adventure($connection)) {
+            story_transition($last_action, $connection);
         } else {
-            print "<p>  &nbsp;</p>";
+                if (is_action($last_action, $connection)) {
+                    print_action_default($last_action, $connection);
+                } else {
+                    print "<p>  &nbsp;</p>";
+                }
         }
     }
     
@@ -145,7 +146,7 @@
             print "<input type=\"hidden\" name=\"travel_type\" value=\"tardis\">";
             print "<center><table>";
             print "<tr>";
-             $planet = get_value_for_location_id("planet", $location_id, $connection);
+            $planet = get_value_for_location_id("planet", $location_id, $connection);
             $century = get_value_for_location_id("century", $location_id, $connection);
             $d1 = get_value_for_location_id("d1", $location_id, $connection);
             $d2 = get_value_for_location_id("d2", $location_id, $connection);

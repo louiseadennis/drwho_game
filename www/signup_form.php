@@ -1,12 +1,15 @@
 <html>
 <head>
-<title>Register for Doctor Who Game</title>
+<title>Register for Explore the Whoniverse</title>
 <link rel="stylesheet" href="styles/default.css" type="text/css">
 </head>
 <body>
   <div class=main>
 <center>
-<h1 style="padding-top:10em">Register for Doctor Who Game</h1>
+<center style="padding-top:10em">
+<img src=assets/logo.png alt="Explore the Whoniverse Logo">
+
+<h1>Register for Explore the Whoniverse</h1>
 <form method="POST" action="signup.php">
 <?php
   if (isset($_GET['msg'])) {
