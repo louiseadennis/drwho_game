@@ -19,6 +19,7 @@
         print "<input type=\"hidden\" name=\"last_action\" value=\"profile_check\">";
         print "<input type=\"submit\" value=\"Back to Game\">";
         print "</form>";
+        print "<img align=left src=\"assets/logo.png\" alt=\"Explore the Whoniverse Logo\" width=80>";
         print "<a href=profile.php>User Profile</a>";
         print "<a href=log.php>Location Log</a>";
         print "<a href=logout.php>Log Out</a>";
@@ -106,6 +107,7 @@
                     print "<p>  &nbsp;</p>";
                 }
         }
+        side_effects($last_action, $connection);
     }
     
     
@@ -266,7 +268,9 @@
                 $uchar = ucfirst($char_name);
                 if ($char_location == $location_id) {
                     $no_space_char_name = str_replace(" ", "_", $char_name);
-                    print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar</td>";
+                    print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                    print_character_modifiers($db, $char_id);
+                    print "</td>";
                 } else {
                     $location_name = get_value_for_location_id("name", $char_location, $db);
                     print "<td align=center><form method=\"POST\" action=\"../main.php\">";

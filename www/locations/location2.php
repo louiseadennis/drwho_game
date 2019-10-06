@@ -48,7 +48,7 @@
         add_critter($critter_id, $db);
         
         $icon = get_value_for_critter_id("icon", $critter_id, $db);
-        
+        // print $icon;
         print("<br><img src=../assets/$icon align=left>")
         ?>
 <i><p>The Nerva Beacon watches over a new asteroid orbiting Jupiter, warning spacecraft of its location.  When the Tardis crew arrive it is an eerie place full of dead bodies: victims of a mysterious plague.</p>
@@ -58,6 +58,7 @@
     } else if ($event == 2) {
         $bitten = get_event_character($db);
         $name = get_value_for_char_id("name", $bitten, $db);
+        modify_character($bitten, 2, $db); // Bitten by cybermat modifer
         
         $gender = get_value_for_char_id("gender", $bitten, $db);
         

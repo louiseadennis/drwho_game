@@ -123,6 +123,23 @@
         $no_space_char_name = str_replace(" ", "_", $char_name);
         print_character_image($char_name, $connection);
         print "<p>$uchar";
+        
+        print_character_modifiers($connection, $char_id);
+    }
+    
+    function print_character_modifiers($connection, $char_id) {
+        $modifiers = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
+        if ($modifiers != '0' && $modifiers != '') {
+            $modifier_array = explode(",", $modifiers);
+            // print "hello";
+            foreach ($modifier_array as $modifier) {
+                // print $modifier;
+                $sql = "SELECT text from story_modifiers where modifier_id = '$modifier'";
+                // print $sql;
+                $text = select_sql_column($sql, "text", $connection);
+                print "<p>$text";
+            }
+        }
     }
     
     function get_doctors($db) {
@@ -148,6 +165,48 @@
             }
         }
 
+    }
+    
+    function modify_character($char_id, $modifier, $db) {
+        $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $db);
+        $modification_array = explode(",", $modification_list);
+        if (! in_array($modifier, $modification_array)) {
+        
+            $new_modification_list = $modification_list . "," . $modifier;
+            $user_id = get_user_id($db);
+            $sql = "";
+            if ($modification_list == 0 || $char_id_list == '') {
+                $sql = "UPDATE characters_in_play SET modifiers = {$modifier} where char_id = '$char_id' and user_id = '$user_id'";
+                // print $sql;
+            } else {
+                $sql = "UPDATE characters_in_play SET modifiers = '$new_modification_list' where char_id = '$char_id' and user_id = '$user_id'";
+            }
+            if (!$db->query($sql)) {
+                 showerror($db);
+            }
+        }
+
+        
+    }
+    
+    function remove_modification_from_character($modifier, $char_id, $db) {
+        $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $db);
+        $modification_array = explode(",", $modification_list);
+        $new_modification_list = "";
+        foreach ($modification_array as $mod) {
+            if ($modifier != $mod) {
+                if ($new_modification_list == "") {
+                    $new_modification_list = "$modifier";
+                } else {
+                    $new_modification_list = $new_modification_list . "," . $modifier;
+                }
+            }
+        }
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET modifiers = '$new_modification_list' where char_id = '$char_id' and user_id = '$user_id'";
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
     }
     
     function character_location($char_id, $db) {
