@@ -51,7 +51,7 @@
         
         print("<br><img src=../assets/$icon align=left>")
         ?>
-        <i><p>The Nerva Beacon is an eerie place full of dead bodies from a mysterious plague that has infected the inhabitants.</p>
+<i><p>The Nerva Beacon watches over a new asteroid orbiting Jupiter, warning spacecraft of its location.  When the Tardis crew arrive it is an eerie place full of dead bodies: victims of a mysterious plague.</p>
         
         <p>As the crew explore a Cybermat suddenly attacks!</p></i>
 <?php
@@ -69,6 +69,8 @@
         }
         
         print("<i><p>$name has been bitten by a cybermat.  $pronoun is unconscious with black lines growing across $pronoun2 face.<p></i>");
+    } else if ($event == 3) {
+        print("<i><p>Cybermen invade the beacon!  Aided by a traitor, Kellman, from the surviving crew.<p></i>");
     }
     
     print_tardis_team($db);
