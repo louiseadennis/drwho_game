@@ -155,9 +155,11 @@ while ($j <= critter_number($db)) {
     } else {
         $icon = 'unknown_critter.png';
     }
+    
+    $stories = get_value_for_critter_id("stories", $j, $db);
  
     if (!is_null($icon)) {
-        print "<td><img src=assets/$icon></td>";
+        print "<td><img src=assets/$icon title=\"Find at: $stories\"></td>";
     } else {
         $critter_name = get_value_for_critter_id("name", $j, $db);
         print "<td>$critter_name<br>Sorry no icon!</td>";
