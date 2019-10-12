@@ -30,15 +30,33 @@
     
     function create_story_path($story_id, $db) {
         $location_id = get_location($db);
-        $initial_event = get_initial_event($story_id, $location_id, $db);
-        $user_id = get_user_id($db);
         
-        $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $location_id)";
-        // print $sql;
+        // Get All Story Locations
+        $locations = get_story_locations($story_id, $db);
         
-        if (!$result = $db->query($sql))
-            showerror($db);
-        
+        // Figure out relevant Initial Event for each location
+        foreach ($locations as $story_location) {
+            // And insert a location in play into the table.
+            if ($location_id == $story_location) {
+                $initial_event = get_initial_event($story_id, $location_id, $db);
+                $user_id = get_user_id($db);
+                
+                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $location_id)";
+                // print $sql;
+                
+                if (!$result = $db->query($sql))
+                    showerror($db);
+            } else {
+                $initial_event = get_not_present_initial_event($story_id, $story_location, $db);
+                $user_id = get_user_id($db);
+                
+                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $story_location)";
+                // print $sql;
+                
+                if (!$result = $db->query($sql))
+                    showerror($db);
+            }
+        }
     }
     
     function clear_story_path($db) {
@@ -67,12 +85,26 @@
         return select_sql_column($sql, "events", $connection);
     }
     
+    function get_story_locations($story_id, $connection) {
+        $sql = "SELECT locations from stories WHERE story_id ='{$story_id}'";
+        
+        $locations = select_sql_column($sql, "locations", $connection);
+        $location_array = explode(",", $locations);
+        return $location_array;
+    }
+    
     function get_initial_event($story_id, $location_id, $connection) {
         $sql = "SELECT default_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
         
         return select_sql_column($sql, "default_initial", $connection);
     }
     
+    function get_not_present_initial_event($story_id, $location_id, $connection) {
+        $sql = "SELECT not_present_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
+        
+        return select_sql_column($sql, "not_present_initial", $connection);
+    }
+
     function get_current_event($connection) {
         $story = get_value_from_users("story", $connection);
         if ($story != 0 && $story != '') {

@@ -3,7 +3,6 @@ CREATE TABLE `stories` (
   `story_id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text DEFAULT NULL,
   `locations` text,
-  `initial_events` text,
   PRIMARY KEY (`story_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
