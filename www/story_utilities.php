@@ -29,7 +29,7 @@
     }
     
     function create_story_path($story_id, $db) {
-        $location_id = get_location($db);
+        // $location_id = get_location($db);
         
         // Get All Story Locations
         $locations = get_story_locations($story_id, $db);
@@ -37,11 +37,11 @@
         // Figure out relevant Initial Event for each location
         foreach ($locations as $story_location) {
             // And insert a location in play into the table.
-            if ($location_id == $story_location) {
-                $initial_event = get_initial_event($story_id, $location_id, $db);
+            if (count(characters_at_location($story_location, $db)) > 0) {
+                $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $location_id)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $story_location)";
                 // print $sql;
                 
                 if (!$result = $db->query($sql))

@@ -97,8 +97,15 @@
     
     function print_action($connection) {
         $last_action = get_value_from_users("last_action", $connection);
+        $pov_switch = 0;
+        if (is_travel($last_action, $connection)) {
+            $travel_type = get_value_from_users("travel_type", $connection);
+            if ($travel_type == "pov_switch") {
+                $pov_switch = 1;
+            }
+        }
         
-        if (having_adventure($connection)) {
+        if (having_adventure($connection) && !$pov_switch) {
             story_transition($last_action, $connection);
         } else {
                 if (is_action($last_action, $connection)) {

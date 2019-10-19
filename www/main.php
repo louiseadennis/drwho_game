@@ -56,7 +56,7 @@ if ($last_action == "travel") {
     if (!empty($travellers) || $travel_type = "pov_switch") {
        
         if ($travel_type == "transmat" || $travel_type == "pov_switch") {
-            if (! empty($travellers)) {
+            if (! empty($travellers) || $travel_type == "pov_switch") {
                 $location_id = mysqlclean($_POST, "location", 10, $db);
             }
         
