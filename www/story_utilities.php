@@ -203,11 +203,11 @@
                 if ($random_character) {
                     $tardis_crew_size = conscious_tardis_crew_size($connection);
                     $dice = rand(0, $tardis_crew_size - 1);
-                    $tardis_crew = get_value_from_users("tardis_team", $connection);
-                    $crew_array = explode(",", $tardis_crew);
-                    $char = $crew_array[$dice];
+                    $tardis_crew = conscious_tardis_crew($connection);
+                    $char = $tardis_crew[$dice];
                     $char_name = get_value_for_char_id("name", $char, $connection);
                     $outcome_text = $char_name . $outcome_text;
+                    print($outcome_text);
                 
                     $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
                     // print $sql;
@@ -239,7 +239,9 @@
     
     function get_event_character($connection) {
         $user_id = get_user_id($connection);
-        $sql = "SELECT event_character from story_locations_in_play WHERE user_id = '$user_id'";
+        $location_id = get_location($connection);
+        $sql = "SELECT event_character from story_locations_in_play WHERE user_id = '$user_id' and location_id = '$location_id'";
+        // print ($sql);
         
         return select_sql_column($sql, "event_character", $connection);
     }

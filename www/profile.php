@@ -70,9 +70,13 @@ if ($char_id_list != '') {
             print "<tr>";
         }
         $no_space_char_name = str_replace(" ", "_", $char_name);
-        print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+        if (is_conscious($doctor, $db)) {
+            print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+        } else {
+            print "<td align=center><p><img stlye=\"opacity:0.2\" src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+        }
         
-        if ($between_adventures) {
+        if ($between_adventures & is_conscious($doctor, $db)) {
             if (tardis_crew_member($doctor, $db)) {
                 print "<input type=\"radio\" name=\"char_id\" value=\"$doctor\" checked>";
                 print "Current Doctor";
@@ -108,7 +112,11 @@ if ($char_id_list != '') {
              print "<tr>";
           }
           $no_space_char_name = str_replace(" ", "_", $char_name);
-           print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+           if (is_conscious($char_id, $db)) {
+               print "<td align=center><p><img src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+           } else {
+               print "<td align=center><p><img style=\"opacity:0.2\" src=assets/$no_space_char_name.png alt=\"$uchar.\"></p><p>$uchar</p><p>";
+           }
            if ($between_adventures) {
                $max_size = max_tardis_crew();
                if (tardis_crew_size($db) < $max_size) {
@@ -122,10 +130,14 @@ if ($char_id_list != '') {
                
                
                if (tardis_crew_member($char_id, $db)) {
-                   print "<form form method=\"POST\" action=\"profile.php\">";
-                   print "<input type=\"hidden\" name=\"char_id\" value=\"";
-                   print $char_id;
-                   print "\"><input type=\"submit\" value=\"Remove from Tardis Crew\" style=\"font-size:2em\"></form>";
+                   if (is_conscious($char_id, $db)) {
+                       print "<form form method=\"POST\" action=\"profile.php\">";
+                       print "<input type=\"hidden\" name=\"char_id\" value=\"";
+                       print $char_id;
+                       print "\"><input type=\"submit\" value=\"Remove from Tardis Crew\" style=\"font-size:2em\"></form>";
+                   } else {
+                       print "<br>&nbsp;";
+                   }
                }
            }
           print "</p></td>";

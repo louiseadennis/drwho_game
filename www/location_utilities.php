@@ -275,7 +275,11 @@
                 $uchar = ucfirst($char_name);
                 if ($char_location == $location_id) {
                     $no_space_char_name = str_replace(" ", "_", $char_name);
-                    print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                    if (is_conscious($char_id, $db)) {
+                        print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                    } else {
+                        print "<td align=center valign=top><img style=\"opacity:0.2\" src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                    }
                     print_character_modifiers($db, $char_id);
                     print "</td>";
                 } else {

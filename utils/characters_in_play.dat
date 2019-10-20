@@ -5,6 +5,7 @@ CREATE TABLE `characters_in_play` (
   `user_id` int(11) NOT NULL,
   `location_id` int(11) NOT NULL,
   `modifiers` text,
+  `unconscious` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`char_in_play_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

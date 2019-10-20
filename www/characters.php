@@ -58,11 +58,50 @@
     }
     
     function conscious_tardis_crew_size($connection) {
+        $location_team = conscious_tardis_crew($connection);
+        
+        return count($location_team);
+    }
+    
+    function conscious_tardis_crew($connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
-        $crew_array = explode(",", $tardis_crew);
-        return count($crew_array);
+        $location_id = get_location($connection);
+        $location_team = [];
+        $char_id_array = explode(",", $tardis_crew);
+        foreach ($char_id_array as $char_id) {
+            $char_location = character_location($char_id, $connection);
+            if ($char_location == $location_id && is_conscious($char_id, $connection)) {
+                array_push($location_team, $char_id);
+            }
+        }
+        return $location_team;
     }
 
+    function unconscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET unconscious = 1 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+    
+    function conscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET unconscious = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+    
+    function is_conscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT unconscious from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $unconscious = select_sql_column($sql, "unconscious", $db);
+        
+        return (!$unconscious);
+    }
     
     function join_crew($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
@@ -114,7 +153,12 @@
         $uchar = ucfirst($char_name);
         $no_space_char_name = str_replace(" ", "_", $char_name);
         $game_url = default_url();
-        print "<img src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
+        $char_id = get_value_for_name_from("char_id", "characters", $char_name, $connection);
+        if (is_conscious($char_id)) {
+            print "<img src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
+        } else {
+            print "<img style=\"opacity:0.2\" src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
+        }
     }
     
     function print_character_and_name($connection, $char_id) {
@@ -184,6 +228,15 @@
             if (!$db->query($sql)) {
                  showerror($db);
             }
+            
+            $sql = "SELECT unconscious from story_modifiers where modifier_id = '$modifier'";
+            $unconscious = select_sql_column($sql, "unconscious", $db);
+            if ($unconscious) {
+                $sql = "UPDATE characters_in_play SET unconscious = 1 where char_id = '$char_id' and user_id = '$user_id'";
+                if (!$db->query($sql)) {
+                     showerror($db);
+                }
+            }
         }
 
         
@@ -196,9 +249,9 @@
         foreach ($modification_array as $mod) {
             if ($modifier != $mod) {
                 if ($new_modification_list == "") {
-                    $new_modification_list = "$modifier";
+                    $new_modification_list = "$mod";
                 } else {
-                    $new_modification_list = $new_modification_list . "," . $modifier;
+                    $new_modification_list = $new_modification_list . "," . $mod;
                 }
             }
         }
@@ -206,6 +259,15 @@
         $sql = "UPDATE characters_in_play SET modifiers = '$new_modification_list' where char_id = '$char_id' and user_id = '$user_id'";
         if (!$db->query($sql)) {
              showerror($db);
+        }
+        
+        $sql = "SELECT unconscious from story_modifiers where modifier_id = '$modifier'";
+        $unconscious = select_sql_column($sql, "unconscious", $db);
+        if ($unconscious) {
+            $sql = "UPDATE characters_in_play SET unconscious = 0 where char_id = '$char_id' and user_id = '$user_id'";
+            if (!$db->query($sql)) {
+                 showerror($db);
+            }
         }
     }
     

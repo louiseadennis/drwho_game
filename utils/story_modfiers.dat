@@ -5,11 +5,12 @@ CREATE TABLE `story_modifiers` (
   `text` text,
   `remove` int(11),
   `remove_modifier` text,
+  `unconscious` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`modifier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `story_modifiers` WRITE;
 INSERT INTO story_modifiers VALUES
-(1, 1, 'Strapped into a bomb', 0, 0),
-(2, 1, 'Has been bitten by a Cybermat', 100, 'transmat');
+(1, 1, 'Strapped into a bomb', 0, 0, 0),
+(2, 1, 'Has been bitten by a Cybermat', 100, 'transmat', 1);
 UNLOCK TABLES;

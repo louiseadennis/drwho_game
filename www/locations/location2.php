@@ -59,6 +59,7 @@
         $bitten = get_event_character($db);
         $name = get_value_for_char_id("name", $bitten, $db);
         modify_character($bitten, 2, $db); // Bitten by cybermat modifer
+        // unconscious($bitten, $db);
         
         $gender = get_value_for_char_id("gender", $bitten, $db);
         
