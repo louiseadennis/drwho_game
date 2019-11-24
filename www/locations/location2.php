@@ -49,7 +49,7 @@
         
         $icon = get_value_for_critter_id("icon", $critter_id, $db);
         // print $icon;
-        print("<br><img src=../assets/$icon align=left>")
+        print("<br><img src=../assets/$icon align=left>");
         ?>
 <i><p>The Nerva Beacon watches over a new asteroid orbiting Jupiter, warning spacecraft of its location.  When the Tardis crew arrive it is an eerie place full of dead bodies: victims of a mysterious plague.</p>
         
@@ -72,6 +72,15 @@
         
         print("<i><p>$name has been bitten by a cybermat.  $pronoun is unconscious with black lines growing across $pronoun2 face.<p></i>");
     } else if ($event == 3) {
+        
+        $critter_id = get_value_for_name_from("critter_id", "critters", "Cyberman", $db);
+        
+        add_critter($critter_id, $db);
+        
+        $icon = get_value_for_critter_id("icon", $critter_id, $db);
+        // print $icon;
+        print("<br><img src=../assets/$icon align=left>");
+        
         print("<i><p>Cybermen invade the beacon!  Aided by a traitor, Kellman, from the surviving crew.<p></i>");
     }
     
