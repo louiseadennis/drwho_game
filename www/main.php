@@ -33,7 +33,7 @@ if ($start_story != "") {
 if ($last_action == "travel") {
     $location_id = get_location($db);
     update_users("prev_location", $location_id, $db);
-   // resolve_events($db);
+    // resolve_events($db);
     $travellers = [];
     
     $traveller1 = mysqlclean($_POST, "person1", 10, $db);
@@ -53,13 +53,10 @@ if ($last_action == "travel") {
         array_push($travellers, $traveller4);
     }
 
-    if (!empty($travellers) || $travel_type = "pov_switch") {
+    if (!empty($travellers) || $travel_type == "pov_switch") {
        
         if ($travel_type == "transmat" || $travel_type == "pov_switch") {
-            if (! empty($travellers) || $travel_type == "pov_switch") {
-                $location_id = mysqlclean($_POST, "location", 10, $db);
-            }
-        
+            $location_id = mysqlclean($_POST, "location", 10, $db);
         }
     
         if ($travel_type == "tardis") {

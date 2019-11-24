@@ -8,4 +8,4 @@ CREATE TABLE `critters` (
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
 
 INSERT INTO `critters` VALUES (1, 'Cybermat', 'cybermat_1.png', 'Revenge of the Cybermen');
-INSERT INTO `critters` VALUES (2, 'Cyberman', '', 'Revenge of the Cybermen');
+INSERT INTO `critters` VALUES (2, 'Cyberman', 'cyberman_1.png', 'Revenge of the Cybermen');
