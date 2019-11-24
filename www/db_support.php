@@ -20,6 +20,7 @@
     
     function get_value_for_name_from($column, $table, $name, $connection) {
         $sql = "SELECT {$column} FROM {$table} WHERE name = '{$name}'";
+        // print($sql);
         
         return select_sql_column($sql, $column, $connection);
     }
@@ -119,6 +120,11 @@
         return select_sql_column($sql, $column, $connection);
     }
 
+    function get_value_for_action_id($column, $action_id, $connection) {
+      $sql = "SELECT {$column} FROM actions WHERE action_id = '{$action_id}'";
+
+        return select_sql_column($sql, $column, $connection);
+    }
 
     function connect_to_db ( $mysql_host, $mysql_user, $mysql_password, $mysql_database) {
         $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);

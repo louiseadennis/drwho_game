@@ -63,5 +63,16 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 (2, 3, 6, 'bombs', '', 100, 9, 'While looking around, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 100, 'bombs', '', 100, 9, 'The crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3);
 
+(3, 4, 1, 'escape_vogans', '', 10, 13, 'The Tardis crew persuade the Vogans to let them go.', 0, 0, 0, 0);
+(3, 4, 1, 'null', '', 90, 4, 'The Vogans explain that they have been concealing themselves for generations for fear of enemies seeking the gold that Voga has in abundance.', 0, 0, 0, 0);
+/* 2 default */
+(3, 4, 3, 'null', '', 90, 4, 'The crew is locked up with nowhere to run.', 0, 0, 0, 0);
+(3, 4, 4, 'escape_vogans', '', 5, 13, 'The Tardis crew overpower their Vogan guards and escape.', 0, 0, 0, 0);
+(3, 4, 4, 'null', '', 95, 4, 'The Vogans can not be over-powered.', 0, 0, 0, 0);
+/* 5 default */
+(3, 4, 6, 'null', '', 100, 4, 'The area is full of rocks made from gold.', 0, 0, 0, 0);
+/* Travel impossible ? */
+
+
 
 UNLOCK TABLES;

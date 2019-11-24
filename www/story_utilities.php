@@ -152,71 +152,92 @@
                 $action_id = get_value_for_name_from("action_id", "actions", $action, $connection);
             }
             
+            $transition_in_table = 1;
             if ($action_id > 0 && $event != 0) {
                 // Work out which transition we are on
                 $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and action_id = '{$action_id}'";
                 //print $sql;
-                if (!$result = $connection->query($sql))
-                    showerror($connection);
-            
-                $probability = 0;
-                $dice = rand(0, 100);
-                while ($row=$result->fetch_assoc()) {
-                    $probability = $probability + $row["probability"];
-                    if ($dice <= $probability) {
-                        $transition_id = $row["transition_id"];
-                        break;
-                    }
+                
+                if (!$result = $connection->query($sql)) {
+                    // There wasn't a transition for this action id.
+                    // showerror($connection);
+                    $transition_in_table = 0;
                 }
+                
+                if ($result->num_rows == 0) {
+                    //print("A");
+                    $transition_in_table = 0;
+                }
+                //print("C");
             
-                // Update story_locations_in_play
-                $new_event = get_value_for_transition_id("outcome", $transition_id, $connection);
-                $user_id = get_user_id($connection);
+                if ($transition_in_table) {
+                    //print("B");
+                    $probability = 0;
+                    $dice = rand(0, 100);
+                    while ($row=$result->fetch_assoc()) {
+                        $probability = $probability + $row["probability"];
+                        if ($dice <= $probability) {
+                            $transition_id = $row["transition_id"];
+                            break;
+                        }
+                    }
+            
+                    // Update story_locations_in_play
+                    $new_event = get_value_for_transition_id("outcome", $transition_id, $connection);
+                    $user_id = get_user_id($connection);
          
-                if ($action_id != 100 || $current_event != 0) {
-                    $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$location_id'";
-                    if (!$connection->query($sql)) {
-                        showerror($connection);
-                    }
+                    if ($action_id != 100 || $current_event != 0) {
+                        $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$location_id'";
+                        if (!$connection->query($sql)) {
+                            showerror($connection);
+                        }
                 
-                    $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$location_id'";
-                    $story_path = select_sql_column($sql, "story_path", $connection);
+                        $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$location_id'";
+                        $story_path = select_sql_column($sql, "story_path", $connection);
                 
-                    $story_path = $story_path . "," . $new_event;
+                        $story_path = $story_path . "," . $new_event;
 
-                    $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$location_id'";
-                    if (!$connection->query($sql)) {
-                        showerror($connection);
-                    }
-                } else {
-                    $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($new_event, $user_id, \"\", $location_id)";
+                        $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$location_id'";
+                        if (!$connection->query($sql)) {
+                            showerror($connection);
+                        }
+                    } else {
+                        $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($new_event, $user_id, \"\", $location_id)";
                     
-                    if (!$result = $connection->query($sql)) {
-                        showerror($connection);
-                    }
+                        if (!$result = $connection->query($sql)) {
+                            showerror($connection);
+                        }
                 
+                    }
                 }
                 
                 // Print action
-                $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
-                $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
-                if ($random_character) {
-                    $tardis_crew_size = conscious_tardis_crew_size($connection);
-                    $dice = rand(0, $tardis_crew_size - 1);
-                    $tardis_crew = conscious_tardis_crew($connection);
-                    $char = $tardis_crew[$dice];
-                    $char_name = get_value_for_char_id("name", $char, $connection);
-                    $outcome_text = $char_name . $outcome_text;
-                    print($outcome_text);
                 
-                    $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
-                    // print $sql;
-                    if (!$connection->query($sql)) {
-                        showerror($connection);
+                if ($transition_in_table) {
+                    $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
+                    $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
+                    if ($random_character) {
+                        $tardis_crew_size = conscious_tardis_crew_size($connection);
+                        $dice = rand(0, $tardis_crew_size - 1);
+                        $tardis_crew = conscious_tardis_crew($connection);
+                        $char = $tardis_crew[$dice];
+                        $char_name = get_value_for_char_id("name", $char, $connection);
+                        $outcome_text = $char_name . $outcome_text;
+                        print($outcome_text);
+                    
+                        $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
+                        // print $sql;
+                        if (!$connection->query($sql)) {
+                            showerror($connection);
+                        }
                     }
+                    print("<p>$outcome_text</p>");
+                } else {
+                    // print("A");
+                    $action = get_value_for_action_id("name", $action_id, $connection);
+                    print_action_default($action, $connection);
                 }
             
-                print("<p>$outcome_text</p>");
             } else {
                 print ("<p>&nbsp;</p>");
             }

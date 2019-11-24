@@ -11,5 +11,6 @@ INSERT INTO story_events VALUES
 (1, 'A Cybermat Attacks!', 2),
 (2, 'Cybermat Victim', 2),
 (3, 'Cybermen Attack', 2),
+(4, 'Captured by Vogans', 3),
 (8, 'Story Started on Beacon (Not Seen)', 3);
 UNLOCK TABLES;
