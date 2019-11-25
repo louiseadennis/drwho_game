@@ -184,31 +184,66 @@
             
                     // Update story_locations_in_play
                     $new_event = get_value_for_transition_id("outcome", $transition_id, $connection);
+                    $label = get_value_for_transition_id("transition_label", $transition_id, $connection);
                     $user_id = get_user_id($connection);
-         
-                    if ($action_id != 100 || $current_event != 0) {
-                        $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$location_id'";
-                        if (!$connection->query($sql)) {
-                            showerror($connection);
-                        }
-                
-                        $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$location_id'";
-                        $story_path = select_sql_column($sql, "story_path", $connection);
-                
-                        $story_path = $story_path . "," . $new_event;
-
-                        $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$location_id'";
-                        if (!$connection->query($sql)) {
-                            showerror($connection);
-                        }
-                    } else {
-                        $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($new_event, $user_id, \"\", $location_id)";
+          
+                    $sql = "SELECT location_id FROM story_locations_in_play WHERE user_id ='{$user_id}'";
+                   
+                    if (!$result = $connection->query($sql))
+                        showerror($connection);
+                                        
+                    while($row=$result->fetch_assoc()) {
+                        $story_location = $row["location_id"];
+                        
+                        if ($story_location == $location_id) {
                     
-                        if (!$result = $connection->query($sql)) {
-                            showerror($connection);
-                        }
+                   // if ($action_id != 100 || $current_event != 0) {
+                            $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$location_id'";
+                            if (!$connection->query($sql)) {
+                                showerror($connection);
+                            }
                 
+                            $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$location_id'";
+                            $story_path = select_sql_column($sql, "story_path", $connection);
+                
+                            $story_path = $story_path . "," . $new_event;
+
+                            $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$location_id'";
+                            if (!$connection->query($sql)) {
+                                showerror($connection);
+                            }
+                        } else {
+                            print("A");
+                            $sql = "SELECT outcome FROM story_locations_in_play WHERE user_id='{$user_id} AND location_id='$story_location' AND transition_label = '$transition_label' AND action_id = '0'";
+                            if ($result2 = $connection->query($sql)) {
+                                $location_event = select_sql_column($sql, "outcome", $connection);
+                            
+                                $sql = "UPDATE story_locations_in_play SET event_id='{$location_event}' where user_id = '$user_id' and location_id = '$story_location'";
+                                if (!$connection->query($sql)) {
+                                    showerror($connection);
+                                }
+                            
+                                $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$story_location'";
+                                $story_path = select_sql_column($sql, "story_path", $connection);
+                            
+                                $story_path = $story_path . "," . $location_event;
+
+                                $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$story_location'";
+                                if (!$connection->query($sql)) {
+                                        showerror($connection);
+                                }
+                            }
+                            
+                        }
                     }
+                   // } else {
+                    //    $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($new_event, $user_id, \"\", $location_id)";
+                    
+                   //     if (!$result = $connection->query($sql)) {
+                   //         showerror($connection);
+                   //     }
+                
+                   // }
                 }
                 
                 // Print action
