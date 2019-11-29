@@ -75,4 +75,5 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 
 
 
+
 UNLOCK TABLES;
