@@ -185,6 +185,40 @@ while ($j <= critter_number($db)) {
    $j++;
 }
 print "</table>";
+    
+    print "<h2>Allies Encountered</h2>";
+    $ally_id_list = get_value_from_users("ally_id_list", $db);
+    $ally_id_array = explode(",", $ally_id_list);
+    print "<table>";
+    $i = 0;
+    $j = 1;
+    while ($j <= ally_number($db)) {
+        if ($i == 0) {
+             print "<tr>";
+        }
+        if (in_array($j, $ally_id_array)) {
+            $icon = get_value_for_ally_id("icon", $j, $db);
+        } else {
+            $icon = 'unknown_critter.png';
+        }
+        
+        $stories = get_value_for_ally_id("stories", $j, $db);
+     
+        if (!is_null($icon)) {
+            print "<td><img src=assets/$icon title=\"Find at: $stories\"></td>";
+        } else {
+            $ally_name = get_value_for_ally_id("name", $j, $db);
+            print "<td>$ally_name<br>Sorry no icon!</td>";
+        }
+        if ($i == 7) {
+             print "</tr>";
+             $i = 0;
+          } else {
+            $i = $i + 1;
+         }
+       $j++;
+    }
+    print "</table>";
 
 
 ?>

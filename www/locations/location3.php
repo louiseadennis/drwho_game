@@ -44,12 +44,12 @@
 <?php
     $event = get_current_event($db);
     if ($event == 4) {
-        // $ally_id = get_value_for_name_from("ally_id", "allies", "Vogan", $db);
-        // add_ally($ally_id, $db);
-        // $icon = get_value_for_ally_id("icon", $ally_id, $db);
-        // print("<br><img src=../assets/$icon align=left>");
+        $ally_id = get_value_for_name_from("ally_id", "allies", "Vogans", $db);
+        add_ally($ally_id, $db);
+        $icon = get_value_for_ally_id("icon", $ally_id, $db);
+        print("<br><img src=../assets/$icon align=left>");
         
-        print("<i><p>The Tardis lands deep in a cave system where almost immediately they are captured by the Vogan inhabitants.</p></i>");
+        print("<i><p>The Tardis lands deep in a cave system where the crew are almost immediately captured by the Vogan inhabitants.</p></i>");
     }
     
     

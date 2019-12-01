@@ -82,6 +82,16 @@
         return $result->num_rows;
     }
     
+    function ally_number($connection) {
+        $sql = "SELECT * FROM allies";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        return $result->num_rows;
+    }
+
+    
     function add_critter($critter_id, $connection) {
           $uname = $_SESSION["loginUsername"];
 
@@ -94,6 +104,22 @@
                 if (!in_array($critter_id, $critter_id_array)) {
                      $new_critter_id_list = $critter_id_list . "," . $critter_id;
              update_users("critter_id_list", $new_critter_id_list, $connection);
+            }
+          }
+    }
+    
+    function add_ally($ally_id, $connection) {
+          $uname = $_SESSION["loginUsername"];
+
+          $ally_id_list = get_value_from_users("ally_id_list", $connection);
+          $ally_id_array = explode(",", $critter_id_list);
+
+          if (is_null($ally_id_list)) {
+             update_users("ally_id_list", $ally_id, $connection);
+          } else {
+                if (!in_array($ally_id, $ally_id_array)) {
+                     $new_ally_id_list = $ally_id_list . "," . $ally_id;
+             update_users("ally_id_list", $new_ally_id_list, $connection);
             }
           }
     }
@@ -113,12 +139,36 @@
             return 1;
         }
     }
+    
+    function met_ally($ally_id, $connection) {
+        $uname = $_SESSION["loginUsername"];
+        
+        $ally_id_list = get_value_from_users("ally_id_list", $connection);
+        $ally_id_array = explode(",", $ally_id_list);
+        
+        if (is_null($ally_id_list)) {
+            return 0;
+        } else {
+            if (!in_array($ally_id, $ally_id_array)) {
+                return 0;
+            }
+            return 1;
+        }
+    }
+
 
     function get_value_for_critter_id($column, $critter_id, $connection) {
       $sql = "SELECT {$column} FROM critters WHERE critter_id = '{$critter_id}'";
 
         return select_sql_column($sql, $column, $connection);
     }
+    
+    function get_value_for_ally_id($column, $ally_id, $connection) {
+      $sql = "SELECT {$column} FROM allies WHERE ally_id = '{$ally_id}'";
+
+        return select_sql_column($sql, $column, $connection);
+    }
+
 
     function get_value_for_action_id($column, $action_id, $connection) {
       $sql = "SELECT {$column} FROM actions WHERE action_id = '{$action_id}'";
