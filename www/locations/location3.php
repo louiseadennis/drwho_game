@@ -50,6 +50,13 @@
         print("<br><img src=../assets/$icon align=left>");
         
         print("<i><p>The Tardis lands deep in a cave system where the crew are almost immediately captured by the Vogan inhabitants.</p></i>");
+        
+        lock_everyone_up(3, $db);
+        
+    }
+    
+    if ($event == 13) {
+        free_everyone(3, $db);
     }
     
     

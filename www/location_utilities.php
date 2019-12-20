@@ -171,10 +171,15 @@
                 $char_id_array = characters_at_location($location_id, $connection);
                 $to_transmat = 1;
                 foreach ($char_id_array as $char_id) {
+                    $is_locked_up = is_locked_up($char_id, $connection);
                     $char_name = get_value_for_char_id("name", $char_id, $connection);
                     $uchar = ucfirst($char_name);
-                    print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
-                    $to_transmat++;
+                    if ($is_locked_up) {
+                        print "$uchar is locked up and can't reach the Tardis<br>";
+                    } else{
+                        print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
+                        $to_transmat++;
+                    }
                 }
                 for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
                     print "<input type=\"hidden\" name=\"person$to_transmat\" value=\"\">";
@@ -335,8 +340,13 @@
         foreach ($tardis_team as $char_id) {
             $char_name = get_value_for_char_id("name", $char_id, $db);
             $uchar = ucfirst($char_name);
-            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
-            $to_transmat++;
+            $is_locked_up = is_locked_up($char_id, $db);
+             if ($is_locked_up) {
+                 print "$uchar is locked up and can't transmat<br>";
+             } else{
+                 print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
+                 $to_transmat++;
+             }
         }
         for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
             print "<input type=\"hidden\" name=\"person$to_transmat\" value=\"\">";

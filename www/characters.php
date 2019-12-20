@@ -103,6 +103,33 @@
         return (!$unconscious);
     }
     
+    function  locked_up($char_id, $db) {
+        $user_id = get_user_id($db);
+         $sql = "UPDATE characters_in_play SET incarcerated = 1 where char_id = '$char_id' and user_id = '$user_id'";
+         
+         if (!$db->query($sql)) {
+              showerror($db);
+         }
+    }
+    
+    function freed($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET incarcerated = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+
+    function is_locked_up($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT incarcerated from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $locked_up = select_sql_column($sql, "incarcerated", $db);
+        
+        return ($locked_up);
+    }
+
+    
     function join_crew($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
@@ -232,11 +259,14 @@
             $sql = "SELECT unconscious from story_modifiers where modifier_id = '$modifier'";
             $unconscious = select_sql_column($sql, "unconscious", $db);
             if ($unconscious) {
-                $sql = "UPDATE characters_in_play SET unconscious = 1 where char_id = '$char_id' and user_id = '$user_id'";
-                if (!$db->query($sql)) {
-                     showerror($db);
-                }
-            }
+                unconcscious($char_id, $db);
+             }
+            
+            $sql = "SELECT incarcerated from story_modifiers where modifier_id = '$modifier'";
+             $incarcerated = select_sql_column($sql, "incarcerated", $db);
+             if ($incarcerated) {
+                 locked_up($char_id, $db);
+              }
         }
 
         
@@ -264,11 +294,15 @@
         $sql = "SELECT unconscious from story_modifiers where modifier_id = '$modifier'";
         $unconscious = select_sql_column($sql, "unconscious", $db);
         if ($unconscious) {
-            $sql = "UPDATE characters_in_play SET unconscious = 0 where char_id = '$char_id' and user_id = '$user_id'";
-            if (!$db->query($sql)) {
-                 showerror($db);
-            }
+            conscious($char_id, $db);
         }
+        
+        $sql = "SELECT incarcerated from story_modifiers where modifier_id = '$modifier'";
+        $incarcerated = select_sql_column($sql, "incarcerated", $db);
+        if ($incarcerated) {
+            freed($char_id, $db);
+        }
+
     }
     
     function character_location($char_id, $db) {
@@ -278,6 +312,19 @@
         //print "HELLO";
         // return 2;
     }
+    
+    function lock_everyone_up($location_id, $connection) {
+        foreach (characters_at_location($location_id, $connection) as $char_id) {
+            locked_up($char_id, $connection);
+        }
+    }
+    
+    function free_everyone($location_id, $connection) {
+        foreach (characters_at_location($location_id, $connection) as $char_id) {
+            freed($char_id, $connection);
+        }
+    }
+
     
     function characters_at_location($location_id, $connection) {
         $tardis_team = get_value_from_users("tardis_team", $connection);
