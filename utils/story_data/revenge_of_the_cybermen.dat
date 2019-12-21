@@ -43,12 +43,20 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 /* 5 default */
 (3, 4, 6, 'null', '', 100, 4, 'The area is full of rocks made from gold.', 0, 0, 0, 0),
 /* Travel impossible ? */
+(3, 4, 0, 'bombs', '', 100, 5, 'The crew meet up on Voga.  Those who were captured escape from the Vogans.', 0, 0, 0, 0),
 
 
 /* 1 default */
 (3, 5, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 (3, 5, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0);
 /* 3, 4, ,5, 6  default */
+
+/* 1 default */
+(3, 6, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
+(3, 6, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0);
+/* 3, 4, ,5, 6  default */
+
+
 
 /*
 (1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
@@ -59,6 +67,7 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 (6, 'observation', 'There is nothing of note in your surroundings.', 'There is nothing of note in your surroundings.',0);
 
 (100, travel)
+(0, synchonised elsewhere)
 */
 
 /* DROP TABLE IF EXISTS `story_transitions`;

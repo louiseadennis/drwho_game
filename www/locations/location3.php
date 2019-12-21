@@ -55,6 +55,14 @@
         
     }
     
+    if ($event == 5) {
+        print("<i><p>The crew meet up again but some have planet destroying bombs strapped to their chests.</p></i>");
+    }
+
+    if ($event == 6) {
+        print("<i><p>The crew arrive on Voga with bombs strapped to their chests.</p></i>");
+    }
+
     if ($event == 13) {
         free_everyone(3, $db);
     }
