@@ -199,7 +199,7 @@ print "</table>";
         if (in_array($j, $ally_id_array)) {
             $icon = get_value_for_ally_id("icon", $j, $db);
         } else {
-            $icon = 'unknown_critter.png';
+            $icon = 'unknown_ally.png';
         }
         
         $stories = get_value_for_ally_id("stories", $j, $db);
