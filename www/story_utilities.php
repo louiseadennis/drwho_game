@@ -331,9 +331,17 @@
     }
     
     function get_event_text($event_id, $connection) {
-        $sql = "SELECT text from story_events where story_event_id = '{$event_id}'";
+        $story = get_value_from_users("story", $mysql);
+        
+        $sql = "SELECT text from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
         
         return select_sql_column($sql, "text", $connection);
+    }
+    
+    function get_story_event_id($story_id, $event_id, $db) {
+        $sql = "SELECT story_event_id from story_events where story_id = '{$story_id}' and story_number_id = '{$event_id}'";
+        
+        return select_sql_column($sql, "story_event_id", $db);
     }
     
     function get_event_character($connection) {
