@@ -24,6 +24,7 @@
      }
     
     function quit_story($story_id, $db) {
+        create_log($story_id, $db);
         update_users("story", 0, $db);
         clear_story_path($db);
     }
@@ -57,6 +58,23 @@
                     showerror($db);
             }
         }
+    }
+    
+    function create_log($story_id, $db) {
+        $locations = get_story_locations($story_id, $db);
+        
+        $combined_path = "";
+        foreach ($locations as $story_location) {
+            $user_id = get_user_id($db);
+            $sql = "SELECT story_path FROM story_locations_in_play where user_id = '{$user_id}' and location_id = '{$story_location}'";
+            $story_path = select_sql_column($sql, "story_path", $db);
+            $combined_path = $combined_path . ":" . $story_path;
+        }
+        
+        $sql = "INSERT INTO story_logs (story_id, user_id, story_path) VALUES ($story_id, $user_id, '$combined_path')";
+        if (!$result = $db->query($sql))
+            showerror($db);
+        
     }
     
     function clear_story_path($db) {
@@ -114,6 +132,31 @@
             $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}'";
             
             return select_sql_column($sql, "event_id", $connection);
+        }
+    }
+    
+    function first_visit($connection) {
+        $story = get_value_from_users("story", $connection);
+        if ($story != 0 && $story != '') {
+            $location_id = get_location($connection);
+            $user_id = get_user_id($connection);
+            
+            $sql = "SELECT first_visit from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}'";
+            
+            return select_sql_column($sql, "first_visit", $connection);
+        }
+    }
+    
+    function visited($connection) {
+        $story = get_value_from_users("story", $connection);
+        if ($story != 0 && $story != '') {
+            $location_id = get_location($connection);
+            $user_id = get_user_id($connection);
+
+            $sql = "UPDATE story_locations_in_play SET first_visit='0' where user_id = '$user_id' and location_id = '$location_id'";
+            if (!$connection->query($sql)) {
+                showerror($connection);
+            }
         }
     }
     

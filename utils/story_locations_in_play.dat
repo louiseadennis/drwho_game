@@ -6,5 +6,6 @@ CREATE TABLE `story_locations_in_play` (
   `story_path` text,
   `event_character` int(11),
   `location_id` int(11),
+  `first_visit` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`story_location_in_play_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

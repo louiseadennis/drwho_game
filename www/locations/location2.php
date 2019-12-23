@@ -58,7 +58,10 @@
     } else if ($event == 2) {
         $bitten = get_event_character($db);
         $name = get_value_for_char_id("name", $bitten, $db);
-        modify_character($bitten, 2, $db); // Bitten by cybermat modifer
+        if (first_visit($db)) {
+            modify_character($bitten, 2, $db); // Bitten by cybermat modifer
+            visited($db);
+        }
         // unconscious($bitten, $db);
         
         $gender = get_value_for_char_id("gender", $bitten, $db);

@@ -61,11 +61,52 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 /* 5 default */
 (3, 4, 6, 'null', '', 100, 4, 'The area is full of rocks made from gold.', 0, 0, 0, 0),
 /* Travel impossible ? */
+(3, 4, 0, 'bombs', '', 100, 5, 'The crew meet up on Voga.  Those who were captured escape from the Vogans.', 0, 0, 0, 0),
 
 
 /* 1 default */
 (3, 5, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
-(3, 5, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0);
+(3, 5, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
 /* 3, 4, ,5, 6  default */
+
+/* 1 default */
+(3, 6, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
+(3, 6, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
+/* 3, 4, ,5, 6  default */
+
+(3, 8, 0, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0);
+
+
+/*
+(1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
+(2, 'tech', 'The Doctor builds a machine out of string, a cork and a spoon he finds in his pockets.  It doesn\'t work.', 'There is no need for science or technology at the moment.',0),
+(3, 'running', 'There is nothing here to run away from.', 'There is nothing here to run away from.',0),
+(4, 'combat', 'There is nothing here to fight.', 'There is nothing here to fight.',0),
+(5, 'willpower', 'The Doctor reaches out with his mind but senses nothing.', 'closes their eyes and thinks hard but nothing happens',1),
+(6, 'observation', 'There is nothing of note in your surroundings.', 'There is nothing of note in your surroundings.',0);
+
+(100, travel)
+(0, synchonised elsewhere)
+*/
+
+/* DROP TABLE IF EXISTS `story_transitions`;
+CREATE TABLE `story_transitions` (
+  `transition_id` int(11) NOT NULL AUTO_INCREMENT,
+  `location_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `action_id` int(11) NOT NULL,
+  `transition_label` text,
+  `modifiers` text,
+  `probability` tinyint NOT NULL,
+  `outcome` int(11),
+  `outcome_text` text,
+  `random_character_input` tinyint NOT NULL DEFAULT 0,
+  `item_character_input` tinyint NOT NULL DEFAULT 0,
+  `doctor` tinyint NOT NULL DEFAULT 0,
+  `new_location` int(11),
+  PRIMARY KEY (`transition_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1; */
+
+
 
 UNLOCK TABLES;

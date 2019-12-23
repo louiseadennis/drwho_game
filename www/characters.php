@@ -259,7 +259,7 @@
             $sql = "SELECT unconscious from story_modifiers where modifier_id = '$modifier'";
             $unconscious = select_sql_column($sql, "unconscious", $db);
             if ($unconscious) {
-                unconcscious($char_id, $db);
+                unconscious($char_id, $db);
              }
             
             $sql = "SELECT incarcerated from story_modifiers where modifier_id = '$modifier'";

@@ -48,14 +48,18 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 
 /* 1 default */
 (3, 5, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
-(3, 5, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0);
+(3, 5, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
 /* 3, 4, ,5, 6  default */
 
 /* 1 default */
 (3, 6, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
-(3, 6, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0);
+(3, 6, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
 /* 3, 4, ,5, 6  default */
 
+/* All others default */
+(2, 7, 0, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attach on the Nerva Beacon', 0, 0, 0, 0),
+
+(3, 8, 0, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0);
 
 
 /*
