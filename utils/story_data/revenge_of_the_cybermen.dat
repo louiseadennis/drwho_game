@@ -66,6 +66,8 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 (3, 8, 0, 'bombs', '', 100, 6,  'The Cyberman transmat everyone to Voga', 0, 0, 0, 0),
 (3, 8, 0, 'victory', '', 100, 11,  'The Cybermen are defeated', 0, 0, 0, 0);
 
+/* All others default */
+(2, 9, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0),
 
 /*
 (1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
