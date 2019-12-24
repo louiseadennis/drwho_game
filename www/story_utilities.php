@@ -199,7 +199,7 @@
             if ($action_id > 0 && $event != 0) {
                 // Work out which transition we are on
                 $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and action_id = '{$action_id}'";
-                //print $sql;
+                // print $sql;
                 
                 if (!$result = $connection->query($sql)) {
                     // There wasn't a transition for this action id.
@@ -331,7 +331,7 @@
     }
     
     function get_event_text($event_id, $connection) {
-        $story = get_value_from_users("story", $mysql);
+        $story = get_value_from_users("story", $connection);
         
         $sql = "SELECT text from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
         

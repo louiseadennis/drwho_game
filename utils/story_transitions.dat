@@ -29,6 +29,7 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 (2, 1, 4, 'evade', '', 20, 3, 'The Tardis crew smash the cybermat.', 0, 0, 0, 0),
 (2, 1, 5, 'bitten', '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0, 0),
 (2, 1, 6, 'evade', '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0, 0),
+(2, 1, 100, 'transmat', '', 100, 3, 'The Tardis crew transmat to Voga!', 0, 0, 0, 0),
 
 (2, 2, 1, 'null', '', 100, 2, 'The crew of the Nerva Beacon know no cure for a cybermat bite.', 0, 0, 0, 0),
 (2, 2, 2, 'null', 'doctor present', 100, 2, 'The Doctor realises that a trip through the transmat will clear cybermat poison out of someone\'s system.', 0, 0, 1, 0),
@@ -60,7 +61,7 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 (3, 4, 4, 'null', '', 95, 4, 'The Vogans can not be over-powered.', 0, 0, 0, 0),
 /* 5 default */
 (3, 4, 6, 'null', '', 100, 4, 'The area is full of rocks made from gold.', 0, 0, 0, 0),
-/* Travel impossible ? */
+/* Travel impossible */
 (3, 4, 0, 'bombs', '', 100, 5, 'The crew meet up on Voga.  Those who were captured escape from the Vogans.', 0, 0, 0, 0),
 
 
@@ -76,10 +77,12 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 
 /* All others default */
 (2, 7, 0, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 0),
+(2, 7, 100, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 0),
 (2, 7, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0),
 
 /* All others default */
 (3, 8, 0, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0),
+(3, 8, 100, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0),
 (3, 8, 0, 'bombs', '', 100, 6,  'The Cyberman transmat everyone to Voga', 0, 0, 0, 0),
 (3, 8, 0, 'victory', '', 100, 11,  'The Cybermen are defeated', 0, 0, 0, 0);
 
