@@ -29,6 +29,30 @@
         clear_story_path($db);
     }
     
+    function end_story($story_id, $db) {
+        quit_story($story_id, $db);
+        
+        $user_id = get_user_id($db);
+        $sql = "SELECT story_id_list FROM users where user_id = '{$user_id}'";
+        $story_id_list = select_sql_column($sql, $db);
+        $story_array = explode(",", $story_id_list);
+        if (empty($story_array)) {
+            $sql = "UPDATE users SET story_id_list='{$story_id}' where user_id = '{$user_id}'";
+            if (!$db->query($sql)) {
+                showerror($db);
+            }
+        } else {
+            if (! in_array($story_id, $story_array)) {
+                $story_id_list = $story_id_list . "," . $story_id;
+                
+                $sql = "UPDATE users SET story_id_list='{$story_id_list}' where user_id = '{$user_id}'";
+                if (!$db->query($sql)) {
+                    showerror($db);
+                }
+            }
+        }
+    }
+    
     function create_story_path($story_id, $db) {
         // $location_id = get_location($db);
         

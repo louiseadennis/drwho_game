@@ -76,16 +76,19 @@ INSERT INTO story_transitions (location_id, event_id, action_id, transition_labe
 /* 3, 4, ,5, 6  default */
 
 /* All others default */
-(2, 7, 0, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 0),
 (2, 7, 100, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 0),
 (2, 7, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0),
 
 /* All others default */
-(3, 8, 0, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0),
 (3, 8, 100, 'transmat', '', 100, 4,  'The transmat journey cures the cybermat bite!', 0, 0, 0, 0),
 (3, 8, 0, 'bombs', '', 100, 6,  'The Cyberman transmat everyone to Voga', 0, 0, 0, 0),
-(3, 8, 0, 'victory', '', 100, 11,  'The Cybermen are defeated', 0, 0, 0, 0);
+(3, 8, 0, 'victory', '', 100, 11,  'The Cybermen are defeated', 0, 0, 0, 0),
 
+/* All others default */
+(2, 9, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0);
+
+/* No transitions from 10! */
+/* No transitions from 11! */
 
 /*
 (1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),

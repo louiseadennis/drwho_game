@@ -85,6 +85,10 @@
         print("<br><img src=../assets/$icon align=left>");
         
         print("<i><p>Cybermen invade the beacon!  Aided by a traitor, Kellman, from the surviving crew.<p></i>");
+    } else if ($event == 10) {
+        end_story(1, $db);
+        
+        print("<i><p>The Cybermen have been defeated!</p></i>");
     }
     
     print_tardis_team($db);

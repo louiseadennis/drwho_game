@@ -22,6 +22,7 @@ CREATE TABLE `users` (
   `last_action` char(50) DEFAULT 'start',
   `log` text,
   `story` smallint(6) DEFAULT '0',
+  `story_id_list` text,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 

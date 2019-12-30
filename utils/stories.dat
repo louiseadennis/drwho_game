@@ -3,7 +3,8 @@ CREATE TABLE `stories` (
   `story_id` int(11) NOT NULL AUTO_INCREMENT,
   `title` text DEFAULT NULL,
   `locations` text,
+  `badge` text,
   PRIMARY KEY (`story_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
-INSERT INTO `stories` VALUES (1,'Revenge of the Cybermen','2,3');
+INSERT INTO `stories` VALUES (1,'Revenge of the Cybermen','2,3', 'revenge_of_the_cybermen.png');
