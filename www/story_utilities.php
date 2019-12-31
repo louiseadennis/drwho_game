@@ -1,5 +1,9 @@
 <?php
     
+    function developer_mode() {
+        return 1;
+    }
+    
     function start_story($story_id, $db) {
         if ($story_id != 0) {
             $story = get_value_from_users("story", $db);
@@ -10,12 +14,7 @@
                 print "New Adventure: ";
                 print "<input type=submit value=\"Start $story_name\"></form>";
             }
-        } //else {
-            // $story = get_value_from_users("story", $db);
-            //if ($story == '0') {
-            //    print "Hello";
-            //}
-       // }
+        }
     }
     
     function begin_story($story_id, $db) {
@@ -27,6 +26,15 @@
         create_log($story_id, $db);
         update_users("story", 0, $db);
         clear_story_path($db);
+        
+        $location_id = get_location($db);
+        $char_id_array = characters_at_location($location_id, $db);
+        foreach ($char_id_array as $char_id) {
+            $is_locked_up = is_locked_up($char_id, $db);
+            if ($is_locked_up) {
+                freed($char_id, $db);
+            }
+        }
     }
     
     function end_story($story_id, $db) {
@@ -63,10 +71,11 @@
         foreach ($locations as $story_location) {
             // And insert a location in play into the table.
             if (count(characters_at_location($story_location, $db)) > 0) {
+                // $initial_event id number is wrt. story_id not unique
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $story_location)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
                 // print $sql;
                 
                 if (!$result = $db->query($sql))
@@ -75,7 +84,7 @@
                 $initial_event = get_not_present_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, user_id, story_path, location_id) VALUES ($initial_event, $user_id, \"\", $story_location)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
                 // print $sql;
                 
                 if (!$result = $db->query($sql))
@@ -121,11 +130,12 @@
          return $value;
      }
     
-    function get_story_events($story_id, $location_id, $connection) {
-        $sql = "SELECT events from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
-        
-        return select_sql_column($sql, "events", $connection);
-    }
+    // Commenting out since I've not been updating these event lists - is this being used?
+    //function get_story_events($story_id, $location_id, $connection) {
+    //    $sql = "SELECT events from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
+    //
+    //    return select_sql_column($sql, "events", $connection);
+    //}
     
     function get_story_locations($story_id, $connection) {
         $sql = "SELECT locations from stories WHERE story_id ='{$story_id}'";
@@ -135,18 +145,21 @@
         return $location_array;
     }
     
+    // This is the default initial event id wrt. to the story - i.e.  not unique
     function get_initial_event($story_id, $location_id, $connection) {
         $sql = "SELECT default_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
         
         return select_sql_column($sql, "default_initial", $connection);
     }
     
+    // This is the default initial event id wrt. to the story - i.e.  not unique
     function get_not_present_initial_event($story_id, $location_id, $connection) {
         $sql = "SELECT not_present_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
         
         return select_sql_column($sql, "not_present_initial", $connection);
     }
 
+    // This returns event_id wrt. story id
     function get_current_event($connection) {
         $story = get_value_from_users("story", $connection);
         if ($story != 0 && $story != '') {
@@ -196,12 +209,14 @@
     function story_transition($action, $connection) {
         if (having_adventure($connection)) {
             // This is the current event _at this location_ if it equals 0 then this location currently has no event for this story
+            // Event_id is wrt. story_id
             $current_event = get_current_event($connection);
             $event = 0;
             if ($current_event != 0) {
                 $event = $current_event;
             }
             $location_id = get_location($connection);
+            $story_id = get_value_from_users("story", $connection);
             
             $action_id = 0;
             if (is_travel($action, $connection)) {
@@ -215,6 +230,8 @@
                 }
             }
             
+            // $event is id wrt. current story (not unique)
+            
             if (is_action($action, $connection)) {
                 $action_id = get_value_for_name_from("action_id", "actions", $action, $connection);
             }
@@ -222,7 +239,7 @@
             $transition_in_table = 1;
             if ($action_id > 0 && $event != 0) {
                 // Work out which transition we are on
-                $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and action_id = '{$action_id}'";
+                $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
                 // print $sql;
                 
                 if (!$result = $connection->query($sql)) {
@@ -281,11 +298,14 @@
                             }
                         } else {
                             print("A");
-                            $sql = "SELECT outcome FROM story_locations_in_play WHERE user_id='{$user_id} AND location_id='$story_location' AND transition_label = '$transition_label' AND action_id = '0'";
-                            if ($result2 = $connection->query($sql)) {
-                                $location_event = select_sql_column($sql, "outcome", $connection);
+                            $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$story_location'";
+                            $location_event = select_sql_column($sql, "event_id", $connection);
                             
-                                $sql = "UPDATE story_locations_in_play SET event_id='{$location_event}' where user_id = '$user_id' and location_id = '$story_location'";
+                            $sql = "SELECT outcome FROM story_transitions WHERE story_id='$story_id' AND location_id='$story_location' AND transition_label = '$transition_label' AND action_id = '0' AND event_id = '$location_event'";
+                            if ($result2 = $connection->query($sql)) {
+                                $new_location_event = select_sql_column($sql, "outcome", $connection);
+                            
+                                $sql = "UPDATE story_locations_in_play SET event_id='{$new_location_event}' where user_id = '$user_id' and location_id = '$story_location'";
                                 if (!$connection->query($sql)) {
                                     showerror($connection);
                                 }
@@ -293,7 +313,7 @@
                                 $sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$story_location'";
                                 $story_path = select_sql_column($sql, "story_path", $connection);
                             
-                                $story_path = $story_path . "," . $location_event;
+                                $story_path = $story_path . "," . $new_location_event;
 
                                 $sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$story_location'";
                                 if (!$connection->query($sql)) {

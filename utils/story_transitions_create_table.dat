@@ -3,6 +3,7 @@ CREATE TABLE `story_transitions` (
   `transition_id` int(11) NOT NULL AUTO_INCREMENT,
   `location_id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL,
+  `story_id` int(11) NOT NULL,
   `action_id` int(11) NOT NULL,
   `transition_label` text,
   `modifiers` text,

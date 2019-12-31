@@ -10,5 +10,7 @@ INSERT INTO story_events (story_id, story_number_id, text, event_location) VALUE
 (1, 8, 'Story Started on Beacon (Not Seen)', 3),
 (1, 9, 'Cybermen only people on Beacon (Not Seen)', 3),
 (1, 10, 'Victory! The Cybermen are Destroyed!', 2),
-(1, 11, 'Victory on the Beacon (Not Seen)', 3);
+(1, 11, 'Victory on the Beacon (Not Seen)', 3),
+(1, 12, 'News comes that the Cybermen on the Beacon have been destroyed.', 2),
+(1, 13, 'Escape from the Vogans.', 3);
 UNLOCK TABLES;
