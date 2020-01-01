@@ -67,12 +67,11 @@
         free_everyone(3, $db);
     }
     
-    if ($event == 12) {
+    if ($event == 12 || $event == 14) {
         end_story(1, $db);
         
         print("<i><p>The Cybermen have been defeated!</p></i>");
     }
-    
     
     print_tardis_team($db);
 ?>

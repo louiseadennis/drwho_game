@@ -258,6 +258,17 @@
                     //print("B");
                     $probability = 0;
                     $dice = rand(0, 100);
+                    //print("dice: " . $dice . "\n");
+                    
+                    // Options appear in order of increasing goodness therefore companion abilities add to dice roll
+                    $modifier = modify_dice($action_id, $connection);
+                    
+                    //print("modifier: " . $modifier);
+                    $dice = $dice + $modifier;
+                    //print("dice: " . $dice . "\n");
+                    if ($dice > 100) {
+                        $dice = 100;
+                    }
                     while ($row=$result->fetch_assoc()) {
                         $probability = $probability + $row["probability"];
                         if ($dice <= $probability) {
@@ -395,6 +406,45 @@
         // print ($sql);
         
         return select_sql_column($sql, "event_character", $connection);
+    }
+    
+    function modify_dice($action_id, $connection) {
+        $location_id = get_location($connection);
+        $characters_at_location = characters_at_location($location_id, $connection);
+        $modifier = 0;
+        foreach ($characters_at_location as $char_id) {
+            $stat = "";
+            if ($action_id == 1) {
+                $stat = "empathy";
+            } elseif ($action_id == 2) {
+                $stat = "tech";
+            } elseif ($action_id == 3) {
+                $stat = "running";
+            } elseif ($action_id == 4) {
+                $stat = "combat";
+            } elseif ($action_id == 5) {
+                $stat = "willpower";
+            } elseif ($action_id == 6) {
+                $stat = "observation";
+            }
+            
+            if ($stat != "") {
+                $sql = "SELECT $stat FROM characters WHERE char_id = '{$char_id}'";
+                $stat_mod = select_sql_column($sql, "$stat", $connection);
+                
+                $sql = "SELECT doctor FROM characters WHERE char_id = '{$char_id}'";
+                if (select_sql_column($sql, "doctor", $connection) == 1) {
+                    $stat_mod = $stat_mod * 3;
+                } else {
+                    $stat_mod = $stat_mod + 2;
+                }
+                
+                $modifier = $modifier + $stat_mod;
+            }
+        }
+        
+        // print($modifier);
+        return $modifier;
     }
         
 

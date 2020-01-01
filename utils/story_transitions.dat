@@ -34,8 +34,8 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 
 (2, 2, 1, 1, 'null', '', 100, 2, 'The crew of the Nerva Beacon know no cure for a cybermat bite.', 0, 0, 0, 0),
 (2, 2, 1, 2, 'null', 'doctor present', 100, 2, 'The Doctor realises that a trip through the transmat will clear cybermat poison out of someone\'s system.', 0, 0, 1, 0),
-(2, 2, 1, 2, 'null', '', 20, 2, ' works out that a trip through the transmat will clear the poison out of the system.cybermat poison out of someone\'s system.', 1, 0, 0, 0),
 (2, 2, 1, 2, 'null', '', 80, 2, 'It does not seem possible to synthesize a cure from anything available on Nerva Beacon.', 0, 0, 0, 0),
+(2, 2, 1, 2, 'null', '', 20, 2, ' works out that a trip through the transmat will clear the poison out of the system.cybermat poison out of someone\'s system.', 1, 0, 0, 0),
 (2, 2, 1, 3, 'null', '', 100, 2, 'The Tardis crew manage to escape from the cybermat.', 0, 0, 0, 0),
 (2, 2, 1, 4, 'null', '', 100, 2, 'The Tardis crew smash the cybermat.', 0, 0, 0, 0),
 /* 5 default */
@@ -44,11 +44,11 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 
 (2, 3, 1, 1, 'null', '', 100, 3, 'The crew of the Nerva Beacon say that the cybermen were defeated in a war using glitter guns made on Voga, planet of gold.', 0, 0, 0, 0),
 (2, 3, 1, 2, 'null', 'doctor present', 90, 3, 'The Doctor attempts to repel the cybermen with a jury-rigged emotion machine, but fails.', 0, 0, 1, 0),
-(2, 3, 1, 2, 'null', '', 95, 3, ' attempts to build a weapon to repel the cybermen, but fails.', 1, 0, 0, 0),
 (2, 3, 1, 2, 'null', 'doctor present', 10, 10, 'The Doctor manages to repel the cybermen with a jury-rigged emotion machine.', 0, 0, 1, 0),
+(2, 3, 1, 2, 'null', '', 95, 3, ' attempts to build a weapon to repel the cybermen, but fails.', 1, 0, 0, 0),
 (2, 3, 1, 2, 'victory', '', 5, 8, ' manages to build a weapon from chemicals to defeat the cybermen.', 1, 0, 0, 0),
-(2, 3, 1, 3, 'null','', 50, 3, 'The Tardis crew run away from the cybermen.', 0, 0, 0, 0),
 (2, 3, 1, 3, 'bombs', '', 50, 9, 'The Tardis crew are captured by the the cybermen and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
+(2, 3, 1, 3, 'null','', 50, 3, 'The Tardis crew run away from the cybermen.', 0, 0, 0, 0),
 (2, 3, 1, 4, 'bombs', '', 100, 9, 'The cybermen easily defeat the Tardis crew.  They are transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 5, 'bombs', '', 100, 9, 'While attempting to mentally defeat the cybermen, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 6, 'bombs', '', 100, 9, 'While looking around, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
@@ -58,8 +58,8 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (3, 4, 1, 1, 'null', '', 90, 4, 'The Vogans explain that they have been concealing themselves for generations for fear of enemies seeking the gold that Voga has in abundance.', 0, 0, 0, 0),
 /* 2 default */
 (3, 4, 1, 3, 'null', '', 90, 4, 'The crew is locked up with nowhere to run.', 0, 0, 0, 0),
-(3, 4, 1, 4, 'escape_vogans', '', 5, 13, 'The Tardis crew overpower their Vogan guards and escape.', 0, 0, 0, 0),
 (3, 4, 1, 4, 'null', '', 95, 4, 'The Vogans can not be over-powered.', 0, 0, 0, 0),
+(3, 4, 1, 4, 'escape_vogans', '', 5, 13, 'The Tardis crew overpower their Vogan guards and escape.', 0, 0, 0, 0),
 /* 5 default */
 (3, 4, 1, 6, 'null', '', 100, 4, 'The area is full of rocks made from gold.', 0, 0, 0, 0),
 /* Travel impossible */
@@ -67,13 +67,13 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 
 
 /* 1 default */
-(3, 5, 1, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 (3, 5, 1, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
+(3, 5, 1, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 /* 3, 4, ,5, 6  default */
 
 /* 1 default */
-(3, 6, 1, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 (3, 6, 1, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
+(3, 6, 1, 2, 'defuse_bombs', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 /* 3, 4, ,5, 6  default */
 
 /* All others default */
@@ -101,7 +101,13 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (3, 13, 1, 100, 'transmat', '', 100, 13,  'The transmat takes the crew in thte middle of a Cyberman attack on the Nerva Beacon.', 0, 0, 0, 2),
 (3, 13, 1, 0, 'victory', '', 100, 12,  'The Cybermen on the Beacon are Defeated', 0, 0, 0, 0);
 
+/* No transitions from 14! */
+
 /*
+NOTE FAILURE MODES SHOULD COME BEFORE SUCCESS MODES
+MULTIPLE OPTIONS SHOULD APPEAR IN ORDER OF INCREASING GOODNESS
+
+
 (1, 'empathy', 'There is no one here to talk to.', 'There is no one here to talk to.',0),
 (2, 'tech', 'The Doctor builds a machine out of string, a cork and a spoon he finds in his pockets.  It doesn\'t work.', 'There is no need for science or technology at the moment.',0),
 (3, 'running', 'There is nothing here to run away from.', 'There is nothing here to run away from.',0),
