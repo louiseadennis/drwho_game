@@ -32,6 +32,36 @@ $location = get_location($db);
 
 <div class=main style="padding:1em">
 
+<h2>Possible Transitions</h2>
+
+<?php
+  
+    $event = get_current_event($db);
+    $story_id = get_value_from_users("story", $db);
+    
+    if ($event != 0) {
+        $sql = "SELECT transition_id, probability, outcome from story_transitions where event_id = '{$event}' and story_id = '{$story_id}'";
+        
+        if (!$result = $db->query($sql)) {
+            // This event has no transitions
+            print("<p>No Transitions from this Event</p>");
+        } else {
+            print("<ul>");
+            while ($row=$result->fetch_assoc()) {
+                print "<li>Transition to: $row[outcome] with probability $row[probability]";
+                print "<form method=\"POST\" action=\"main.php\">";
+                print "<input type=\"hidden\" name=\"transition\" value=\"$row[transition_id]\">";
+                print "<input type=\"submit\" value=\"Make transition\"></form>";
+                print "</li>";
+            }
+            print("</ul>");
+        }
+
+    }
+    
+    
+?>
+
 
 <input type="hidden" name="last_action" value="profile_check">
 <input type="submit" value="Back to Game" style="font-size:2em">

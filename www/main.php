@@ -14,6 +14,7 @@ if ($db -> connect_errno > 0) {
    }
     
 $last_action = mysqlclean($_POST, "last_action", 15, $db);
+$transition = mysqlclean($_POST, "transition", 15, $db);
 //    print $last_action;
 
 
@@ -27,6 +28,10 @@ if ($start_story != "") {
     begin_story($start_story, $db);
 } else if ($quit_story != "") {
     quit_story($quit_story, $db);
+}
+    
+if ($transition != "") {
+    make_transition($transition, $db);
 }
     
 // Handle Travel

@@ -45,6 +45,11 @@
         return select_sql_column($sql, $column, $connection);
     }
 
+    function get_value_for_item_id($column, $item_id, $connection) {
+        $sql = "SELECT {$column} FROM items where item_id = '{$item_id}'";
+        
+        return select_sql_column($sql, $column, $connection);
+    }
 
     function get_user_id($connection)
     {
