@@ -40,7 +40,7 @@ $location = get_location($db);
     $story_id = get_value_from_users("story", $db);
     
     if ($event != 0) {
-        $sql = "SELECT transition_id, probability, outcome from story_transitions where event_id = '{$event}' and story_id = '{$story_id}'";
+        $sql = "SELECT transition_id, probability, outcome, action_id from story_transitions where event_id = '{$event}' and story_id = '{$story_id}'";
         
         if (!$result = $db->query($sql)) {
             // This event has no transitions
@@ -48,7 +48,23 @@ $location = get_location($db);
         } else {
             print("<ul>");
             while ($row=$result->fetch_assoc()) {
-                print "<li>Transition to: $row[outcome] with probability $row[probability]";
+                $next_event = $row["outcome"];
+                $sql = "SELECT text FROM story_events WHERE story_id = '{$story_id}' and story_number_id = '{$next_event}'";
+                $event_name = select_sql_column($sql, "text", $db);
+                
+                $action_id = $row["action_id"];
+                
+                $action_name = "Synchronised Action.";
+                if ($action_id > 0) {
+                    if ($action_id < 7) {
+                        $sql = "SELECT name FROM actions WHERE action_id = '$action_id'";
+                        $action_name = select_sql_column($sql, "name", $db);
+                    } else {
+                        $action_name = "Travel";
+                    }
+                }
+                
+                print "<li>Transition to: $event_name with probability $row[probability] using $action_name";
                 print "<form method=\"POST\" action=\"main.php\">";
                 print "<input type=\"hidden\" name=\"transition\" value=\"$row[transition_id]\">";
                 print "<input type=\"submit\" value=\"Make transition\"></form>";
@@ -62,7 +78,7 @@ $location = get_location($db);
     
 ?>
 
-
+<form method="POST" action="main.php">
 <input type="hidden" name="last_action" value="profile_check">
 <input type="submit" value="Back to Game" style="font-size:2em">
 </form>

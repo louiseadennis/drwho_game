@@ -287,8 +287,11 @@
                     $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
                     $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
                     if ($random_character) {
+                        $user_id = get_user_id($connection);
                         $sql = "SELECT event_character FROM story_locations_in_play WHERE user_id = '$user_id' AND location_id = '$location_id'";
+                        // print $sql;
                         $char = select_sql_column($sql, "event_character", $connection);
+                        // print("character" . $char);
                         
                         
                         $char_name = get_value_for_char_id("name", $char, $connection);
