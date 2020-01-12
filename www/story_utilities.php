@@ -156,6 +156,16 @@
         return select_sql_column($sql, "default_initial", $connection);
     }
     
+    function get_location_events($story_id, $location_id, $connection) {
+        $sql = "SELECT story_number_id FROM story_events WHERE story_id = '{$story_id}' AND event_location = '{$location_id}'";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+            return [];
+        } else {
+            return $connection->query($sql);
+        }
+    }
+    
     // This is the default initial event id wrt. to the story - i.e.  not unique
     function get_not_present_initial_event($story_id, $location_id, $connection) {
         $sql = "SELECT not_present_initial from story_locations WHERE story_id = '{$story_id}' AND location_id = '{$location_id}'";
@@ -173,6 +183,52 @@
             $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}'";
             
             return select_sql_column($sql, "event_id", $connection);
+        }
+    }
+    
+    function go_to_event($story_id_number, $connection) {
+        $story_id = get_value_from_users("story", $connection);
+        quit_story($story_id, $connection);
+        begin_story($story_id, $connection);
+        $location_id = get_location($connection);
+        $initial_event = get_initial_event($story_id, $location_id, $connection);
+        $path = find_path_to($initial_event, $story_id_number, $story_id, $connection);
+        $from_event = $initial_event;
+        // print($path);
+        $rpath = array_reverse($path);
+        foreach ($rpath as $event) {
+            transition($from_event, $event, $story_id, $connection);
+            $from_event = $event;
+        }
+    }
+    
+    function find_path_to($event1, $event2, $story_id, $connection) {
+        if ($event1 == $event2) {
+            // print($event1);
+            return array($event1);
+        } else {
+            $sql = "SELECT outcome from story_transitions where event_id = '{$event1}' and story_id = '{$story_id}'";
+            // print($sql);
+             
+             if (!$result = $connection->query($sql)) {
+                 // This event has no transitions
+                 return NULL;
+             } else {
+                 while ($row=$result->fetch_assoc()) {
+                     $next_event = $row["outcome"];
+                     // print($next_event);
+                     if ($next_event != $event1) {
+                         $path = find_path_to($next_event, $event2, $story_id, $connection);
+                         if ($path != NULL) {
+                             // print $path;
+                             $path[] = $event1;
+                             return $path;
+                         }
+                     }
+                 }
+                 return NULL;
+             }
+
         }
     }
     
@@ -314,6 +370,17 @@
             }
         } else {
             print ("<p>&nbsp;</p>");
+        }
+    }
+    
+    function transition($from_event, $to_event, $story_id, $connection) {
+        if ($from_event != $to_event) {
+            $sql = "SELECT transition_id FROM story_transitions where event_id = '{$from_event}' and story_id = '{$story_id}' and outcome='{$to_event}'";
+            if ($result = $connection->query($sql)) {
+                $row = $result->fetch_assoc();
+                $transition_id = $row["transition_id"];
+                make_transition($transition_id, $connection);
+            }
         }
     }
     

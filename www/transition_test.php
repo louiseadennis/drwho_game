@@ -72,7 +72,20 @@ $location = get_location($db);
             }
             print("</ul>");
         }
-
+        
+        $location_id = get_location($db);
+        $story_events = get_location_events($story_id, $location_id, $db);
+        while ($row = $story_events->fetch_assoc()) {
+            $event = $row["story_number_id"];
+            $sql = "SELECT text FROM story_events WHERE story_id = '{$story_id}' and story_number_id = '{$event}'";
+            $event_name = select_sql_column($sql, "text", $db);
+            print "<li>Switch to: $event_name";
+            print "<form method=\"POST\" action=\"main.php\">";
+            print "<input type=\"hidden\" name=\"go_to_event\" value=\"$event\">";
+            print "<input type=\"submit\" value=\"Go To Event\"></form>";
+            print "</li>";
+        }
+        print("</ul>");
     }
     
     
