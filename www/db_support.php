@@ -117,14 +117,14 @@
           $uname = $_SESSION["loginUsername"];
 
           $ally_id_list = get_value_from_users("ally_id_list", $connection);
-          $ally_id_array = explode(",", $critter_id_list);
+          $ally_id_array = explode(",", $ally_id_list);
 
           if (is_null($ally_id_list)) {
              update_users("ally_id_list", $ally_id, $connection);
           } else {
                 if (!in_array($ally_id, $ally_id_array)) {
-                     $new_ally_id_list = $ally_id_list . "," . $ally_id;
-             update_users("ally_id_list", $new_ally_id_list, $connection);
+                    $new_ally_id_list = $ally_id_list . "," . $ally_id;
+                    update_users("ally_id_list", $new_ally_id_list, $connection);
             }
           }
     }
