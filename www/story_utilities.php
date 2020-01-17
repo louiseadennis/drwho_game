@@ -7,6 +7,9 @@
     function start_story($story_id, $db) {
         if ($story_id != 0) {
             $story = get_value_from_users("story", $db);
+            if (in_end_state($story, $db)) {
+                $story = 0;
+            }
             if ($story == '0' || $story == '') {
                 $story_name = get_value_for_story_id("title", $story_id, $db);
                 // print "<u>$story_name</u>";
@@ -35,6 +38,35 @@
                 freed($char_id, $db);
             }
         }
+    }
+    
+    function in_end_state($story, $db) {
+        $location_id = get_location($db);
+        $event_id = get_current_event($db);
+        
+        $sql = "SELECT text from story_events where event_location = '{$location_id}' AND story_number_id = '{$event_id}' AND story_id = '{$story}'";
+        //print($sql);
+        if ($result = $db->query($sql)) {
+            if ($result->num_rows == 0) {
+                return 0;
+            }
+            
+            
+            $sql = "SELECT action_id from story_transitions where story_id = '{$story}' and event_id = '{$event_id}'";
+            if (!$result = $db->query($sql))
+                showerror($db);
+             
+            if ($result->num_rows > 0) {
+                //print("B");
+                return 0;
+            } else {
+               // print("C");
+                return 1;
+            }
+
+        }
+        
+        return 0;
     }
     
     function fail_story($story_id, $db) {
@@ -180,7 +212,8 @@
             $location_id = get_location($connection);
             $user_id = get_user_id($connection);
             
-            $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}'";
+            $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}' and story_id = '{$story}'";
+            // print($sql);
             
             return select_sql_column($sql, "event_id", $connection);
         }
@@ -203,12 +236,13 @@
     }
     
     function find_path_to($event1, $event2, $story_id, $connection) {
+        //print($event2);
         if ($event1 == $event2) {
-            // print($event1);
+            //print($event1);
             return array($event1);
         } else {
             $sql = "SELECT outcome from story_transitions where event_id = '{$event1}' and story_id = '{$story_id}'";
-            // print($sql);
+            //print($sql);
              
              if (!$result = $connection->query($sql)) {
                  // This event has no transitions
@@ -287,6 +321,9 @@
                     $user_id = get_user_id($connection);
                     $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
                     $event = select_sql_column($sql, "event_id", $connection);
+                    
+                    
+                    
                 }
             }
             
@@ -299,7 +336,13 @@
             $transition_in_table = 1;
             if ($action_id > 0 && $event != 0) {
                 // Work out which transition we are on
-                $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
+                $travel_type = get_value_from_users("travel_type", $connection);
+                
+                if ($action_id != 100) {
+                    $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
+                } else {
+                    $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and transition_label = '{$travel_type}'";
+                }
                 // print $sql;
                 
                 if (!$result = $connection->query($sql)) {

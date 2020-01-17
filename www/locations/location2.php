@@ -42,6 +42,7 @@
 
 <?php
     $event = get_current_event($db);
+    // print($event);
     if ($event == 1) {
         $critter_id = get_value_for_name_from("critter_id", "critters", "Cybermat", $db);
         

@@ -35,7 +35,12 @@ if ($log != '') {
         $badge = get_value_for_story_id("badge", $entry, $db);
         $text = get_value_for_story_id("title", $entry, $db);
         print "<tr><td><img src=assets/$badge></td>";
-        print "<td>$text</td></tr>";
+        print "<td>$text</td>";
+        print "<td><form method=\"POST\" action=\"story.php\">";
+        print "<input type=\"hidden\" name=\"story_id\" value=\"$entry\">";
+        print "<input type=\"submit\" value=\"View Full Logs\">";
+        print "</form></td>";
+        print "</tr>";
      }
 }
 print "</table>";

@@ -61,11 +61,37 @@ $location = get_location($db);
                         $action_name = select_sql_column($sql, "name", $db);
                     } else {
                         $action_name = "Travel";
+
                     }
                 }
                 
                 print "<li>Transition to: $event_name with probability $row[probability] using $action_name";
                 print "<form method=\"POST\" action=\"main.php\">";
+                
+                if ($action_name == "Travel") {
+                    $char_id_array = characters_at_location(get_location($db), $db);
+                    $to_transmat = 1;
+                    foreach ($char_id_array as $char_id) {
+                        $is_locked_up = is_locked_up($char_id, $db);
+                        $char_name = get_value_for_char_id("name", $char_id, $db);
+                        $uchar = ucfirst($char_name);
+                        if ($is_locked_up) {
+                            print "$uchar is locked up and can't travel<br>";
+                        } else{
+                            print "<label><input type=checkbox name=\"person$to_transmat\" value=$char_id checked><labelspan>$uchar</labelspan></label><br>";
+                            $to_transmat++;
+                        }
+                    }
+                    for ($i = $to_transmat; $to_transmat<5; $to_transmat++) {
+                        print "<input type=\"hidden\" name=\"person$to_transmat\" value=\"\">";
+                    }
+                    
+                    $transition_id = $row["transition_id"];
+                    $sql = "SELECT new_location from story_transitions where transition_id = '{$transition_id}'";
+                    $location = select_sql_column($sql, "new_location", $db);
+                    print "<input type=\"hidden\" name=\"location\" value=\"$location\">";
+                }
+                
                 print "<input type=\"hidden\" name=\"transition\" value=\"$row[transition_id]\">";
                 print "<input type=\"submit\" value=\"Make transition\"></form>";
                 print "</li>";

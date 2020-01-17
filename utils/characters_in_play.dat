@@ -7,6 +7,12 @@ CREATE TABLE `characters_in_play` (
   `modifiers` text,
   `unconscious` int(11) NOT NULL DEFAULT 0,
   `incarcerated` int(11) NOT NULL DEFAULT 0,
+  `combat` tinyint(4) NOT NULL DEFAULT 0,
+  `tech` tinyint(4) NOT NULL DEFAULT 0,
+  `observation` tinyint(4) NOT NULL DEFAULT 0,
+  `empathy` tinyint(4) NOT NULL DEFAULT 0,
+  `willpower` tinyint(4) NOT NULL DEFAULT 0,
+  `running` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`char_in_play_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

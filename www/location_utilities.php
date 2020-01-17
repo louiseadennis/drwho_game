@@ -39,9 +39,16 @@
         print "<div class=\"dynamic\">";
         print "<div class=\"action\">";
         $story = get_value_from_users("story", $mysql);
+        
+        
         if ($story != '0' && $story != '') {
-            $story_name = get_value_for_story_id("title", $story, $mysql);
-            print "<b style=\"font-size:1.5em\">$story_name</b>";
+            if (in_end_state($story, $mysql)) {
+                $story = 0;
+            }
+        }
+        if ($story != '0' && $story != '') {
+                $story_name = get_value_for_story_id("title", $story, $mysql);
+                print "<b style=\"font-size:1.5em\">$story_name</b>";
          } else {
             print "<b style=\"font-size:1.5em\">&nbsp;</b>";
         }

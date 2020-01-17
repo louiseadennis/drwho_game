@@ -33,6 +33,14 @@ if ($start_story != "") {
     
 if ($transition != "") {
     make_transition($transition, $db);
+    $sql = "SELECT action_id from story_transitions where transition_id = '{$transition}'";
+    $action_id = select_sql_column($sql, "action_id", $db);
+    if ($action_id == 100) {
+        $last_action = 'travel';
+        $sql = "SELECT transition_label from story_transitions where transition_id = '{$transition}'";
+        $travel_type = select_sql_column($sql, "transition_label", $db);
+        //print($travel_type);
+    }
 }
     
 if ($event != "") {
