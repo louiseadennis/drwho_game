@@ -321,9 +321,6 @@
                     $user_id = get_user_id($connection);
                     $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
                     $event = select_sql_column($sql, "event_id", $connection);
-                    
-                    
-                    
                 }
             }
             

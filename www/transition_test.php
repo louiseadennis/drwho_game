@@ -65,7 +65,7 @@ $location = get_location($db);
                     }
                 }
                 
-                print "<li>Transition to: $event_name with probability $row[probability] using $action_name";
+                print "<li>Transition to: $next_event ($event_name) with probability $row[probability] using $action_name";
                 print "<form method=\"POST\" action=\"main.php\">";
                 
                 if ($action_name == "Travel") {

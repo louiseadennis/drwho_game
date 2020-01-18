@@ -30,17 +30,17 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (2, 1, 1, 4, 'evade', '', 20, 3, 'The Tardis crew smash the cybermat.', 0, 0, 0, 0),
 (2, 1, 1, 5, 'bitten', '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0, 0),
 (2, 1, 1, 6, 'evade', '', 100, 2, ' is bitten by the cybermat.', 1, 0, 0, 0),
-(2, 1, 1, 100, 'transmat', '', 100, 3, 'The Tardis crew transmat to Voga!', 0, 0, 0, 0),
+(2, 1, 1, 100, 'transmat', '', 100, 3, 'The Tardis crew transmat to Voga!', 0, 0, 0, 3),
 
 (2, 2, 1, 1, 'null', '', 100, 2, 'The crew of the Nerva Beacon know no cure for a cybermat bite.', 0, 0, 0, 0),
 (2, 2, 1, 2, 'null', 'doctor present', 100, 2, 'The Doctor realises that a trip through the transmat will clear cybermat poison out of someone\'s system.', 0, 0, 1, 0),
 (2, 2, 1, 2, 'null', '', 80, 2, 'It does not seem possible to synthesize a cure from anything available on Nerva Beacon.', 0, 0, 0, 0),
 (2, 2, 1, 2, 'null', '', 20, 2, ' works out that a trip through the transmat will clear the poison out of the system.cybermat poison out of someone\'s system.', 1, 0, 0, 0),
-(2, 2, 1, 3, 'null', '', 100, 2, 'The Tardis crew manage to escape from the cybermat.', 0, 0, 0, 0),
+(2, 2, 1, 3, 'null', '', 100, 2, 'The Tardis crew hide from the cybermat.', 0, 0, 0, 0),
 (2, 2, 1, 4, 'null', '', 100, 2, 'The Tardis crew smash the cybermat.', 0, 0, 0, 0),
 /* 5 default */
 (2, 2, 1, 6, 'null', '', 100, 2, 'The only thing of use in Nerva Beacon is the transmat.', 0, 0, 0, 0),
-(2, 2, 1, 100, 'transmat', '', 100, 3, 'The transmat journey cures the cybermat bite!', 0, 0, 0, 0),
+(2, 2, 1, 100, 'transmat', '', 100, 3, 'The transmat journey cures the cybermat bite!', 0, 0, 0, 3),
 
 (2, 3, 1, 1, 'null', '', 100, 3, 'The crew of the Nerva Beacon say that the cybermen were defeated in a war using glitter guns made on Voga, planet of gold.', 0, 0, 0, 0),
 (2, 3, 1, 2, 'null', 'doctor present', 90, 3, 'The Doctor attempts to repel the cybermen with a jury-rigged emotion machine, but fails.', 0, 0, 1, 0),
@@ -52,7 +52,7 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (2, 3, 1, 4, 'bombs', '', 100, 9, 'The cybermen easily defeat the Tardis crew.  They are transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 5, 'bombs', '', 100, 9, 'While attempting to mentally defeat the cybermen, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 6, 'bombs', '', 100, 9, 'While looking around, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
-(2, 3, 1, 100, 'bombs', '', 100, 9, 'The crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
+(2, 3, 1, 100, 'transmat', '', 100, 3, 'Some of the crew transmat to Voga!', 0, 0, 0, 3),
 
 (3, 4, 1, 1, 'escape_vogans', '', 10, 13, 'The Tardis crew persuade the Vogans to let them go.', 0, 0, 0, 0), 
 (3, 4, 1, 1, 'null', '', 90, 4, 'The Vogans explain that they have been concealing themselves for generations for fear of enemies seeking the gold that Voga has in abundance.', 0, 0, 0, 0),
@@ -86,12 +86,12 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 /* 3, 4, ,5, 6  default */
 
 /* All others default */
-(2, 7, 1, 100, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 0),
+(2, 7, 1, 100, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 2),
 (2, 7, 1, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0),
 (2, 7, 1, 0, 'fail', '', 100, 10, 'The planet, Voga, explodes.', 0, 0, 0, 0),
 
 /* All others default */
-(3, 8, 1, 100, 'transmat', '', 100, 4,  'Tardis crew transmat to Voga!', 0, 0, 0, 0),
+(3, 8, 1, 100, 'transmat', '', 100, 4,  'Tardis crew transmat to Voga!', 0, 0, 0, 3),
 (3, 8, 1, 0, 'bombs', '', 100, 6,  'The Cyberman transmat everyone to Voga', 0, 0, 0, 0),
 (3, 8, 1, 0, 'victory', '', 100, 11,  'The Cybermen are defeated', 0, 0, 0, 0),
 
