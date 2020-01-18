@@ -15,4 +15,5 @@ INSERT INTO story_events (story_id, story_number_id, text, event_location) VALUE
 (1, 13, 'Escape from the Vogans.', 3),
 (1, 14, 'The Vogans launch a Rocket that Destroys the Cyberman Spaceship.', 3);
 (1, 15, 'The bombs explode, destroying Voga.', 3);
+(1, 16, 'Failure State (Not Seen)', 2);
 UNLOCK TABLES;
