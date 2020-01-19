@@ -105,7 +105,7 @@ $location = get_location($db);
             $event = $row["story_number_id"];
             $sql = "SELECT text FROM story_events WHERE story_id = '{$story_id}' and story_number_id = '{$event}'";
             $event_name = select_sql_column($sql, "text", $db);
-            print "<li>Switch to: $event_name";
+            print "<li>Switch to: $event ($event_name)";
             print "<form method=\"POST\" action=\"main.php\">";
             print "<input type=\"hidden\" name=\"go_to_event\" value=\"$event\">";
             print "<input type=\"submit\" value=\"Go To Event\"></form>";

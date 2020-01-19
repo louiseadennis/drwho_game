@@ -128,6 +128,33 @@
         
         return ($locked_up);
     }
+    
+    function  hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+         $sql = "UPDATE characters_in_play SET hypnotised = 1 where char_id = '$char_id' and user_id = '$user_id'";
+         
+         if (!$db->query($sql)) {
+              showerror($db);
+         }
+    }
+    
+    function not_hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET hypnotised = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+
+    function is_hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT hypnotised from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $locked_up = select_sql_column($sql, "hypnotised", $db);
+        
+        return ($locked_up);
+    }
+
 
     
     function join_crew($char_id, $connection) {

@@ -7,6 +7,7 @@ CREATE TABLE `characters_in_play` (
   `modifiers` text,
   `unconscious` int(11) NOT NULL DEFAULT 0,
   `incarcerated` int(11) NOT NULL DEFAULT 0,
+  `hypnotised` int(11) NOT NULL DEFAULT 0,
   `combat` tinyint(4) NOT NULL DEFAULT 0,
   `tech` tinyint(4) NOT NULL DEFAULT 0,
   `observation` tinyint(4) NOT NULL DEFAULT 0,

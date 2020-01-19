@@ -37,6 +37,9 @@
             if ($is_locked_up) {
                 freed($char_id, $db);
             }
+            if ($is_hypnotised) {
+                not_hypnotised($char_id, $db);
+            }
         }
     }
     
@@ -225,13 +228,24 @@
         begin_story($story_id, $connection);
         $location_id = get_location($connection);
         $initial_event = get_initial_event($story_id, $location_id, $connection);
+        $not_present_event = get_not_present_initial_event($story_id, $location_id, $connection);
         $path = find_path_to($initial_event, $story_id_number, $story_id, $connection);
+        print($path);
+        if (is_null($path)) {
+            // print("Trying not present<br>");
+            $initial_event=$not_present_event;
+            $path = find_path_to($not_present_event, $story_id_number, $story_id, $connection);
+            // print($path);
+        }
         $from_event = $initial_event;
         // print($path);
-        $rpath = array_reverse($path);
-        foreach ($rpath as $event) {
-            transition($from_event, $event, $story_id, $connection);
-            $from_event = $event;
+        if (!is_null($path)) {
+            $rpath = array_reverse($path);
+            foreach ($rpath as $event) {
+                transition($from_event, $event, $story_id, $connection);
+                $from_event = $event;
+            }
+            // print("HI");
         }
     }
     
@@ -242,7 +256,7 @@
             return array($event1);
         } else {
             $sql = "SELECT outcome from story_transitions where event_id = '{$event1}' and story_id = '{$story_id}'";
-            //print($sql);
+            // print($sql);
              
              if (!$result = $connection->query($sql)) {
                  // This event has no transitions
@@ -317,10 +331,12 @@
                 $action_id = 100;
                 $prev_location = get_value_from_users("prev_location", $connection);
                 // Nothing interesting happening here, but maybe we came from somewhere with a transition to here.
+                // Don't think this should happen any more -- locations of interest now have empty states if no one is there.
                 if ($current_event == 0) {
                     $user_id = get_user_id($connection);
                     $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
                     $event = select_sql_column($sql, "event_id", $connection);
+                    print("Should we be in this bit of code?");
                 }
             }
             
@@ -460,10 +476,17 @@
                           // print("A");
                 $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$story_location'";
                 $location_event = select_sql_column($sql, "event_id", $connection);
+                // print("location: " . $story_location);
+                // print("current event: " . $location_event);
                           
                 $sql = "SELECT outcome FROM story_transitions WHERE story_id='$story_id' AND location_id='$story_location' AND transition_label = '$transition_label' AND action_id = '0' AND event_id = '$location_event'";
                 if ($result2 = $connection->query($sql)) {
                     $new_location_event = select_sql_column($sql, "outcome", $connection);
+                    // Nothing for this transition.
+                    if ($new_location_event == 0) {
+                        $new_location_event = $location_event;
+                    }
+                    // print("current event: " . $location_event);
                           
                     $sql = "UPDATE story_locations_in_play SET event_id='{$new_location_event}' where user_id = '$user_id' and location_id = '$story_location'";
                     if (!$connection->query($sql)) {

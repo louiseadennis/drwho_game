@@ -54,8 +54,8 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (2, 3, 1, 6, 'bombs', '', 100, 9, 'While looking around, the crew are captured and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 100, 'transmat', '', 100, 3, 'Some of the crew transmat to Voga!', 0, 0, 0, 3),
 
-(3, 4, 1, 1, 'escape_vogans', '', 10, 13, 'The Tardis crew persuade the Vogans to let them go.', 0, 0, 0, 0), 
 (3, 4, 1, 1, 'null', '', 90, 4, 'The Vogans explain that they have been concealing themselves for generations for fear of enemies seeking the gold that Voga has in abundance.', 0, 0, 0, 0),
+(3, 4, 1, 1, 'escape_vogans', '', 10, 13, 'The Tardis crew persuade the Vogans to let them go.', 0, 0, 0, 0), 
 /* 2 default */
 (3, 4, 1, 3, 'null', '', 90, 4, 'The crew is locked up with nowhere to run.', 0, 0, 0, 0),
 (3, 4, 1, 4, 'null', '', 95, 4, 'The Vogans can not be over-powered.', 0, 0, 0, 0),
