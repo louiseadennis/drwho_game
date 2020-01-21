@@ -414,11 +414,16 @@
                         $outcome_text = $char_name . $outcome_text;
                         // print($outcome_text);
                     }
+                    
                     print("<p>$outcome_text</p>");
                 } else {
-                    // print("A");
+                    
                     $action = get_value_for_action_id("name", $action_id, $connection);
-                    print_action_default($action, $connection);
+                    if (is_action($action, $connection)) {
+                        print_action_default($action, $connection);
+                    } else {
+                        print "<p>  &nbsp;</p>";
+                    }
                 }
             
             } else {

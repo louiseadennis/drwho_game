@@ -119,6 +119,7 @@
             }
         }
         
+        
         if (having_adventure($connection) && !$pov_switch) {
             story_transition($last_action, $connection);
         } else {

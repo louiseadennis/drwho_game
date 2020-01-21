@@ -16,7 +16,7 @@ if ($db -> connect_errno > 0) {
 $story_id = mysqlclean($_POST, "story_id", 15, $db);
 $story = get_value_for_story_id("title", $story_id, $db);
     
-    $location = get_location($db);
+$location = get_location($db);
 ?>
 <html>
 <head>
@@ -39,6 +39,18 @@ $story = get_value_for_story_id("title", $story_id, $db);
 
 <?php
     print "<h1>$story</h1>";
+
+    $sql = "SELECT locations from stories where story_id='{$story_id}'";
+    $story_locations = select_sql_column($sql, "locations", $db);
+    $location_array = explode(",", $story_locations);
+    foreach ($location_array as $location) {
+        $sql = "SELECT name from locations where location_id='{$location}'";
+        $name = select_sql_column($sql, "name", $db);
+        print "<h3>$name</h3>";
+    }
+    
+    
+    
     ?>
 
 <form method="POST" action="main.php">
