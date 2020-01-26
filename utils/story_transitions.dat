@@ -46,7 +46,7 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 (2, 3, 1, 2, 'null', 'doctor present', 90, 3, 'The Doctor attempts to repel the cybermen with a jury-rigged emotion machine, but fails.', 0, 0, 1, 0),
 (2, 3, 1, 2, 'null', 'doctor present', 10, 10, 'The Doctor manages to repel the cybermen with a jury-rigged emotion machine.', 0, 0, 1, 0),
 (2, 3, 1, 2, 'null', '', 95, 3, ' attempts to build a weapon to repel the cybermen, but fails.', 1, 0, 0, 0),
-(2, 3, 1, 2, 'victory', '', 5, 8, ' manages to build a weapon from chemicals to defeat the cybermen.', 1, 0, 0, 0),
+(2, 3, 1, 2, 'victory', '', 5, 10, ' manages to build a weapon from chemicals to defeat the cybermen.', 1, 0, 0, 0),
 (2, 3, 1, 3, 'bombs', '', 50, 9, 'The Tardis crew are captured by the the cybermen and transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
 (2, 3, 1, 3, 'null','', 50, 3, 'The Tardis crew run away from the cybermen.', 0, 0, 0, 0),
 (2, 3, 1, 4, 'bombs', '', 100, 9, 'The cybermen easily defeat the Tardis crew.  They are transmatted down to Voga strapped into bombs that the cymbermen intend to use to blow up the planet.', 0, 0, 0, 3),
@@ -67,23 +67,29 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 
 
 (3, 5, 1, 1, 'fail', '', 5, 15, 'The bombs explode', 0, 0, 0, 0),
-(3, 5, 1, 1, 'null', '', 95, 5, 'Despite much discussion there are no ideas for how to defuse the bombs.', 0, 0, 0, 0),
-(3, 5, 1, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
+(3, 5, 1, 1, 'try_fail_bomb', '', 95, 18, 'Despite much discussion there are no ideas for how to defuse the bombs.', 0, 0, 0, 0),
+(3, 5, 1, 2, 'try_fail_bomb', '', 10, 18, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
 (3, 5, 1, 2, 'victory', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
 (3, 5, 1, 3, 'fail', '', 5, 15, 'The bombs explode', 0, 0, 0, 0),
-(3, 5, 1, 3, 'null', '', 95, 5, 'Running around does not help defuse the bombs.', 0, 0, 0, 0),
+(3, 5, 1, 3, 'try_fail_bomb', '', 95, 18, 'Running around does not help defuse the bombs.', 0, 0, 0, 0),
 (3, 5, 1, 4, 'fail', '', 5, 15, 'The bombs explode', 0, 0, 0, 0),
-(3, 5, 1, 4, 'null', '', 95, 5, 'There is no one to fight.', 0, 0, 0, 0),
+(3, 5, 1, 4, 'try_fail_bomb', '', 95, 18, 'There is no one to fight.', 0, 0, 0, 0),
 (3, 5, 1, 5, 'fail', '', 5, 15, 'The bombs explode', 0, 0, 0, 0),
-(3, 5, 1, 5, 'null', '', 95, 5, 'The bombs have no minds to influence.', 0, 0, 0, 0),
+(3, 5, 1, 5, 'try_fail_bomb', '', 95, 18, 'The bombs have no minds to influence.', 0, 0, 0, 0),
 (3, 5, 1, 6, 'fail', '', 5, 15, 'The bombs explode', 0, 0, 0, 0),
-(3, 5, 1, 6, 'null', '', 95, 5, 'The bombs probably require a technological solution.', 0, 0, 0, 0),
+(3, 5, 1, 6, 'try_fail_bomb', '', 95, 18, 'The bombs probably require a technological solution.', 0, 0, 0, 0),
+(3, 5, 1, 100, 'transmat', '', 100, 18, 'Transmat does not help.', 0, 0, 0, 2),
 
 
-/* 1 default */
-(3, 6, 1, 2, 'null', '', 10, 5, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
+(3, 6, 1, 1, 'try_fail_bomb', '', 100, 18, 'Despite much discussion there are no ideas for how to defuse the bombs', 0, 0, 0, 0),
+(3, 6, 1, 2, 'try_fail_bomb', '', 10, 18, 'The crew do not manage to defuse the bombs.', 0, 0, 0, 0),
 (3, 6, 1, 2, 'victory', '', 90, 14, 'The Doctor defuses the  bombs.', 0, 0, 1, 0),
-/* 3, 4, ,5, 6  default */
+(3, 6, 1, 3, 'try_fail_bomb', '', 100, 18, 'Running around does not help defuse the bombs.', 0, 0, 0, 0),
+(3, 6, 1, 4, 'try_fail_bomb', '', 100, 18, 'There is no one to fight.', 0, 0, 0, 0),
+(3, 6, 1, 6, 'try_fail_bomb', '', 100, 18, 'The bombs probably require a technological solution', 0, 0, 0, 0),
+(3, 6, 1, 5, 'try_fail_bomb', '', 100, 18, 'The bombs have no mind to influence.', 0, 0, 0, 0),
+(3, 6, 1, 100, 'try_fail_bomb', '', 100, 18, 'Transmat does not help', 0, 0, 0, 2),
+
 
 /* All others default */
 (2, 7, 1, 100, 'transmat', '', 100, 3, 'The transmat takes the crew into the middle of a Cyberman attack on the Nerva Beacon', 0, 0, 0, 2),

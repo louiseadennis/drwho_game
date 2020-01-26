@@ -230,7 +230,7 @@
         $initial_event = get_initial_event($story_id, $location_id, $connection);
         $not_present_event = get_not_present_initial_event($story_id, $location_id, $connection);
         $path = find_path_to($initial_event, $story_id_number, $story_id, $connection);
-        print($path);
+        // print($path);
         if (is_null($path)) {
             // print("Trying not present<br>");
             $initial_event=$not_present_event;
