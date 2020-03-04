@@ -64,6 +64,10 @@ labelspan {
     padding: 5px;
 }
 
+.story {
+    text-align: center;
+}
+
 .dynamic {
    background-color: #FFFFFF;
 	font-family: sans-serif;

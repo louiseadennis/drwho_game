@@ -104,6 +104,7 @@ INSERT INTO story_transitions (location_id, event_id, story_id, action_id, trans
 /* All others default */
 (2, 9, 1, 0, 'victory', '', 100, 10, 'The Vogans are Victorious', 0, 0, 0, 0),
 (2, 9, 1, 0, 'fail', '', 100, 10, 'The planet, Voga, explodes.', 0, 0, 0, 0),
+(2, 9, 1, 100, 'transmat', '', 100, 19, 'Some of the crew travel to the Beacon', 0, 0, 0, 2),
 
 /* No transitions from 10! */
 /* No transitions from 11! */

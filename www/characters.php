@@ -332,6 +332,25 @@
 
     }
     
+    function remove_modification($modifier, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "SELECT char_id FROM characters_in_play WHERE user_id = '$user_id'";
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+                
+        while ($row=$result->fetch_assoc()) {
+            $char_id = $row["char_id"];
+            $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
+            $modification_array = explode(",", $modification_list);
+            foreach ($modification_array as $m) {
+                if ($modifier == $m) {
+                    remove_modification_from_character($modifier, $char_id, $connection);
+                }
+            }
+        }
+    }
+
+    
     function character_location($char_id, $db) {
         $location_id = get_value_for_char_in_play_id("location_id", $char_id, $db);
         return $location_id;

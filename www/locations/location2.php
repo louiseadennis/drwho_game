@@ -87,9 +87,15 @@
         
         print("<i><p>Cybermen invade the beacon!  Aided by a traitor, Kellman, from the surviving crew.<p></i>");
     } else if ($event == 10) {
+        remove_modification(1, $db);
         end_story(1, $db);
         
         print("<i><p>The Cybermen have been defeated!</p></i>");
+    } else if ($event == 16) {
+        remove_modification(1, $db);
+        fail_story(1, $db);
+        
+        print("<i><p>Everyone Dies.  This story is over.</p></i>");
     }
     
     print_tardis_team($db);

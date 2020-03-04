@@ -62,18 +62,20 @@
     if ($event == 6) {
         print("<i><p>The crew arrive on Voga with bombs strapped to their chests.</p></i>");
     }
-
+    
     if ($event == 13) {
         free_everyone(3, $db);
     }
     
     if ($event == 12 || $event == 14) {
+        remove_modification(1, $db);
         end_story(1, $db);
         
         print("<i><p>The Cybermen have been defeated!</p></i>");
     }
     
     if ($event == 15) {
+        remove_modification(1, $db);
         fail_story(1, $db);
         
         print("<i><p>Everyone Dies.  This story is over.</p></i>");

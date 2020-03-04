@@ -27,23 +27,25 @@ $location = get_location($db);
 <h2>Log Book</h2>
 <?php
 $log = get_value_from_users("story_id_list", $db);
-print "<table>";
+// print "<table>";
 if ($log != '') {
     $log_array = explode(",", $log);
     sort ($log_array);
     foreach ($log_array as $entry) {
         $badge = get_value_for_story_id("badge", $entry, $db);
         $text = get_value_for_story_id("title", $entry, $db);
-        print "<tr><td><img src=assets/$badge></td>";
-        print "<td>$text</td>";
-        print "<td><form method=\"POST\" action=\"story.php\">";
+        print "<div class=story>";
+        print "<img src=assets/$badge><br>";
+        // print "<td>$text</td>";
+        print "<form method=\"POST\" action=\"story.php\">";
         print "<input type=\"hidden\" name=\"story_id\" value=\"$entry\">";
         print "<input type=\"submit\" value=\"View Full Logs\">";
-        print "</form></td>";
-        print "</tr>";
+        print "</form>";
+        print "</div>";
+        //print "</tr>";
      }
 }
-print "</table>";
+//print "</table>";
 
 
 ?>
