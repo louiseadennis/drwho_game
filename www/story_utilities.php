@@ -355,9 +355,9 @@
                 $travel_type = get_value_from_users("travel_type", $connection);
                 
                 if ($action_id != 100) {
-                    $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
+                    $sql = "SELECT transition_id, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
                 } else {
-                    $sql = "SELECT transition_id, probability from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and transition_label = '{$travel_type}'";
+                    $sql = "SELECT transition_id, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and transition_label = '{$travel_type}'";
                 }
                 // print $sql;
                 
@@ -384,15 +384,18 @@
                     
                     //print("modifier: " . $modifier);
                     $dice = $dice + $modifier;
-                    //print("dice: " . $dice . "\n");
+                    // print("dice: " . $dice . "\n");
                     if ($dice > 100) {
                         $dice = 100;
                     }
                     while ($row=$result->fetch_assoc()) {
-                        $probability = $probability + $row["probability"];
-                        if ($dice <= $probability) {
-                            $transition_id = $row["transition_id"];
-                            break;
+                        $modifiers = $row["modifiers"];
+                        if (check_modifiers($modifiers, $connection)) {
+                            $probability = $probability + $row["probability"];
+                            if ($dice <= $probability) {
+                                $transition_id = $row["transition_id"];
+                                break;
+                            }
                         }
                     }
             
@@ -571,38 +574,60 @@
         $characters_at_location = characters_at_location($location_id, $connection);
         $modifier = 0;
         foreach ($characters_at_location as $char_id) {
-            $stat = "";
-            if ($action_id == 1) {
-                $stat = "empathy";
-            } elseif ($action_id == 2) {
-                $stat = "tech";
-            } elseif ($action_id == 3) {
-                $stat = "running";
-            } elseif ($action_id == 4) {
-                $stat = "combat";
-            } elseif ($action_id == 5) {
-                $stat = "willpower";
-            } elseif ($action_id == 6) {
-                $stat = "observation";
-            }
-            
-            if ($stat != "") {
-                $sql = "SELECT $stat FROM characters WHERE char_id = '{$char_id}'";
-                $stat_mod = select_sql_column($sql, "$stat", $connection);
-                
-                $sql = "SELECT doctor FROM characters WHERE char_id = '{$char_id}'";
-                if (select_sql_column($sql, "doctor", $connection) == 1) {
-                    $stat_mod = $stat_mod * 3;
-                } else {
-                    $stat_mod = $stat_mod + 2;
+            if (is_conscious($char_id, $connection)) {
+                $stat = "";
+                if ($action_id == 1) {
+                    $stat = "empathy";
+                } elseif ($action_id == 2) {
+                    $stat = "tech";
+                } elseif ($action_id == 3) {
+                    $stat = "running";
+                } elseif ($action_id == 4) {
+                    $stat = "combat";
+                } elseif ($action_id == 5) {
+                    $stat = "willpower";
+                } elseif ($action_id == 6) {
+                    $stat = "observation";
                 }
                 
-                $modifier = $modifier + $stat_mod;
+                if ($stat != "") {
+                    $sql = "SELECT $stat FROM characters WHERE char_id = '{$char_id}'";
+                    $stat_mod = select_sql_column($sql, "$stat", $connection);
+                    
+                    $sql = "SELECT doctor FROM characters WHERE char_id = '{$char_id}'";
+                    if (select_sql_column($sql, "doctor", $connection) == 1) {
+                        $stat_mod = $stat_mod * 3;
+                    } else {
+                        $stat_mod = $stat_mod + 2;
+                    }
+                    
+                    $modifier = $modifier + $stat_mod;
+                }
             }
         }
         
         // print($modifier);
         return $modifier;
+    }
+    
+    function check_modifiers($modifiers, $connection) {
+        $modifier_array = explode(",", $modifiers);
+        if ($modifiers == '') {
+            return 1;
+        } else {
+            // print($modifiers);
+            if ($modifiers == 'doctor present' || in_array('doctor present', $modifier_array)) {
+                if (!doctor_here($connection)) {
+                    return 0;
+                }
+                $doctor_id = current_doctor($connection);
+                if (!is_conscious($doctor_id, $connection)) {
+                    return 0;
+                }
+            }
+        }
+        
+        return 1;
     }
         
 
