@@ -171,7 +171,7 @@
                     update_users("tardis_team", $new_char_id_list, $connection);
                     leave_crew($current, $connection);
                     
-                    $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id) VALUES ('$char_id', '$user_id', '$location_id')";
+                    $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location) VALUES ('$char_id', '$user_id', '$location_id', '$location_id')";
                     if (!$connection->query($sql)) {
                         showerror($connection);
                     }
@@ -179,7 +179,7 @@
             } else {
                 $new_char_id_list = $tardis_crew . "," . $char_id;
                 update_users("tardis_team", $new_char_id_list, $connection);
-                $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id) VALUES ('$char_id', '$user_id', '$location_id')";
+                $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location) VALUES ('$char_id', '$user_id', '$location_id', '$location_id')";
                 if (!$connection->query($sql)) {
                     showerror($connection);
                 }

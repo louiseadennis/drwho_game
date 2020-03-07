@@ -96,8 +96,7 @@
         fail_story(1, $db);
         
         print("<i><p>Everyone Dies.  This story is over.</p></i>");
-    }
-    
+    } 
     print_tardis_team($db);
 ?>
 

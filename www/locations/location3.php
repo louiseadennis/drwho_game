@@ -56,10 +56,27 @@
     }
     
     if ($event == 5) {
-        print("<i><p>The crew meet up again but some have planet destroying bombs strapped to their chests.</p></i>");
+        if (first_visit($db)) {
+            foreach (characters_at_location(3, $db) as $char_id) {
+                if (get_value_for_char_in_play_id("prev_location", $char_id, $db) != 3) {
+                    modify_character($char_id, 1, $db);
+                }
+            }
+            visited($db);
+        }
+        print("<i><p>Those imprisoned on Voga managed to escape and meet up with the crew who have been captured and transmatted down with bombs by the Cybermen.</p></i>");
     }
 
     if ($event == 6) {
+        if (first_visit($db)) {
+            foreach (characters_at_location(3, $db) as $char_id) {
+                if (get_value_for_char_in_play_id("prev_location", $char_id, $db) != 3) {
+                    modify_character($char_id, 1, $db);
+                }
+            }
+            visited($db);
+        }
+        
         print("<i><p>The crew arrive on Voga with bombs strapped to their chests.</p></i>");
     }
     

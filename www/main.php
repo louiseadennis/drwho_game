@@ -23,6 +23,7 @@ $travel_type = mysqlclean($_POST, "travel_type", 10, $db);
 // $location_id = mysqlclean($_POST, "location", 10, $db);
 $start_story = mysqlclean($_POST, "start_story", 10, $db);
 $quit_story = mysqlclean($_POST, "quit_story", 10, $db);
+    $forced_travel = 0;
 
 // Handle Story Events
 if ($start_story != "") {
@@ -30,51 +31,90 @@ if ($start_story != "") {
 } else if ($quit_story != "") {
     quit_story($quit_story, $db);
 }
-    
+
+//    print($transition);
 if ($transition != "") {
     make_transition($transition, $db);
     $sql = "SELECT action_id from story_transitions where transition_id = '{$transition}'";
     $action_id = select_sql_column($sql, "action_id", $db);
-    if ($action_id == 100) {
+    
+    $sql = "SELECT force_travel from story_transitions where transition_id = '{$transition}'";
+    $forced_travel = select_sql_column($sql, "force_travel", $db);
+    //print("hey");
+    //print($forced_travel);
+    if ($action_id == 100 || $forced_travel) {
         $last_action = 'travel';
         $sql = "SELECT transition_label from story_transitions where transition_id = '{$transition}'";
         $travel_type = select_sql_column($sql, "transition_label", $db);
         //print($travel_type);
     }
+} elseif (having_adventure($db) && $travel_type != 'pov_switch') {
+    story_transition($last_action, $db);
+    $transition = get_value_from_users("last_transition", $db);
+    $sql = "SELECT action_id from story_transitions where transition_id = '{$transition}'";
+    $action_id = select_sql_column($sql, "action_id", $db);
+    
+    $sql = "SELECT force_travel from story_transitions where transition_id = '{$transition}'";
+    $forced_travel = select_sql_column($sql, "force_travel", $db);
+    //print("hey");
+    //print($forced_travel);
+    if ($forced_travel) {
+        $last_action = 'travel';
+        $sql = "SELECT transition_label from story_transitions where transition_id = '{$transition}'";
+        $travel_type = select_sql_column($sql, "transition_label", $db);
+        //print($travel_type);
+    }
+
 }
     
 if ($event != "") {
     go_to_event($event, $db);
 }
     
+$old_location = get_location($db);
+foreach (characters_at_location($old_location, $db) as $char_id) {
+    update_character($char_id, "prev_location", $old_location, $db);
+}
+    
 // Handle Travel
 if ($last_action == "travel") {
-    $location_id = get_location($db);
+    $location_id = $old_location;
     update_users("prev_location", $location_id, $db);
+    $prev_location = $location_id;
     // resolve_events($db);
     $travellers = [];
     
-    $traveller1 = mysqlclean($_POST, "person1", 10, $db);
-    if ($traveller1 != "") {
-        array_push($travellers, $traveller1);
-    }
-    $traveller2 = mysqlclean($_POST, "person2", 10, $db);
-    if ($traveller2 != "") {
-        array_push($travellers, $traveller2);
-    }
-    $traveller3 = mysqlclean($_POST, "person3", 10, $db);
-    if ($traveller3 != "") {
-        array_push($travellers, $traveller3);
-    }
-    $traveller4 = mysqlclean($_POST, "person4", 10, $db);
-    if ($traveller4 != "") {
-        array_push($travellers, $traveller4);
+    if ($forced_travel) {
+        $travellers = characters_at_location($location_id, $db);
+    } else {
+    
+        $traveller1 = mysqlclean($_POST, "person1", 10, $db);
+        if ($traveller1 != "") {
+            array_push($travellers, $traveller1);
+        }
+        $traveller2 = mysqlclean($_POST, "person2", 10, $db);
+        if ($traveller2 != "") {
+            array_push($travellers, $traveller2);
+        }
+        $traveller3 = mysqlclean($_POST, "person3", 10, $db);
+        if ($traveller3 != "") {
+            array_push($travellers, $traveller3);
+        }
+        $traveller4 = mysqlclean($_POST, "person4", 10, $db);
+        if ($traveller4 != "") {
+            array_push($travellers, $traveller4);
+        }
     }
 
     if (!empty($travellers) || $travel_type == "pov_switch") {
        
         if ($travel_type == "transmat" || $travel_type == "pov_switch") {
             $location_id = mysqlclean($_POST, "location", 10, $db);
+        }
+        
+        if ($forced_travel) {
+            $sql = "SELECT new_location from story_transitions where transition_id = '{$transition}'";
+            $location_id = select_sql_column($sql, "new_location", $db);
         }
     
         if ($travel_type == "tardis") {
@@ -90,6 +130,10 @@ if ($last_action == "travel") {
     
         update_users("travel_type", $travel_type, $db);
         update_users("action_done", 0, $db);
+        
+        foreach (characters_at_location($location_id, $db) as $char_id) {
+            update_character($char_id, "prev_location", $location_id, $db);
+        }
         
         foreach($travellers as $char_id) {
             update_character($char_id, "location_id", $location_id, $db);

@@ -121,7 +121,8 @@
         
         
         if (having_adventure($connection) && !$pov_switch) {
-            story_transition($last_action, $connection);
+            $last_transition = get_value_from_users("last_transition", $connection);
+            print_transition_outcome($last_transition, $last_action, $connection);
         } else {
                 if (is_action($last_action, $connection)) {
                     print_action_default($last_action, $connection);
@@ -130,6 +131,10 @@
                 }
         }
         side_effects($last_action, $connection);
+        $sql = "UPDATE users SET last_transition='0' where user_id = '$user_id'";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
     }
     
     

@@ -14,6 +14,7 @@ CREATE TABLE `story_transitions` (
   `item_character_input` tinyint NOT NULL DEFAULT 0,
   `doctor` tinyint NOT NULL DEFAULT 0,
   `new_location` int(11),
+  `force_travel` int(11),
   PRIMARY KEY (`transition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
