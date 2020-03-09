@@ -13,6 +13,7 @@ CREATE TABLE `story_transitions` (
   `random_character_input` tinyint NOT NULL DEFAULT 0,
   `item_character_input` tinyint NOT NULL DEFAULT 0,
   `doctor` tinyint NOT NULL DEFAULT 0,
+  `old_location` int(11),
   `new_location` int(11),
   `force_travel` int(11),
   PRIMARY KEY (`transition_id`)
