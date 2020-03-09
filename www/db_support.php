@@ -96,6 +96,15 @@
         return $result->num_rows;
     }
 
+    function story_number($connection) {
+        $sql = "SELECT * FROM stories";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        return $result->num_rows;
+    }
+
     
     function add_critter($critter_id, $connection) {
           $uname = $_SESSION["loginUsername"];

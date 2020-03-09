@@ -219,6 +219,42 @@ print "</table>";
        $j++;
     }
     print "</table>";
+    
+    print "<h2>Stories Successfully Completed</h2>";
+    $log = get_value_from_users("story_id_list", $db);
+    $log_array = explode(",", $log);
+    print "<table>";
+    $i = 0;
+    $j = 1;
+    while ($j <= story_number($db)) {
+        if ($i = 0) {
+            print "<tr>";
+        }
+        if (in_array($j, $log_array)) {
+            $badge = get_value_for_story_id("badge", $j, $db);
+            $icon = str_replace(".png", "_badge.png", $badge);
+            // print $badge;
+            // print "$icon";
+        } else {
+            $icon = 'unknown_story.png';
+        }
+        
+        if (!is_null($icon)) {
+            print "<td><img src=assets/$icon></td>";
+        } else {
+            $text = get_value_for_story_id("title", $j, $db);
+            print "<td>$text<br>";
+        }
+        
+        if ($i == 7) {
+              print "</tr>";
+              $i = 0;
+           } else {
+             $i = $i + 1;
+          }
+        $j++;
+    }
+    print "</table>";
 
 
 ?>
