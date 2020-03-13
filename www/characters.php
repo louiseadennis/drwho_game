@@ -238,6 +238,26 @@
                 print "<p>$text";
             }
         }
+        
+        $stats = ["empathy", "tech", "combat", "willpower", "observation", "running"];
+        
+        foreach ($stats as $stat) {
+            $stat_status = check_stat($connection, $char_id, $stat);
+            if ($stat_status) {
+                print "<p>Injured: $stat is lower than usual";
+            }
+        }
+        
+        
+    }
+    
+    function check_stat($connection, $char_id, $stat) {
+        $stat_value = get_value_for_char_in_play_id("$stat", $char_id, $connection);
+        $total_value = get_value_for_char_id("$stat", $char_id, $connection);
+        if ($total_value > $stat_value) {
+            return 1;
+        }
+        return 0;
     }
     
     function get_doctors($db) {
@@ -417,6 +437,42 @@
         
         return select_sql_column($sql, $column, $connection);
 
+    }
+    
+    function lost_fight($connection) {
+        $tardis_crew_size = conscious_tardis_crew_size($connection);
+        $dice = rand(0, $tardis_crew_size - 1);
+        $tardis_crew = conscious_tardis_crew($connection);
+        $char = $tardis_crew[$dice];
+
+        $dice = rand(0, 5);
+        if ($dice == 0) {
+            $stat = "empathy";
+        } elseif ($dice == 1) {
+                $stat = "tech";
+        } elseif ($dice == 2) {
+                $stat = "running";
+        } elseif ($dice == 3) {
+                $stat = "combat";
+        } elseif ($dice == 4) {
+                $stat = "willpower";
+        } elseif ($dice == 5) {
+                $stat = "observation";
+        }
+        
+        $user_id = get_user_id($connection);
+        $sql = "SELECT {$stat} FROM characters_in_play WHERE char_id = '{$char}' AND user_id = $user_id";
+        
+        $stat_value = select_sql_column($sql, "$stat", $connection);
+        if ($stat_value > 0) {
+            $stat_value = $stat_value - 1;
+        }
+        
+        $sql = "UPDATE characters_in_play SET {$stat} = '{$stat_value}' WHERE char_id = '{$char}' AND user_id = $user_id";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
+        
     }
     
 ?>

@@ -16,6 +16,7 @@ CREATE TABLE `story_transitions` (
   `old_location` int(11),
   `new_location` int(11),
   `force_travel` int(11),
+  `lost_fight` int(11),
   PRIMARY KEY (`transition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

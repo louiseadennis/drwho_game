@@ -599,7 +599,7 @@
                 }
                 
                 if ($stat != "") {
-                    $sql = "SELECT $stat FROM characters WHERE char_id = '{$char_id}'";
+                    $sql = "SELECT $stat FROM characters_in_play WHERE char_id = '{$char_id}'";
                     $stat_mod = select_sql_column($sql, "$stat", $connection);
                     
                     $sql = "SELECT doctor FROM characters WHERE char_id = '{$char_id}'";
