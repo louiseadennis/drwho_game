@@ -217,4 +217,18 @@
             }
         }
     }
+    
+    function sql_return_to_array($sql, $column, $connection) {
+        if (!$result = $connection->query($sql))
+              showerror($connection);
+        
+        $rows = array();
+        while ($row=$result->fetch_assoc()) {
+            $value = $row["$column"];
+            if (! in_array($value, $rows )) {
+                array_push($rows, $value);
+            }
+        }
+        return $rows;
+    }
 ?>

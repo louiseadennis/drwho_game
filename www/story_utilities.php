@@ -25,6 +25,12 @@
         create_story_path($story_id, $db);
      }
     
+    function begin_story_elsewhere($story_id, $db) {
+        update_users("story", $story_id, $db);
+        create_story_path_elsewhere($story_id, $db);
+     }
+
+    
     function quit_story($story_id, $db) {
         create_log($story_id, $db);
         update_users("story", 0, $db);
@@ -33,13 +39,7 @@
         $location_id = get_location($db);
         $char_id_array = characters_at_location($location_id, $db);
         foreach ($char_id_array as $char_id) {
-            $is_locked_up = is_locked_up($char_id, $db);
-            if ($is_locked_up) {
-                freed($char_id, $db);
-            }
-            if ($is_hypnotised) {
-                not_hypnotised($char_id, $db);
-            }
+            clear_all_modifiers_except_health($char_id, $db);
         }
     }
     
@@ -132,6 +132,74 @@
         }
     }
     
+    function get_initial_events($story_id, $db) {
+        $locations = get_story_locations($story_id, $db);
+        $initial_events = array();
+        foreach ($locations as $story_location) {
+            $initial_event = get_initial_event($story_id, $story_location, $db);
+            array_push($initial_events, $initial_event);
+        }
+        return $initial_events;
+    }
+    
+    function create_story_path_elsewhere($story_id, $db) {
+        $location_id = get_location($db);
+        
+        // Get All Story Locations
+        $locations = get_story_locations($story_id, $db);
+        
+        $one_starting_location = 0;
+        
+        // Figure out relevant Initial Event for each location
+        foreach ($locations as $story_location) {
+            // And insert a location in play into the table.
+            if (count(characters_at_location($story_location, $db)) > 0 && $location_id != $story_location) {
+                // $initial_event id number is wrt. story_id not unique
+                $initial_event = get_initial_event($story_id, $story_location, $db);
+                $user_id = get_user_id($db);
+                
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                // print $sql;
+                
+                if (!$result = $db->query($sql))
+                    showerror($db);
+                
+                $one_starting_location = 1;
+            }
+        }
+        
+        foreach ($locations as $story_location) {
+            // And insert a location in play into the table.
+            if ($location_id != $story_location && !$one_starting_location) {
+                    // $initial_event id number is wrt. story_id not unique
+                $initial_event = get_initial_event($story_id, $story_location, $db);
+                $user_id = get_user_id($db);
+                    
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                    // print $sql;
+                    
+                if (!$result = $db->query($sql))
+                    showerror($db);
+                    
+                $one_starting_location = 1;
+            } elseif (count(characters_at_location($story_location, $db)) == 0 || $location_id == $story_location) {
+                $initial_event = get_not_present_initial_event($story_id, $story_location, $db);
+                $user_id = get_user_id($db);
+                
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                // print $sql;
+                
+                if (!$result = $db->query($sql))
+                    showerror($db);
+            }
+        }
+        
+        if (!$one_starting_location) {
+            print ("ERROR ERROR in create_story_path_elsewhere");
+        }
+    }
+
+    
     function create_log($story_id, $db) {
         $locations = get_story_locations($story_id, $db);
         
@@ -208,19 +276,6 @@
         return select_sql_column($sql, "not_present_initial", $connection);
     }
 
-    // This returns event_id wrt. story id
-    function get_current_event($connection) {
-        $story = get_value_from_users("story", $connection);
-        if ($story != 0 && $story != '') {
-            $location_id = get_location($connection);
-            $user_id = get_user_id($connection);
-            
-            $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}' and story_id = '{$story}'";
-            // print($sql);
-            
-            return select_sql_column($sql, "event_id", $connection);
-        }
-    }
     
     function go_to_event($story_id_number, $connection) {
         $story_id = get_value_from_users("story", $connection);
@@ -229,12 +284,16 @@
         $location_id = get_location($connection);
         $initial_event = get_initial_event($story_id, $location_id, $connection);
         $not_present_event = get_not_present_initial_event($story_id, $location_id, $connection);
-        $path = find_path_to($initial_event, $story_id_number, $story_id, $connection);
+        $elsewhere_events = get_elsewhere_events($connection);
+        $path = find_path_to($initial_event, $story_id_number, $elsewhere_events, $story_id, $connection);
         // print($path);
         if (is_null($path)) {
             // print("Trying not present<br>");
+            quit_story($story_id, $connection);
+            begin_story_elsewhere($story_id, $connection);
             $initial_event=$not_present_event;
-            $path = find_path_to($not_present_event, $story_id_number, $story_id, $connection);
+            $elsewhere_events = get_elsewhere_events($connection);
+            $path = find_path_to($not_present_event, $story_id_number, $elsewhere_events, $story_id, $connection);
             // print($path);
         }
         $from_event = $initial_event;
@@ -249,13 +308,13 @@
         }
     }
     
-    function find_path_to($event1, $event2, $story_id, $connection) {
+    function find_path_to($event1, $event2, $elsewhere_events, $story_id, $connection) {
         //print($event2);
         if ($event1 == $event2) {
             //print($event1);
             return array($event1);
         } else {
-            $sql = "SELECT outcome from story_transitions where event_id = '{$event1}' and story_id = '{$story_id}'";
+            $sql = "SELECT outcome, transition_label from story_transitions where event_id = '{$event1}' and story_id = '{$story_id}'";
             // print($sql);
              
              if (!$result = $connection->query($sql)) {
@@ -264,6 +323,13 @@
              } else {
                  while ($row=$result->fetch_assoc()) {
                      $next_event = $row["outcome"];
+                     $transition_label = $row["transition_label"];
+                     
+                     $can_transition = 1;
+                     foreach ($elsewhere_events as $next_elsewhere) {
+                         $sql = "SELECT outcome from story_transitions where event_id = '{$next_elsewhere}' and story_id = '{$story_id} and transition_label = '{$transition_label}'";
+                     }
+                     
                      // print($next_event);
                      if ($next_event != $event1) {
                          $path = find_path_to($next_event, $event2, $story_id, $connection);
@@ -334,9 +400,12 @@
                 // Don't think this should happen any more -- locations of interest now have empty states if no one is there.
                 if ($current_event == 0) {
                     $user_id = get_user_id($connection);
-                    $sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
-                    $event = select_sql_column($sql, "event_id", $connection);
-                    print("Should we be in this bit of code?");
+                    // BUT prev_location is not a story location
+                    //$sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
+                    //$event = select_sql_column($sql, "event_id", $connection);
+                    $event = 0;
+                    // print("Should we be in this bit of code?");
+                    // Apparently we get here if Tardis flying from a non story location.
                 }
             }
             
@@ -349,7 +418,7 @@
             $transition_in_table = 1;
             
             // Why might action_id = 0?
-            // In what circumstances is the event 0?
+            // In what circumstances is the event 0?  When travelling from a non-story location
             if ($action_id > 0 && $event != 0) {
                 // Work out which transition we are on
                 $travel_type = get_value_from_users("travel_type", $connection);
@@ -553,15 +622,7 @@
         
         return select_sql_column($sql, $column, $connection);
     }
-    
-    function get_event_text($event_id, $connection) {
-        $story = get_value_from_users("story", $connection);
         
-        $sql = "SELECT text from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
-        
-        return select_sql_column($sql, "text", $connection);
-    }
-    
     function get_story_event_id($story_id, $event_id, $db) {
         $sql = "SELECT story_event_id from story_events where story_id = '{$story_id}' and story_number_id = '{$event_id}'";
         
@@ -636,6 +697,17 @@
         }
         
         return 1;
+    }
+    
+    function get_stories($db) {
+        $sql = "SELECT story_id FROM stories";
+        if (!$result = $db->query($sql))
+            showerror($connection);
+        $stories = [];
+        while ($row=$result->fetch_assoc()) {
+            array_push($stories, $row["story_id"]);
+        }
+        return $stories;
     }
         
 

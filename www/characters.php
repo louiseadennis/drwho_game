@@ -475,4 +475,15 @@
         
     }
     
+    function clear_all_modifiers_except_health($char_id, $connection) {
+        conscious($char_id, $connection);
+        freed($char_id, $connection);
+        not_hypnotised($char_id, $connection);
+        $user_id = get_user_id($connection);
+        $sql = "UPDATE characters_in_play SET modifiers = '' where char_id = '$char_id' and user_id = '$user_id'";
+        if (!$connection->query($sql)) {
+             showerror($connection);
+        }
+    }
+    
 ?>

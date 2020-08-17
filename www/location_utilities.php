@@ -10,6 +10,7 @@
  
         if (developer_mode()) {
             print "<a href=../transition_test.php>Test Rig</a>";
+            print "<a href=../story_designer.php>Story Designer</a>";
         }
         
         print "<hr>";
@@ -30,6 +31,10 @@
         print "<a href=log.php>Location Log</a>";
         print "<a href=story_log.php>Story Log</a>";
         print "<a href=logout.php>Log Out</a>";
+        if (developer_mode()) {
+             print "<a href=transition_test.php>Test Rig</a>";
+             print "<a href=story_designer.php>Story Designer</a>";
+         }
         print "<hr>";
         print "</div>";
     }
@@ -377,16 +382,5 @@
         print "</form>";
         print "</div>";
     }
-    
-    function print_event($db) {
-        $event = get_current_event($db);
-        $text = get_event_text($event, $db);
-        if ($text != '') {
-            print $text;
-        } else {
-            print "<br>";
-        }
-    }
-
 
 ?>

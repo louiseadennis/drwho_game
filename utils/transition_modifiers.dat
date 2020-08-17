@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS `transition_modifiers`;
+CREATE TABLE `transition_modifiers` (
+  `modifier_id` int(11) NOT NULL AUTO_INCREMENT,
+  `text` text,
+  PRIMARY KEY (`modifier_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `transition_modifiers` WRITE;
+INSERT INTO transition_modifiers VALUES
+(1, 'doctor present'),
+(2, 'sonic_screwdriver');
+UNLOCK TABLES;

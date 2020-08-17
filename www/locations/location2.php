@@ -43,20 +43,8 @@
 <?php
     $event = get_current_event($db);
     // print($event);
-    if ($event == 1) {
-        $critter_id = get_value_for_name_from("critter_id", "critters", "Cybermat", $db);
-        
-        add_critter($critter_id, $db);
-        
-        $icon = get_value_for_critter_id("icon", $critter_id, $db);
-        // print $icon;
-        print("<br><img src=../assets/$icon align=left>");
-        ?>
-<i><p>The Nerva Beacon watches over a new asteroid orbiting Jupiter, warning spacecraft of its location.  When the Tardis crew arrive it is an eerie place full of dead bodies: victims of a mysterious plague.</p>
-        
-        <p>As the crew explore a Cybermat suddenly attacks!</p></i>
-<?php
-    } else if ($event == 2) {
+    print_event_long($db);
+    if ($event == 2) {
         $bitten = get_event_character($db);
         $name = get_value_for_char_id("name", $bitten, $db);
         if (first_visit($db)) {
