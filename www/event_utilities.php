@@ -36,10 +36,37 @@
             }
         }
         
+        if (get_locked_up($event, $db) == 1) {
+            $location_id = get_location($db);
+            lock_everyone_up($location_id, $db);
+        }
+        
         if ($description != '')
             {
-                print "$description<br>";
+                if (preg_match("/\\\$name/", $description) == 1) {
+                    $affected = get_event_character($db);
+                    $name = get_value_for_char_id("name", $affected, $db);
+                    $des = preg_replace("/\\\$name/", $name, $description);
+                
+                    if (preg_match("/\\\$pronoun/", $description) == 1) {
+                        $gender = get_value_for_char_id("gender", $affected, $db);
+                        
+                        $pronoun = "She";
+                        $pronoun2 = "her";
+                        if ($gender == 1) {
+                            $pronoun = "He";
+                            $pronoun2 = "his";
+                        }
+                        
+                        $des = preg_replace("/\\\$pronoun2/", $pronoun2, $des);
+                        $des = preg_replace("/\\\$pronoun/", $pronoun, $des);
+                    }
+                }
+                
+                
+                print "$des<br>";
             }
+        
         
 
         print "<br>";
@@ -60,6 +87,60 @@
             return select_sql_column($sql, "event_id", $connection);
         }
     }
+    
+    function get_hypnotised($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'hypnotised'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+        
+    }
+    
+    function get_locked_up($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'locked up'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+    }
+
+    
+    function get_unconscious($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'unconscious'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+   }
+
 
     function get_event_text($event_id, $connection) {
         $story = get_value_from_users("story", $connection);

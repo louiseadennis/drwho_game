@@ -127,6 +127,7 @@
         
         if (having_adventure($connection) && !$pov_switch) {
             $last_transition = get_value_from_users("last_transition", $connection);
+            print($last_transition);
             print_transition_outcome($last_transition, $last_action, $connection);
         } else {
                 if (is_action($last_action, $connection)) {

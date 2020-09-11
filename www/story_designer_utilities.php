@@ -176,6 +176,7 @@
                 //    print("<br>");
                 //}
             }
+            $this->remove_transitions_that_dont_need_to_synchronise();
         }
         
         function __construct3($event_list, $story_id, $automaton) {
@@ -190,8 +191,30 @@
                     array_push($automaton->events, $event);
                 }
             }
+            $this->remove_transitions_that_dont_need_to_synchronise();
             $string = $this->story_state_string();
             //print ("Created 2: $string");
+        }
+        
+        function remove_transitions_that_dont_need_to_synchronise() {
+            foreach($this->events as $event) {
+                foreach ($this->unexplored_transitions[$event->event_id] as $transition_label) {
+                    $remove = 1;
+                    foreach($this->events as $event) {
+                        foreach($event->transitions as $transition) {
+                            if ($transition->label == $transition_label) {
+                                if ($transition->not_controlled == 0) {
+                                    $remove = 0;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if ($remove == 1) {
+                        $this->unexplored_transitions[$event->event_id] = array_diff($this->unexplored_transitions[$event->event_id], [$transition_label]);
+                    }
+                }
+            }
         }
         
         function is_equal($state) {
@@ -255,6 +278,8 @@
                     // print("Pushed 0 onto event list<br>");
                 }
             }
+            
+            
             // $this->automaton->print_automaton();
             return new story_state($event_list, $this->story_id, $this->automaton);
         }
@@ -315,7 +340,7 @@
                 while ($row=$result->fetch_assoc()) {
                     //print("A");
                     if (!in_array($row["transition_label"], $this->transition_labels)) {
-                        array_push($this->transitions, new local_transition($this->event_id, $row["transition_label"], $row["outcome"]));
+                        array_push($this->transitions, new local_transition($this->event_id, $row["transition_label"], $row["outcome"], $row["action_id"]));
                         array_push($this->transition_labels, $row["transition_label"]);
                         //array_push($label_list, $row["transition_label"]);
                     }
@@ -441,17 +466,21 @@
         public $from;
         public $label;
         public $to;
+        public $not_controlled = 0;
         
-        function __construct($f, $l, $t) {
+        function __construct($f, $l, $t, $action_id) {
             $this->from = $f;
             $this->label = $l;
             $this->to = $t;
+            if ($action_id == 0) {
+                $this->not_controlled = 1;
+            }
             //print ($this->transition_string());
             //print "<br>";
         }
         
         function transition_string() {
-            return "plink $this->from -$this->label-> $this->to";
+            return "plink $this->from -$this->label-> $this->to ($this->not_controlled)";
         }
     
         
@@ -476,7 +505,7 @@
             $total_probability = $total_probability + $probability;
         }
         
-        if ($total_probability == 100) {
+        if ($total_probability == 100 || $action_id == 0) {
             return 1;
         }
         return 0;
@@ -499,7 +528,7 @@
         $text = select_sql_column($sql, "text", $db);
 
         $font_color = "black";
-         if ($total_prob != 100) {
+         if ($total_prob != 100 && $action_id != 0) {
              print $total_prob;
              $font_color = "red";
          }
@@ -531,12 +560,14 @@
     function print_transitions_for_action($action_id, $story_id, $story_number_id, $event_location, $db) {
         $sql = "SELECT transition_id FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id}' AND action_id = '{$action_id}'";
         //print($sql);
+        $no_transitions = true;
         
         if (!$result = $db->query($sql))
             showerror($db);
         while ($row=$result->fetch_assoc()) {
             $transition_id = $row["transition_id"];
             print_transition($transition_id, $story_id, $db);
+            $no_transitions = false;
         }
         
         print "<form method=\"POST\" action=\"edit_transition.php\">";
@@ -547,6 +578,17 @@
         print "<input type=\"hidden\" name=\"location_id\" value=\"$event_location\">";
         print "<input type=\"submit\" value=\"Add Transition\">";
         print "</form>";
+        
+        if ($no_transitions) {
+            print "<form method=\"POST\" action=\"edit_event.php\">";
+            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+            print "<input type=\"hidden\" name=\"task\" value=\"new_default_transition\">";
+            print "<input type=\"hidden\" name=\"action_id\" value=\"$action_id\">";
+            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+            print "<input type=\"hidden\" name=\"location_id\" value=\"$event_location\">";
+            print "<input type=\"submit\" value=\"Add Default Transition\">";
+            print "</form>";
+        }
 
     }
     

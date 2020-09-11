@@ -7,11 +7,14 @@ CREATE TABLE `story_modifiers` (
   `remove_modifier` text,
   `unconscious` int(11) NOT NULL DEFAULT 0,
   `incarcerated` int(11) NOT NULL DEFAULT 0,
+  `all_or_random_or_doctor` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`modifier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+/* all is 0, 1 is random, 2 is doctor (if present) */
+
 LOCK TABLES `story_modifiers` WRITE;
 INSERT INTO story_modifiers VALUES
-(1, 1, 'Strapped into a bomb', 0, 0, 0, 0),
-(2, 1, 'Has been bitten by a Cybermat', 100, 'transmat', 1, 0);
+(1, 1, 'Strapped into a bomb', 0, 0, 0, 0, 0),
+(2, 1, 'Has been bitten by a Cybermat', 100, 'transmat', 1, 0, 1);
 UNLOCK TABLES;

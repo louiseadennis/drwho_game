@@ -12,7 +12,6 @@
             }
             if ($story == '0' || $story == '') {
                 $story_name = get_value_for_story_id("title", $story_id, $db);
-                // print "<u>$story_name</u>";
                 print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"start_story\", value=\"$story_id\">";
                 print "New Adventure: ";
                 print "<input type=submit value=\"Start $story_name\"></form>";
@@ -41,6 +40,8 @@
         foreach ($char_id_array as $char_id) {
             clear_all_modifiers_except_health($char_id, $db);
         }
+        
+        
     }
     
     function in_end_state($story, $db) {
@@ -226,7 +227,11 @@
         if (!$result = $db->query($sql))
             // print "error";
             showerror($db);
-     }
+        
+        $sql = "UPDATE users SET last_transition = NULL WHERE user_id = '{$user_id}'";
+               if (!$result = $db->query($sql))
+                    showerror($db);
+         }
 
     
     function get_value_for_story_id($column, $story_id, $connection) {

@@ -16,8 +16,8 @@
     $story_id = mysqlclean($_POST, "story_id", 15, $db);
     $story = get_value_for_story_id("title", $story_id, $db);
     $story_number_id = mysqlclean($_POST, "story_number_id", 15, $db);
-    $task = mysqlclean($_POST, "task", 15, $db);
-    $sql = "SELECT text, description, critter_id_list, ally_id_list, story_event_id, event_location FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+    $task = mysqlclean($_POST, "task", 25, $db);
+    $sql = "SELECT * FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
     $text = select_sql_column($sql, "text", $db);
     $description = select_sql_column($sql, "description", $db);
     $critter_list = select_sql_column($sql, "critter_id_list", $db);
@@ -25,6 +25,8 @@
     $critter_array = explode(",", $critter_list);
     $event_location = select_sql_column($sql, "event_location", $db);
     $ally_array = explode(",", $ally_list);
+    $modifier_list = select_sql_column($sql, "modifier_id_list", $db);
+    $modifier_array = explode(",", $modifier_list);
         
     $global_event_id = select_sql_column($sql, "global_event_id", $db);
     // $event_id = select_sql_column($sql, "event_id", $db);
@@ -101,12 +103,72 @@
         }
     }
     
+    if ($task == "add_modifier") {
+         $new_modifier = mysqlclean($_POST, "new_modifier", 1000, $db);
+         if ($modifier_list != "") {
+             $new_modifier_list = $modifier_list . "," . $new_modifier;
+         } else {
+             $new_modifier_list = $new_modifier;
+         }
+         $sql = "UPDATE story_events SET modifier_id_list='{$new_modifier_list}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+         if (!$result = $db->query($sql))
+             showerror($db);
+         $modifier_list = $new_modifier_list;
+         $modifier_array = explode(",", $new_modifier_list);
+     }
+    
+    if ($task == "del_modifier") {
+        $modifier_to_remove = mysqlclean($_POST, "modifier", 1000, $db);
+        $key = array_search($modifier_to_remove, $modifier_array);
+        if ($key !== false) {
+            unset($modifier_array[$key]);
+            $new_modifier_list = join(",", $modifier_array);
+            $sql = "UPDATE story_events SET modifier_id_list='{$new_modifier_list}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+            if (!$result = $db->query($sql))
+                showerror($db);
+            $modifier_list = $new_modifier_list;
+            $modifier_array = explode(",", $new_modifier_list);
+        }
+    }
+
+
+    
     if ($task == "del_transition") {
         $transition_to_remove = mysqlclean($_POST, "transition_id", 1000, $db);
         $sql = "DELETE FROM story_transitions WHERE transition_id = '{$transition_to_remove}'";
         if (!$result = $db->query($sql))
             showerror($db);
     }
+    
+    if ($task == "new_default_transition") {
+        $event_id=$story_number_id;
+        $location_id=mysqlclean($_POST, "location_id", 3000, $db);
+        $action_id=mysqlclean($_POST, "action_id", 3000, $db);
+        $doctor_message = addslashes(get_value_for_action_id("default_message_doctor", $action_id, $db));
+        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', 'doctor present', 100, '{$event_id}', '{$doctor_message}', 0, 0, 0, 0, 0)";
+        if (!$result = $db->query($sql))
+            showerror($db);
+        $needs_name = get_value_for_action_id("needs_name", $action_id, $db);
+        $message = addslashes(get_value_for_action_id("default_message_no_doctor", $action_id, $db));
+        if ($needs_name) {
+            $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', '', 100, '{$event_id}', '{$message}', 1, 0, 0, 0, 0)";
+        } else {
+            $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', '', 100, '{$event_id}', '{$message}', 0, 0, 0, 0, 0)";
+        }
+        if (!$result = $db->query($sql))
+            showerror($db);
+ 
+    }
+    
+      if ($task == "empty_transition") {
+           $event_id=$story_number_id;
+           $transition_label=mysqlclean($_POST, "transition_label", 3000, $db);
+           $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$event_location}', '{$event_id}', '{$story_id}', 0, '{$transition_label}', '', 100, '{$event_id}', '', 0, 0, 0, 0, 0)";
+           if (!$result = $db->query($sql))
+               showerror($db);
+    
+       }
+
 
     
     
@@ -216,7 +278,58 @@
     print "<input type=\"submit\" value=\"Add Ally\">";
     print "</form>";
 
-    
+    print "<h2>Modifications to Character Status when they encounter this Event</h2>";
+    if ($modifier_list != '') {
+        print "<ul>";
+        foreach ($modifier_array as $modifier_id) {
+            $text = get_value_for_event_modifier_id("name", $modifier_id, $db);
+            print "<form method=\"POST\">";
+                      print "<li>$text";
+            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+            print "<input type=\"hidden\" name=\"task\" value=\"del_modifier\">";
+            print "<input type=\"submit\" value=\"Delete Modifier\">";
+            print "<input type=\"hidden\" name=\"modifier\" value=\"$modifier_id\">";
+            print "</form><br></li>";
+        }
+        print "</ul>";
+    }
+
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"add_modifier\">";
+    $sql = "SELECT modifier_id, name from event_modifiers";
+    if (!$result = $db->query($sql)) {
+        showerror($db);
+    }
+    print "<select name=\"new_modifier\">";
+    while ($row=$result->fetch_assoc()) {
+        $name = $row["name"];
+        $modifier_id = $row["modifier_id"];
+        print "<option value=\"$modifier_id\">$name</option>";
+    }
+    print "</select>";
+    print "<input type=\"submit\" value=\"Add General Modifier\">";
+    print "</form>";
+
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"add_story_modifier\">";
+    $sql = "SELECT modifier_id, text from story_modifiers";
+    if (!$result = $db->query($sql)) {
+        showerror($db);
+    }
+    print "<select name=\"new_modifier\">";
+    while ($row=$result->fetch_assoc()) {
+        $name = $row["text"];
+        $modifier_id = $row["modifier_id"];
+        print "<option value=\"$modifier_id\">$name</option>";
+    }
+    print "</select>";
+    print "<input type=\"submit\" value=\"Add Story Specific Modifier\">";
+    print "</form>";
 
 
     $automaton = new story_automaton($story_id, $db);
@@ -264,6 +377,14 @@
         print("<ul>");
         foreach ($transition_labels as $label) {
             print "<li>$label";
+            print "<form method=\"POST\" action=\"edit_event.php\">";
+            print "<input type=\"hidden\" name=\"transition_label\" value=\"$label\">";
+            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+            print "<input type=\"hidden\" name=\"task\" value=\"empty_transition\">";
+            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+            print "<input type=\"submit\" value=\"Add Empty Transition for Label\">";
+             
+            print "</form>";
         }
         print("</ul>");
     } else {

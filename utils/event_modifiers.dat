@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS `event_modifiers`;
+CREATE TABLE `event_modifiers` (
+  `modifier_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text,
+  PRIMARY KEY (`modifier_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `event_modifiers` WRITE;
+INSERT INTO event_modifiers VALUES
+(1, 'unconscious'),
+(2, 'conscious'),
+(3, 'locked up'),
+(4, 'freed'),
+(5, 'hypnotised'),
+(6, 'unhypnotised');
+UNLOCK TABLES;

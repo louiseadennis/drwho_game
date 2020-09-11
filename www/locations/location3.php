@@ -43,18 +43,8 @@
 
 <?php
     $event = get_current_event($db);
-    if ($event == 4) {
-        $ally_id = get_value_for_name_from("ally_id", "allies", "Vogans", $db);
-        add_ally($ally_id, $db);
-        $icon = get_value_for_ally_id("icon", $ally_id, $db);
-        print("<br><img src=../assets/$icon align=left>");
-        
-        print("<i><p>The Tardis lands deep in a cave system where the crew are almost immediately captured by the Vogan inhabitants.</p></i>");
-        
-        lock_everyone_up(3, $db);
-        
-    }
-    
+    print_event_long($db);
+     
     if ($event == 5) {
         if (first_visit($db)) {
             foreach (characters_at_location(3, $db) as $char_id) {

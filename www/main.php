@@ -23,11 +23,13 @@ $travel_type = mysqlclean($_POST, "travel_type", 10, $db);
 // $location_id = mysqlclean($_POST, "location", 10, $db);
 $start_story = mysqlclean($_POST, "start_story", 10, $db);
 $quit_story = mysqlclean($_POST, "quit_story", 10, $db);
-    $forced_travel = 0;
+$forced_travel = 0;
+$just_started = 0;
 
 // Handle Story Events
 if ($start_story != "") {
     begin_story($start_story, $db);
+    $just_started = 1;
 } else if ($quit_story != "") {
     quit_story($quit_story, $db);
 }
@@ -50,7 +52,7 @@ if ($transition != "") {
         $travel_type = select_sql_column($sql, "transition_label", $db);
         //print($travel_type);
     }
-} elseif (having_adventure($db) && $travel_type != 'pov_switch') {
+} elseif (having_adventure($db) && $travel_type != 'pov_switch'  && !$just_started) {
     story_transition($last_action, $db);
     $transition = get_value_from_users("last_transition", $db);
     $sql = "SELECT action_id from story_transitions where transition_id = '{$transition}'";
