@@ -27,7 +27,9 @@
     $ally_array = explode(",", $ally_list);
     $modifier_list = select_sql_column($sql, "modifier_id_list", $db);
     $modifier_array = explode(",", $modifier_list);
-        
+    $story_modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
+    $story_modifier_array = explode(",", $story_modifier_list);
+
     $global_event_id = select_sql_column($sql, "global_event_id", $db);
     // $event_id = select_sql_column($sql, "event_id", $db);
     
@@ -130,6 +132,35 @@
             $modifier_array = explode(",", $new_modifier_list);
         }
     }
+    
+    if ($task == "add_story_modifier") {
+         $new_modifier = mysqlclean($_POST, "new_modifier", 1000, $db);
+         if ($story_modifier_list != "") {
+             $new_modifier_list = $story_modifier_list . "," . $new_modifier;
+         } else {
+             $new_modifier_list = $new_modifier;
+         }
+         $sql = "UPDATE story_events SET story_modifier_id_list='{$new_modifier_list}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+         if (!$result = $db->query($sql))
+             showerror($db);
+         $story_modifier_list = $new_modifier_list;
+        $story_modifier_array = explode(",",$new_modifier_list);
+     }
+    
+    if ($task == "del_story_modifier") {
+        $modifier_to_remove = mysqlclean($_POST, "modifier", 1000, $db);
+        $key = array_search($modifier_to_remove, $story_modifier_array);
+        if ($key !== false) {
+            unset($story_modifier_array[$key]);
+            $new_modifier_list = join(",", $story_modifier_array);
+            $sql = "UPDATE story_events SET story_modifier_id_list='{$new_modifier_list}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+            if (!$result = $db->query($sql))
+                showerror($db);
+            $story_modifier_list = $new_modifier_list;
+            $story_modifier_array = explode(",", $new_modifier_list);
+        }
+    }
+
 
 
     
@@ -193,6 +224,12 @@
 <div class=main style="padding:1em">
 
 <?php
+    
+    print "<form method=\"POST\" action=\"edit_story.php\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"submit\" value=\"Edit Story\">";
+    print "</form>";
+
     print "<h1>$story_number_id: $text</h1>";
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
@@ -279,6 +316,8 @@
     print "</form>";
 
     print "<h2>Modifications to Character Status when they encounter this Event</h2>";
+    print "<h3>General Modifiers</h3>";
+
     if ($modifier_list != '') {
         print "<ul>";
         foreach ($modifier_array as $modifier_id) {
@@ -313,6 +352,27 @@
     print "<input type=\"submit\" value=\"Add General Modifier\">";
     print "</form>";
 
+    print "<h3>Story Specific Modifiers</h3>";
+    
+    if ($story_modifier_list != '') {
+         print "<ul>";
+         foreach ($story_modifier_array as $modifier_id) {
+             $text = get_value_for_story_modifier_id("text", $modifier_id, $db);
+             print "<form method=\"POST\">";
+                       print "<li>$text";
+             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+             print "<input type=\"hidden\" name=\"task\" value=\"del_story_modifier\">";
+             print "<input type=\"submit\" value=\"Delete Specific Modifier\">";
+             print "<input type=\"hidden\" name=\"modifier\" value=\"$modifier_id\">";
+             print "</form><br></li>";
+         }
+         print "</ul>";
+     }
+
+
+    
+    
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
     print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";

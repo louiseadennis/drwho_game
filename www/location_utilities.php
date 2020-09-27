@@ -45,12 +45,15 @@
         print "<div class=\"action\">";
         $story = get_value_from_users("story", $mysql);
         
+       //  print "<p>STORY: $story</p>";
         
-        if ($story != '0' && $story != '') {
-            if (in_end_state($story, $mysql)) {
-                $story = 0;
-            }
-        }
+        
+        //if ($story != '0' && $story != '') {
+       //     if (in_end_state($story, $mysql)) {
+        //        // print("<p><b>END STATE</b></p>");
+       ///         $story = 0;
+       //     }
+       // }
         if ($story != '0' && $story != '') {
                 $story_name = get_value_for_story_id("title", $story, $mysql);
                 print "<b style=\"font-size:1.5em\">$story_name</b>";
@@ -127,7 +130,7 @@
         
         if (having_adventure($connection) && !$pov_switch) {
             $last_transition = get_value_from_users("last_transition", $connection);
-            print($last_transition);
+            // print($last_transition);
             print_transition_outcome($last_transition, $last_action, $connection);
         } else {
                 if (is_action($last_action, $connection)) {

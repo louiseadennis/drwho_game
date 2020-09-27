@@ -57,6 +57,11 @@
          return select_sql_column($sql, $column, $connection);
      }
 
+    function get_value_for_story_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM story_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
 
     function get_user_id($connection)
     {

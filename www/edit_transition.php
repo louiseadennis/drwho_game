@@ -21,14 +21,15 @@
         $event_id=mysqlclean($_POST, "event_id", 3000, $db);
         $location_id=mysqlclean($_POST, "location_id", 3000, $db);
         $action_id=mysqlclean($_POST, "action_id", 3000, $db);
-        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'no label', '', 100, '{$event_id}', 'no outcome text', 0, 0, 0, 0, 0)";
+        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', '', 100, '{$event_id}', 'no outcome text', 0, 0, 0, 0, 0)";
         if (!$result = $db->query($sql))
             showerror($db);
+        $transition_id = $db->insert_id;
         
-        $sql = "SELECT transition_id FROM story_transitions where story_id = '{$story_id}' AND transition_label = 'no label'";
-        if (!$result = $db->query($sql))
-            showerror($db);
-        $transition_id = select_sql_column($sql, "transition_id", $db);
+        // $sql = "SELECT transition_id FROM story_transitions where story_id = '{$story_id}' AND transition_label = 'no label'";
+        // if (!$result = $db->query($sql))
+        //    showerror($db);
+        // $transition_id = select_sql_column($sql, "transition_id", $db);
     } else {
         $transition_id = mysqlclean($_POST, "transition_id", 15, $db);
     }
@@ -154,6 +155,19 @@
 <div class=main style="padding:1em">
 
 <?php
+    
+    print "<form method=\"POST\" action=\"edit_event.php\">";
+     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+     print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event_id\">";
+     print "<input type=\"submit\" value=\"Edit Event\">";
+     print "</form>";
+
+    
+    print "<form method=\"POST\" action=\"edit_story.php\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"submit\" value=\"Edit Story\">";
+    print "</form>";
+    
     print "<h1>$transition_id: $text for $action_id</h1>";
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";

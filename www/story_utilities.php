@@ -49,7 +49,7 @@
         $event_id = get_current_event($db);
         
         $sql = "SELECT text from story_events where event_location = '{$location_id}' AND story_number_id = '{$event_id}' AND story_id = '{$story}'";
-        //print($sql);
+        // print($sql);
         if ($result = $db->query($sql)) {
             if ($result->num_rows == 0) {
                 return 0;
@@ -61,13 +61,15 @@
                 showerror($db);
              
             if ($result->num_rows > 0) {
-                //print("B");
+                // print("B");
                 return 0;
             } else {
-               // print("C");
+                // print("C $sql");
                 return 1;
             }
 
+        } else {
+            showerror($db);
         }
         
         return 0;
@@ -110,7 +112,8 @@
         // Figure out relevant Initial Event for each location
         foreach ($locations as $story_location) {
             // And insert a location in play into the table.
-            if (count(characters_at_location($story_location, $db)) > 0) {
+           // if (count(characters_at_location($story_location, $db)) > 0) {
+            // NO SOMEONE CAN ALWAYS TRAVEL IN
                 // $initial_event id number is wrt. story_id not unique
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
@@ -120,16 +123,16 @@
                 
                 if (!$result = $db->query($sql))
                     showerror($db);
-            } else {
-                $initial_event = get_not_present_initial_event($story_id, $story_location, $db);
-                $user_id = get_user_id($db);
+           // } else {
+            //    $initial_event = get_not_present_initial_event($story_id, $story_location, $db);//
+           //     $user_id = get_user_id($db);//
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+           //     $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
                 // print $sql;
                 
-                if (!$result = $db->query($sql))
-                    showerror($db);
-            }
+           //     if (!$result = $db->query($sql))
+          //          showerror($db);
+          //  }
         }
     }
     
@@ -171,7 +174,7 @@
         
         foreach ($locations as $story_location) {
             // And insert a location in play into the table.
-            if ($location_id != $story_location && !$one_starting_location) {
+            // if ($location_id != $story_location && !$one_starting_location) {
                     // $initial_event id number is wrt. story_id not unique
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
@@ -183,7 +186,7 @@
                     showerror($db);
                     
                 $one_starting_location = 1;
-            } elseif (count(characters_at_location($story_location, $db)) == 0 || $location_id == $story_location) {
+            /* } elseif (count(characters_at_location($story_location, $db)) == 0 || $location_id == $story_location) {
                 $initial_event = get_not_present_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
@@ -192,7 +195,7 @@
                 
                 if (!$result = $db->query($sql))
                     showerror($db);
-            }
+            } */
         }
         
         if (!$one_starting_location) {
@@ -288,7 +291,7 @@
         begin_story($story_id, $connection);
         $location_id = get_location($connection);
         $initial_event = get_initial_event($story_id, $location_id, $connection);
-        $not_present_event = get_not_present_initial_event($story_id, $location_id, $connection);
+        // $not_present_event = get_not_present_initial_event($story_id, $location_id, $connection);
         $elsewhere_events = get_elsewhere_events($connection);
         $path = find_path_to($initial_event, $story_id_number, $elsewhere_events, $story_id, $connection);
         // print($path);

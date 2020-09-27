@@ -48,8 +48,8 @@ if ($transition != "") {
     //print($forced_travel);
     if ($action_id == 100 || $forced_travel) {
         $last_action = 'travel';
-        $sql = "SELECT transition_label from story_transitions where transition_id = '{$transition}'";
-        $travel_type = select_sql_column($sql, "transition_label", $db);
+        $sql = "SELECT travel_type from story_transitions where transition_id = '{$transition}'";
+        $travel_type = select_sql_column($sql, "travel_type", $db);
         //print($travel_type);
     }
 } elseif (having_adventure($db) && $travel_type != 'pov_switch'  && !$just_started) {
@@ -64,8 +64,8 @@ if ($transition != "") {
     //print($forced_travel);
     if ($forced_travel) {
         // $last_action = 'travel';
-        $sql = "SELECT transition_label from story_transitions where transition_id = '{$transition}'";
-        $travel_type = select_sql_column($sql, "transition_label", $db);
+        $sql = "SELECT travel_type from story_transitions where transition_id = '{$transition}'";
+        $travel_type = select_sql_column($sql, "travel_type", $db);
         //print($travel_type);
         $sql = "SELECT old_location from story_transitions where transition_id = '{$transition}'";
         $old_location = select_sql_column($sql, "old_location", $db);

@@ -13,28 +13,31 @@
             $event_sets = array();
             foreach ($locations as $location) {
                 $event1 = get_initial_event($story_id, $location, $db);
-                $event2 = get_not_present_initial_event($story_id, $location, $db);
-                // print("Events: $event1, $event2 <br>");
-                array_push($this->events, $event1, $event2);
+                // $event2 = get_not_present_initial_event($story_id, $location, $db);
+                // print("Events: $event1<br>");
+                array_push($this->events, $event1);
                 if (count($event_sets) == 0) {
                     $event_array1 = array($event1);
-                    $event_array2 = array($event2);
+                    // $event_array2 = array($event2);
                     array_push($event_sets, $event_array1);
-                    array_push($event_sets, $event_array2);
+                    // array_push($event_sets, $event_array2);
+                    // print(count($event_sets));
                 } else {
                     $new_event_sets = array();
                     foreach ($event_sets as $event_set) {
-                        $event_set2 = $event_set;
+                        // $event_set2 = $event_set;
                         array_push($event_set, $event1);
-                        array_push($event_set2, $event2);
-                        array_push($new_event_sets, $event_set, $event_set2);
+                        // array_push($event_set2, $event2);
+                        array_push($new_event_sets, $event_set);
                     }
                     $event_sets = $new_event_sets;
+                    // print(count($event_sets));
                 }
             }
             
-            // This should get rid of the event set where not characters are present anywhere.
-            array_pop($event_sets);
+            // This should get rid of the event set where no characters are present anywhere.
+            // ???
+            // array_pop($event_sets);
             
             foreach($event_sets as $events) {
                 $state = new story_state($events, $story_id, $db, $this);
@@ -159,6 +162,7 @@
         function __construct4($event_list, $story_id, $db, $automaton) {
             //print("A");
             foreach ($event_list as $event) {
+                print($event);
                 $location_event = new location_event_state($event, $story_id, $db);
                 array_push($this->events, $location_event);
                 $event_string = $location_event->location_event_state_string($db);
@@ -521,6 +525,7 @@
         $outcome_text = select_sql_column($sql, "outcome_text", $db);
         $action_id = select_sql_column($sql, "action_id", $db);
         $event_id = select_sql_column($sql, "event_id", $db);
+        $travel_type = select_sql_column($sql, "travel_type", $db);
 
         $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $db);
         
@@ -533,7 +538,11 @@
              $font_color = "red";
          }
 
-        print "<p style=\"color:$font_color\">[$modifiers] -$label ($probability) -> $outcome ($text) : $outcome_text</p>";
+        if ($action_id == 100) {
+            print "<p style=\"color:$font_color\">[$modifiers AND $travel_type] -$label ($probability) -> $outcome ($text) : $outcome_text</p>";
+        } else {
+            print "<p style=\"color:$font_color\">[$modifiers] -$label ($probability) -> $outcome ($text) : $outcome_text</p>";
+        }
         
         print "<form method=\"POST\" action=\"edit_transition.php\">";
         print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
@@ -551,9 +560,6 @@
         print "<input type=\"submit\" value=\"Delete Transition\">";
          
         print "</form>";
-        
-        print "<hr>";
-
 
     }
     
@@ -589,6 +595,8 @@
             print "<input type=\"submit\" value=\"Add Default Transition\">";
             print "</form>";
         }
+        
+        print "<hr>";
 
     }
     

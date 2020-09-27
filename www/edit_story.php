@@ -49,6 +49,9 @@ $story = get_value_for_story_id("title", $story_id, $db);
         $name = select_sql_column($sql, "name", $db);
         print "<h3>$name</h3>";
         
+        $initial_event = get_initial_event($story_id, $location, $db);
+        $not_presentinitial_event = get_not_present_initial_event($story_id, $location, $db);
+        
         $sql = "SELECT story_number_id, text FROM story_events where story_id = '{$story_id}' AND event_location = '{$location}'";
         if (!$result = $db->query($sql))
             showerror($db);
@@ -64,6 +67,10 @@ $story = get_value_for_story_id("title", $story_id, $db);
             } elseif (($automaton->get_event($event)->incomplete() or $automaton->get_event($event)->unhandled_action() or
                 $automaton->get_event($event)->other_transition_issue) and !$automaton->get_event($event)->end_state) {
                  print ("<span style=\"color:red\">INCOMPLETE!</span>");
+            }
+            
+            if ($event == $initial_event) {
+                print "<br><b>Initial Event</b>";
             }
             print "</form>";
          }

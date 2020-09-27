@@ -44,26 +44,7 @@
     $event = get_current_event($db);
     // print($event);
     print_event_long($db);
-    if ($event == 2) {
-        $bitten = get_event_character($db);
-        $name = get_value_for_char_id("name", $bitten, $db);
-        if (first_visit($db)) {
-            modify_character($bitten, 2, $db); // Bitten by cybermat modifer
-            visited($db);
-        }
-        // unconscious($bitten, $db);
-        
-        $gender = get_value_for_char_id("gender", $bitten, $db);
-        
-        $pronoun = "She";
-        $pronoun2 = "her";
-        if ($gender == 1) {
-            $pronoun = "He";
-            $pronoun2 = "his";
-        }
-        
-        print("<i><p>$name has been bitten by a cybermat.  $pronoun is unconscious with black lines growing across $pronoun2 face.<p></i>");
-    } else if ($event == 3) {
+    if ($event == 3) {
         
         $critter_id = get_value_for_name_from("critter_id", "critters", "Cyberman", $db);
         

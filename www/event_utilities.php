@@ -36,6 +36,22 @@
             }
         }
         
+        $story_modifier_array = get_story_modifiers_for_event_id($event, $db);
+        foreach ($story_modifier_array as $modifier_id) {
+            $who_affected = get_value_for_story_modifier_id("all_or_random_or_doctor", $modifier_id, $db);
+            if ($who_affected == 0) {
+                // TODO:  EVERYONE AFFECTED
+            } elseif ($who_affected == 1) {
+                $who = get_event_character($db);
+                if (first_visit($db)) {
+                    modify_character($who, $modifier_id, $db);
+                    visited($db);
+                }
+            } else {
+                // TODO: DOCTOR
+            }
+        } 
+        
         if (get_locked_up($event, $db) == 1) {
             $location_id = get_location($db);
             lock_everyone_up($location_id, $db);
@@ -187,6 +203,21 @@
                    return [];
         }
 
+    }
+    
+    function get_story_modifiers_for_event_id($event, $db) {
+        $story = get_value_from_users("story", $db);
+         
+        $sql = "SELECT story_modifier_id_list from story_events where story_number_id = '{$event}' and story_id = '{$story}'";
+        
+        $modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
+        if ($modifier_list != "") {
+            $modifier_array = explode(",", $modifier_list);
+            return $modifier_array;
+        } else {
+            return [];
+        }
+        
     }
 
 
