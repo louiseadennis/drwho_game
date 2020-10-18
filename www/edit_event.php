@@ -13,24 +13,12 @@
        die('Unable to connect to database [' . $mysql_host . $mysql_user .  $mysql_password . $mysql_database . $db->connect_error . ']');
        }
         
+    $task = mysqlclean($_POST, "task", 25, $db);
     $story_id = mysqlclean($_POST, "story_id", 15, $db);
     $story = get_value_for_story_id("title", $story_id, $db);
     $story_number_id = mysqlclean($_POST, "story_number_id", 15, $db);
-    $task = mysqlclean($_POST, "task", 25, $db);
     $sql = "SELECT * FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
-    $text = select_sql_column($sql, "text", $db);
-    $description = select_sql_column($sql, "description", $db);
-    $critter_list = select_sql_column($sql, "critter_id_list", $db);
-    $ally_list = select_sql_column($sql, "ally_id_list", $db);
-    $critter_array = explode(",", $critter_list);
     $event_location = select_sql_column($sql, "event_location", $db);
-    $ally_array = explode(",", $ally_list);
-    $modifier_list = select_sql_column($sql, "modifier_id_list", $db);
-    $modifier_array = explode(",", $modifier_list);
-    $story_modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
-    $story_modifier_array = explode(",", $story_modifier_list);
-
-    $global_event_id = select_sql_column($sql, "global_event_id", $db);
     // $event_id = select_sql_column($sql, "event_id", $db);
     
     if ($task == "change_title") {
@@ -38,7 +26,6 @@
         $sql = "UPDATE story_events SET text='{$new_text}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
-        $text = $new_text;
     }
     
     if ($task == "change_des") {
@@ -46,7 +33,6 @@
         $sql = "UPDATE story_events SET description='{$new_description}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
-        $description = $new_description;
     }
     
     if ($task == "add_critter") {
@@ -59,8 +45,6 @@
         $sql = "UPDATE story_events SET critter_id_list='{$new_critter_list}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
-        $critter_list = $new_critter_list;
-        $critter_array = explode(",", $new_critter_list);
     }
     
     if ($task == "del_critter") {
@@ -173,7 +157,7 @@
     
     if ($task == "new_default_transition") {
         $event_id=$story_number_id;
-        $location_id=mysqlclean($_POST, "location_id", 3000, $db);
+        $location_id=$event_location;
         $action_id=mysqlclean($_POST, "action_id", 3000, $db);
         $doctor_message = addslashes(get_value_for_action_id("default_message_doctor", $action_id, $db));
         $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', 'doctor present', 100, '{$event_id}', '{$doctor_message}', 0, 0, 0, 0, 0)";
@@ -199,6 +183,22 @@
                showerror($db);
     
        }
+    
+    $sql = "SELECT * FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+
+    $text = select_sql_column($sql, "text", $db);
+    $description = select_sql_column($sql, "description", $db);
+    $critter_list = select_sql_column($sql, "critter_id_list", $db);
+    $ally_list = select_sql_column($sql, "ally_id_list", $db);
+    $critter_array = explode(",", $critter_list);
+    $ally_array = explode(",", $ally_list);
+    $modifier_list = select_sql_column($sql, "modifier_id_list", $db);
+    $modifier_array = explode(",", $modifier_list);
+    $story_modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
+    $story_modifier_array = explode(",", $story_modifier_list);
+
+    $global_event_id = select_sql_column($sql, "global_event_id", $db);
+
 
 
     

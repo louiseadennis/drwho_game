@@ -300,7 +300,7 @@
         $tardis_team = get_value_from_users("tardis_team", $db);
         if ($tardis_team != '') {
             print "<h2>Tardis Crew</h2>";
-            print "<table>";
+            print "<table cellspacing=6>";
             $char_id_array = explode(",", $tardis_team);
             print "<tr>";
             foreach ($char_id_array as $char_id) {
@@ -310,9 +310,9 @@
                 if ($char_location == $location_id) {
                     $no_space_char_name = str_replace(" ", "_", $char_name);
                     if (is_conscious($char_id, $db)) {
-                        print "<td align=center valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                        print "<td align=center style=\"overflow:hidden; width:150px;\" valign=top><img src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
                     } else {
-                        print "<td align=center valign=top><img style=\"opacity:0.2\" src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
+                        print "<td align=center valign=top><img style=\"overflow:hidden; width:150px; opacity:0.2\" src=../assets/$no_space_char_name.png alt=\"$uchar.\"><p>$uchar";
                     }
                     print_character_modifiers($db, $char_id);
                     print "</td>";

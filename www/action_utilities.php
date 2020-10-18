@@ -61,7 +61,7 @@
                     if ($value) {
                         remove_modification_from_character($modifier, $char_id, $connection);
                     }
-                }
+                 }
             }
         }
     }

@@ -160,13 +160,15 @@
         }
         
         function __construct4($event_list, $story_id, $db, $automaton) {
-            //print("A");
+            //print("A<br>");
             foreach ($event_list as $event) {
-                print($event);
+                // print($event);
                 $location_event = new location_event_state($event, $story_id, $db);
                 array_push($this->events, $location_event);
-                $event_string = $location_event->location_event_state_string($db);
+                // event_string = $location_event->location_event_state_string($db);
                 // print ("Location Event: $event_string<br>");
+                
+                // Unexplored transitions are, at the start, all the transitions in the database for this event.
                 $this->unexplored_transitions[$event] = $location_event->transition_labels;
                 $this->story_id = $story_id;
                 $this->automaton = $automaton;
@@ -174,17 +176,13 @@
                      array_push($automaton->events, $location_event);
                 }
                 $string = $this->story_state_string();
-                //print ("Created 4: $string<br>");
-                //foreach ($this->unexplored_transitions[$event] as $transition) {
-                //    print($transition->transition_string());
-                //    print("<br>");
-                //}
-            }
+             }
+            // print($this->story_state_string());
             $this->remove_transitions_that_dont_need_to_synchronise();
         }
         
         function __construct3($event_list, $story_id, $automaton) {
-            // print("Hey!<br>");
+            //print("B<br>");
             $this->automaton = $automaton;
             $this->story_id = $story_id;
             foreach ($event_list as $event) {
@@ -194,22 +192,58 @@
                 if (!in_array($event, $automaton->events)) {
                     array_push($automaton->events, $event);
                 }
-            }
+                
+             }
+            
             $this->remove_transitions_that_dont_need_to_synchronise();
-            $string = $this->story_state_string();
+            // $this->remove_transitiosn_that_are_only_synchronised();
+            //$string = $this->story_state_string();
             //print ("Created 2: $string");
         }
         
         function remove_transitions_that_dont_need_to_synchronise() {
+            //print "REMOVING TRANSITIONS<br>";
             foreach($this->events as $event) {
                 foreach ($this->unexplored_transitions[$event->event_id] as $transition_label) {
+                    $remove = 1;
+                    foreach($this->events as $event2) {
+                        foreach($event2->transitions as $transition) {
+                            if ($transition->label == $transition_label) {
+                               // If a transition is not controlled then that means the action_id != 0 - i.e. it is not a synchronised transitions
+                               if ($transition->not_controlled == 0) {
+                                     $remove = 0;
+                                 }
+                            }
+                        }
+                    }
+                    
+                    // Remove a transition for this event only if no other event has a synchronised transition with that label
+                    if ($remove == 1) {
+                        //$string = $this->story_state_string();
+                        //print ("Removing $transition_label from $event->event_id in $string<br>");
+                        //print_r ($this->unexplored_transitions[$event->event_id]);
+                        $this->unexplored_transitions[$event->event_id] = array_diff($this->unexplored_transitions[$event->event_id], [$transition_label]);
+                        //print_r ($this->unexplored_transitions[$event->event_id]);
+                    }
+                }
+                //print ("$event->event_id : ");
+                //print_r ($this->unexplored_transitions[$event->event_id]);
+                //print ("<br>");
+            }
+        }
+        
+        function remove_transitions_that_are_only_synchronised() {
+            foreach($this->events as $event) {
+                foreach ($this->unexplored_transitions[$event->event_id] as $transition_label) {
+                    // so far all appearances of this transition have been synchronised
                     $remove = 1;
                     foreach($this->events as $event) {
                         foreach($event->transitions as $transition) {
                             if ($transition->label == $transition_label) {
-                                if ($transition->not_controlled == 0) {
-                                    $remove = 0;
-                                }
+                               // We've found an instance of this transition that is not synchronised
+                                if ($transition->not_controlled == 1) {
+                                       $remove = 0;
+                               }
                             }
                         }
                     }
@@ -415,7 +449,7 @@
         
         function next_event($transition) {
             $transition_string = $transition;
-            //print ("Check for $transition_string <br>");
+            //print ("Check for $transition_string for $this->event_id<br>");
             foreach ($this->transitions as $t) {
                 $t_string = $t->transition_string();
                 //print("Checking $t_string <br>");
@@ -425,6 +459,7 @@
                     return $t->to;
                 }
             }
+            //print("$transition_string not handled");
             array_push($this->unhandled_transitions, $transition);
         }
         
@@ -498,21 +533,58 @@
     
     function transitions_complete_for_modifier_and_action($event_id, $action_id, $story_id, $modifiers, $db) {
         // $modifiers = "test";
-        $sql = "SELECT probability FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$event_id}' AND action_id = '{$action_id}' AND modifiers = '{$modifiers}'";
-        //print($sql);
-        //print("<br>");
-        if (!$result = $db->query($sql))
-            showerror($db);
-        $total_probability = 0;
-        while ($row=$result->fetch_assoc()) {
-            $probability = $row["probability"];
-            $total_probability = $total_probability + $probability;
+        if ($action_id != 100) {
+            $sql = "SELECT probability FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$event_id}' AND action_id = '{$action_id}' AND modifiers = '{$modifiers}'";
+            //print($sql);
+            //print("<br>");
+            if (!$result = $db->query($sql))
+                showerror($db);
+            $total_probability = 0;
+            while ($row=$result->fetch_assoc()) {
+                $probability = $row["probability"];
+                $total_probability = $total_probability + $probability;
+            }
+            
+            if ($total_probability == 100 || $action_id == 0) {
+  
+                return 1;
+            }
+            return 0;
+        } else {
+            $sql = "SELECT probability, travel_type FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$event_id}' AND action_id = '{$action_id}' AND modifiers = '{$modifiers}'";
+            //print($sql);
+            //print("<br>");
+            if (!$result = $db->query($sql))
+                showerror($db);
+            $total_probability = 0;
+            $any_travel_type = 0;
+            $travel_probs = array();
+            while ($row=$result->fetch_assoc()) {
+                $probability = $row["probability"];
+                $travel_type = $row["travel_type"];
+                if ($row["travel_type"] == 'any') {
+                    $any_travel_type = 1;
+                }
+                if (array_key_exists($travel_type, $travel_probs)) {
+                    $travel_probs[$travel_type] = $travel_probs[$travel_type] + $probability;
+                } else {
+                    $travel_probs[$travel_type] = $probability;
+                }
+            }
+            
+            if ($any_travel_type == 0) {
+                return 0;
+            }
+  
+            foreach ($travel_probs as $total_probability) {
+                if ($total_probability != 100) {
+                    return 0;
+                }
+                return 1;
+            }
+            return 0;
+
         }
-        
-        if ($total_probability == 100 || $action_id == 0) {
-            return 1;
-        }
-        return 0;
     }
     
     function print_transition($transition_id, $story_id, $db) {
@@ -527,16 +599,24 @@
         $event_id = select_sql_column($sql, "event_id", $db);
         $travel_type = select_sql_column($sql, "travel_type", $db);
 
-        $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $db);
-        
+        $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db);
+         
         $sql = "SELECT text FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$outcome}'";
         $text = select_sql_column($sql, "text", $db);
 
         $font_color = "black";
-         if ($total_prob != 100 && $action_id != 0) {
+        if ($total_prob != 100 && $action_id != 0) {
              print $total_prob;
              $font_color = "red";
-         }
+        }
+        
+        if ($action_id == 100 && $travel_type != 'any') {
+            $any_travel_type = any_travel_type($story_id, $modifiers, $event_id, $db);
+            if (!$any_travel_type) {
+                $font_color = "red";
+            }
+        }
+
 
         if ($action_id == 100) {
             print "<p style=\"color:$font_color\">[$modifiers AND $travel_type] -$label ($probability) -> $outcome ($text) : $outcome_text</p>";
@@ -613,8 +693,12 @@
         print(":<br>");
     }
     
-    function probability_sum($story_id, $modifiers, $action_id, $event_id, $db) {
-        $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+    function probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db) {
+        if ($action_id != 100) {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+        } else {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and travel_type = '{$travel_type}'";
+        }
         //print $sql;
         $other_transitions = sql_return_to_array($sql, "transition_id", $db);
         $total_prob = 0;
@@ -627,6 +711,22 @@
         }
         return $total_prob;
     }
+    
+    function any_travel_type($story_id, $modifiers, $event_id, $db) {
+        $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = 100 and event_id = '{$event_id}'";
+        $other_transitions = sql_return_to_array($sql, "transition_id", $db);
+
+        //print $sql;
+        foreach ($other_transitions as $transition) {
+            $sql = "SELECT travel_type from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
+            $travel_type = select_sql_column($sql, "probability", $db);
+            if ($travel_type == 'any') {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     
     function probability_outcomes($story_id, $modifiers, $action_id, $event_id, $db) {
          $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";

@@ -50,7 +50,44 @@
             } else {
                 // TODO: DOCTOR
             }
-        } 
+        }
+        
+        $modifier_array = get_modifiers_for_event_id($event, $db);
+        foreach ($modifier_array as $modifier_id) {
+            $who_affected = get_value_for_modifier_id("all_or_random_or_doctor", $modifier_id, $db);
+            if ($who_affected == 0) {
+                $name = get_value_for_modifier_id("name", $modifier_id, $db);
+                $location_id = get_location($db);
+                if ($name == "freed") {
+                    free_everyone($location_id, $db);
+                } elseif ($name == "unconscious") {
+                    foreach (characters_at_location($location_id, $db) as $char_id) {
+                        unconscious($char_id, $db);
+                    }
+                } elseif ($name == "conscious") {
+                    foreach (characters_at_location($location_id, $db) as $char_id) {
+                        conscious($char_id, $db);
+                    }
+                } elseif ($name == "locked up") {
+                    lock_everyone_up($location_id, $db);
+                } elseif ($name == "hypnotised") {
+                    foreach (characters_at_location($location_id, $db) as $char_id) {
+                        hypnotised($char_id, $db);
+                    }
+
+                } elseif ($name == "unhypnotsed") {
+                    foreach (characters_at_location($location_id, $db) as $char_id) {
+                        not_hypnotised($char_id, $db);
+                    }
+
+                }
+            } elseif ($who_affected == 1) {
+                // TODO: RANDOM CHARACTER
+            } else {
+                // TODO: DOCTOR
+            }
+        }
+
         
         if (get_locked_up($event, $db) == 1) {
             $location_id = get_location($db);
@@ -219,6 +256,22 @@
         }
         
     }
+    
+    function get_modifiers_for_event_id($event, $db) {
+        $story = get_value_from_users("story", $db);
+         
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event}' and story_id = '{$story}'";
+        
+        $modifier_list = select_sql_column($sql, "modifier_id_list", $db);
+        if ($modifier_list != "") {
+            $modifier_array = explode(",", $modifier_list);
+            return $modifier_array;
+        } else {
+            return [];
+        }
+        
+    }
+
 
 
 

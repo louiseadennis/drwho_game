@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS `travel_types`;
+CREATE TABLE `travel_types` (
+  `travel_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` text,
+  PRIMARY KEY (`travel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `travel_types` WRITE;
+INSERT INTO travel_types VALUES
+(1, 'any'),
+(2, 'tardis'),
+(3, 'transmat');
+UNLOCK TABLES;

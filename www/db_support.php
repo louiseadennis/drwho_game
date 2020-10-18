@@ -62,6 +62,13 @@
          
          return select_sql_column($sql, $column, $connection);
      }
+    
+    function get_value_for_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
+
 
     function get_user_id($connection)
     {

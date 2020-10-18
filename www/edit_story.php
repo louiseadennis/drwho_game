@@ -40,7 +40,6 @@ $story = get_value_for_story_id("title", $story_id, $db);
     print "<h1>$story</h1>";
 
     $automaton = new story_automaton($story_id, $db);
-
     $sql = "SELECT locations from stories where story_id='{$story_id}'";
     $story_locations = select_sql_column($sql, "locations", $db);
     $location_array = explode(",", $story_locations);

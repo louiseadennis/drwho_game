@@ -108,6 +108,12 @@
         $sql = "UPDATE story_transitions SET random_character_input='{$new_affected}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
+    } elseif ($task = "change_travel_type") {
+        $new_travel_type = mysqlclean($_POST, "travel_type", 3000, $db);
+        $sql = "UPDATE story_transitions SET travel_type = '{$new_travel_type}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        if (!$result = $db->query($sql))
+            showerror($db);
+
     }
     
     $sql = "SELECT * FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
@@ -122,17 +128,19 @@
     $action_id = select_sql_column($sql, "action_id", $db);
     $person_affected = select_sql_column($sql, "random_character_input", $db);
     
+    if ($action_id == 100) {
+        $travel_type = select_sql_column($sql, "travel_type", $db);
+    }
+    
     $sql = "SELECT text from story_events where story_id = '{$story_id}' AND story_number_id = '{$outcome}'";
     $outcome_event_text = select_sql_column($sql, "text", $db);
-
     
-//    if ($task == "change_title") {
-  //      $new_text = mysqlclean($_POST, "event_text", 100, $db);
-    //    $sql = "UPDATE story_events SET text='{$new_text}' WHERE story_id = //'{$story_id}' AND story_number_id = '{$story_number_id}'";
-//        if (!$result = $db->query($sql))
-  //          showerror($db);
-    //    $text = $new_text;
-    // }
+    if ($action_id == 0) {
+        $action_name = "Synchronised Action (controlled elsewhere)";
+    } else {
+        $action_name = get_value_for_action_id('name', $action_id, $db);
+    }
+
     
 ?>
 <html>
@@ -168,17 +176,78 @@
     print "<input type=\"submit\" value=\"Edit Story\">";
     print "</form>";
     
-    print "<h1>$transition_id: $text for $action_id</h1>";
+    if ($text == "") {
+        $title_text = "NO OUTCOME TEXT";
+    } else {
+        $title_text = $text;
+    }
+    
+    print "<h1>$transition_id: $title_text for $action_name</h1>";
+    
+    
+    //=========== Outcome
+    
+    print "<p><h3>Outcome: <font color=\"blue\">";
+    print " $outcome ( $outcome_event_text )</font></h3>";
+    
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"change_event\">";
+    print "&nbsp <select id=\"outcome\" name=\"outcome\">";
+    
+    $sql = "SELECT story_number_id from story_events where story_id='{$story_id}'";
+    $story_events = sql_return_to_array($sql, "story_number_id", $db);
+     foreach ($story_events as $event) {
+        $sql = "SELECT text from story_events where story_number_id = '{$event}' and story_id = '{$story_id}'";
+        $event_name = select_sql_column($sql, "text", $db);
+        print "<option value=\"$event\">$event  ($event_name)</option>";
+    }
+    print "</select>";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Outcome\">";
+    print "</form></p>";
+    
+    //=========== Outcome Text
+    
+    
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
     print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
     print "<input type=\"hidden\" name=\"task\" value=\"change_outcome\">";
     print "<input type=\"text\" name=\"new_outcome_text\" size=100 value=\"$text\">";
-    print "<input type=\"submit\" value=\"Change Outcome Text\">";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Outcome Text\">";
     print "</form>";
     
-    print "<p><b>Transition Label:</b> ";
+    
+    //============ Probability
+    $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db);
+
+    $font_color = "black";
+    if ($total_prob != 100) {
+        $font_color = "red";
+    }
+        
+    print "<p style=\"color:$font_color\"><h3>Probability: ";
+    print " $probability</h3>";
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"change_prob\">";
+    print "<input type=\"probability\" name=\"new_probability\" size=3 value=\"$probability\">";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Probability\">";
+    print "</form><br>";
+
+    $outcome_list = probability_outcomes($story_id, $modifiers, $action_id, $event_id, $db);
+    print "<ul style=\"color:$font_color\">";
+    print $outcome_list;
+    print "</ul></p>";
+    
+    print "<hr>";
+    
+    //===========Transition Label
+    print "<p><h3>Transition Label: <font color=blue>";
     print $transition_label;
+    print "</font></h3>";
     
     $sql = "SELECT transition_label FROM story_transitions where story_id = '{$story_id}'";
     $label_array = sql_return_to_array($sql, "transition_label", $db);
@@ -192,7 +261,7 @@
         print "<option value=\"$label\">$label</option>";
     }
     print "</select>";
-    print "<input type=\"submit\" value=\"Change to Existing Label\">";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change to Existing Label\">";
     print "</form>";
     print "<br>";
     print "<form method=\"POST\">";
@@ -200,19 +269,21 @@
     print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
     print "<input type=\"hidden\" name=\"task\" value=\"change_label\">";
     print "&nbsp <input type=\"text\" name=\"label\" size=25 value=\"$transition_label\">";
-    print "<input type=\"submit\" value=\"New Label\">";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"New Label\">";
     print "</form>";
 
     print "</p>";
     
     
-    print "<p><b>Location after transition:</b>";
+    print "<hr>";
+    //============ Location
+    print "<p><h3>Location after transition: <font color=\"blue\">";
     if ($new_location != 0) {
         print "New location: ";
         $new_location_name = get_value_for_location_id("name", $new_location, $db);
-        print "$new_location_name ($new_location)</p>";
+        print "$new_location_name ($new_location)</font></h3>";
     } else {
-        print "Location remains the same.</p>";
+        print "Location remains the same.</font></h3>";
     }
     
     print "<form method=\"POST\">";
@@ -229,57 +300,16 @@
         print "<option value=\"$location\">$location  ($location_name)</option>";
     }
     print "</select>";
-    print "<input type=\"submit\" value=\"Change New Location\">";
-    print "</form>";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change New Location\">";
+    print "</form></p>";
 
     # $automaton = new story_automaton($story_id, $db);
-    
-    print "</p><p><b>Outcome:</b>";
-    print " $outcome ( $outcome_event_text )";
-    
-    print "<form method=\"POST\">";
-    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
-    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
-    print "<input type=\"hidden\" name=\"task\" value=\"change_event\">";
-    print "&nbsp <select id=\"outcome\" name=\"outcome\">";
-    
-    $sql = "SELECT story_number_id from story_events where story_id='{$story_id}'";
-    $story_events = sql_return_to_array($sql, "story_number_id", $db);
-     foreach ($story_events as $event) {
-        $sql = "SELECT text from story_events where story_number_id = '{$event}' and story_id = '{$story_id}'";
-        $event_name = select_sql_column($sql, "text", $db);
-        print "<option value=\"$event\">$event  ($event_name)</option>";
-    }
-    print "</select>";
-    print "<input type=\"submit\" value=\"Change Outcome\">";
-    print "</form>";
-    
-    $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $db);
 
-    $font_color = "black";
-    if ($total_prob != 100) {
-        $font_color = "red";
-    }
-        
-    print "</p><p style=\"color:$font_color\"><b>Probability:</b>";
-    print " $probability";
-    print "<form method=\"POST\">";
-    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
-    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
-    print "<input type=\"hidden\" name=\"task\" value=\"change_prob\">";
-    print "<input type=\"probability\" name=\"new_probability\" size=3 value=\"$probability\">";
-    print "<input type=\"submit\" value=\"Change Probability\">";
-    print "</form>";
-
-    $outcome_list = probability_outcomes($story_id, $modifiers, $action_id, $event_id, $db);
-    print "<ul style=\"color:$font_color\">";
-    print $outcome_list;
-    print "</ul></p>";
-    
-
-    print "</p><p><b>Modifiers:</b>";
+    print "<hr>";
+    //======== Modifiers
+    print "<p><h3>Modifiers:<font color=\"blue\">";
     $modifier_array = explode(",", $modifiers);
-    print "<ul>";
+    print "</font></h3><ul>";
     foreach ($modifier_array as $modifier) {
         if ($modifier != "") {
                 print "<form method=\"POST\">";
@@ -288,7 +318,7 @@
              print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
              print "<input type=\"hidden\" name=\"task\" value=\"remove_mod\">";
             print "<input type=\"hidden\" name=\"old_modifier\" value=\"$modifier\">";
-            print "<input type=\"submit\" value=\"Remove Modifier\">";
+            print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Remove Modifier\">";
             print "</li>";
             print "</form>";
         }
@@ -305,10 +335,34 @@
     foreach ($modifiers as $modifier) {
         print "<option value=\"$modifier\">$modifier</option>";
     }
-    print "<input type=\"submit\" value=\"Add Modifier\">";
+    print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Add Modifier\">";
     print "</form></p>";
+        
+    if ($action_id == 100) {
+        print "<p><h3>Travel Type:<font color=\"blue\">";
+        print " $travel_type";
+        print "</font></h3>";
+        
+        $sql = "SELECT * from travel_types";
+        $travel_types = sql_return_to_array($sql, "name", $db);
+        print "<form method=\"POST\">";
+        print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+        print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+        print "<input type=\"hidden\" name=\"task\" value=\"change_travel_type\">";
+        print "<select id=\"travel_type\" name=\"travel_type\">";
+        foreach ($travel_types as $modifier) {
+            print "<option value=\"$modifier\">$modifier</option>";
+        }
+        print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Travel Type\">";
+        print "</form></p>";
+  
+    }
     
-    print "</p><p><b>Who Does the Transition Affect?: $person_affected</b>";
+    print "<hr>";
+    
+
+    //============== Affected
+    print "<p><h3>Who Does the Transition Affect?: $person_affected</h3>";
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
     print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
@@ -317,12 +371,12 @@
     if ($person_affected == "0") {
         $checked = "checked";
     }
-    print "<input type=\"radio\" id=\"nobody\" name=\"who_effect\" $checked value=\"0\"><label for=\"nobody\">No One</label><br>";
+    print "<input type=\"radio\" id=\"nobody\" name=\"who_effect\" $checked value=\"0\"><label for=\"nobody\">0.  No One</label><br>";
     $checked = "";
     if ($person_affected == "1") {
          $checked = "checked";
     }
-    print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"1\"><label for=\"random\">Random Character</label><br>";
+    print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"1\"><label for=\"random\">1.  Random Character</label><br>";
     $checked = "";
     if ($person_affected == "2") {
          $checked = "checked";
@@ -335,8 +389,8 @@
         print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"3\"><label for=\"random\">The Doctor</label><br>";
 
     }
-    print "<input type=\"submit\" value=\"Submit\">";
-    print "</form>";
+    print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Affected\">";
+    print "</form></p>";
 
     print "<hr>";
     // ----------------------------------------------------------------------------------------------------------------
