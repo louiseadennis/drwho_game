@@ -716,10 +716,13 @@
         $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = 100 and event_id = '{$event_id}'";
         $other_transitions = sql_return_to_array($sql, "transition_id", $db);
 
-        //print $sql;
+        // print $sql;
         foreach ($other_transitions as $transition) {
             $sql = "SELECT travel_type from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
-            $travel_type = select_sql_column($sql, "probability", $db);
+            $travel_type = select_sql_column($sql, "travel_type", $db);
+            // print("::");
+            // print $travel_type;
+            
             if ($travel_type == 'any') {
                 return 1;
             }

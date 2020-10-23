@@ -108,7 +108,7 @@
         $sql = "UPDATE story_transitions SET random_character_input='{$new_affected}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
-    } elseif ($task = "change_travel_type") {
+    } elseif ($task == "change_travel_type") {
         $new_travel_type = mysqlclean($_POST, "travel_type", 3000, $db);
         $sql = "UPDATE story_transitions SET travel_type = '{$new_travel_type}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
         if (!$result = $db->query($sql))

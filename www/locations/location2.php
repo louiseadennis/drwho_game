@@ -44,18 +44,7 @@
     $event = get_current_event($db);
     // print($event);
     print_event_long($db);
-    if ($event == 3) {
-        
-        $critter_id = get_value_for_name_from("critter_id", "critters", "Cyberman", $db);
-        
-        add_critter($critter_id, $db);
-        
-        $icon = get_value_for_critter_id("icon", $critter_id, $db);
-        // print $icon;
-        print("<br><img src=../assets/$icon align=left>");
-        
-        print("<i><p>Cybermen invade the beacon!  Aided by a traitor, Kellman, from the surviving crew.<p></i>");
-    } else if ($event == 10) {
+    if ($event == 10) {
         remove_modification(1, $db);
         end_story(1, $db);
         

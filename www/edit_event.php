@@ -420,6 +420,7 @@
         print_transitions_for_action(6, $story_id, $story_number_id, $event_location, $db);
         
         print_action_header("TRAVEL", $automaton->get_event($story_number_id)->observation_unhandled);
+        print("<p><b>NB:</b> a transition is triggered when someone leaves the location.  If someone travels in that should be handled by a synchronised transition.</p>");
         print_transitions_for_action(100, $story_id, $story_number_id, $event_location, $db);
         
         print("</ul>");
