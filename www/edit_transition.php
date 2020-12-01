@@ -21,7 +21,7 @@
         $event_id=mysqlclean($_POST, "event_id", 3000, $db);
         $location_id=mysqlclean($_POST, "location_id", 3000, $db);
         $action_id=mysqlclean($_POST, "action_id", 3000, $db);
-        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', '', 100, '{$event_id}', 'no outcome text', 0, 0, 0, 0, 0)";
+        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$location_id}', '{$event_id}', '{$story_id}', '{$action_id}', 'null', '', 100, '{$event_id}', 'no outcome text', 0, '{$location_id}', 0, 0, 0)";
         if (!$result = $db->query($sql))
             showerror($db);
         $transition_id = $db->insert_id;
@@ -45,13 +45,18 @@
          if (!$result = $db->query($sql))
              showerror($db);
     } elseif ($task == "change_new_loc") {
-        $sql = "SELECT location_id FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        $sql = "SELECT location_id, action_id FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
         $location_id = select_sql_column($sql, "location_id", $db);
+        $action_id = select_sql_column($sql, "action_id", $db);
         $new_new_location=mysqlclean($_POST, "new_location", 3000, $db);
+        $forced_travel = 0;
         if ($new_new_location == $location_id) {
             $new_new_location = 0;
+        } else if ($action_id != 100) {
+            $forced_travel = 1;
+            
         }
-        $sql = "UPDATE story_transitions set new_location='{$new_new_location}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        $sql = "UPDATE story_transitions set new_location='{$new_new_location}', force_travel = '{$forced_travel}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
         if (!$result = $db->query($sql))
             showerror($db);
     } elseif ($task == "change_event") {
@@ -114,6 +119,12 @@
         if (!$result = $db->query($sql))
             showerror($db);
 
+    } elseif ($task == "fight_lost") {
+        $new_fight_lost = mysqlclean($_POST, "fight_lost", 3000, $db);
+        $sql = "UPDATE story_transitions SET lost_fight = '{$new_fight_lost}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        if (!$result = $db->query($sql))
+            showerror($db);
+
     }
     
     $sql = "SELECT * FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
@@ -127,8 +138,10 @@
     $modifiers = select_sql_column($sql, "modifiers", $db);
     $action_id = select_sql_column($sql, "action_id", $db);
     $person_affected = select_sql_column($sql, "random_character_input", $db);
+    $forced_travel = select_sql_column($sql, "force_travel", $db);
+    $fight_lost = select_sql_column($sql, "lost_fight", $db);
     
-    if ($action_id == 100) {
+    if ($action_id == 100 || $forced_travel) {
         $travel_type = select_sql_column($sql, "travel_type", $db);
     }
     
@@ -220,7 +233,7 @@
     
     
     //============ Probability
-    $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db);
+    $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $transition_label, $db);
 
     $font_color = "black";
     if ($total_prob != 100) {
@@ -237,7 +250,7 @@
     print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Probability\">";
     print "</form><br>";
 
-    $outcome_list = probability_outcomes($story_id, $modifiers, $action_id, $event_id, $db);
+    $outcome_list = probability_outcomes($story_id, $modifiers, $action_id, $event_id, $transition_label, $db);
     print "<ul style=\"color:$font_color\">";
     print $outcome_list;
     print "</ul></p>";
@@ -276,36 +289,6 @@
     
     
     print "<hr>";
-    //============ Location
-    print "<p><h3>Location after transition: <font color=\"blue\">";
-    if ($new_location != 0) {
-        print "New location: ";
-        $new_location_name = get_value_for_location_id("name", $new_location, $db);
-        print "$new_location_name ($new_location)</font></h3>";
-    } else {
-        print "Location remains the same.</font></h3>";
-    }
-    
-    print "<form method=\"POST\">";
-    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
-    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
-    print "<input type=\"hidden\" name=\"task\" value=\"change_new_loc\">";
-    print "&nbsp <select id=\"new_location\" name=\"new_location\">";
-    
-    $sql = "SELECT locations from stories where story_id='{$story_id}'";
-    $story_locations = select_sql_column($sql, "locations", $db);
-    $location_array = explode(",", $story_locations);
-    foreach ($location_array as $location) {
-        $location_name = get_value_for_location_id("name", $location, $db);
-        print "<option value=\"$location\">$location  ($location_name)</option>";
-    }
-    print "</select>";
-    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change New Location\">";
-    print "</form></p>";
-
-    # $automaton = new story_automaton($story_id, $db);
-
-    print "<hr>";
     //======== Modifiers
     print "<p><h3>Modifiers:<font color=\"blue\">";
     $modifier_array = explode(",", $modifiers);
@@ -337,8 +320,40 @@
     }
     print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Add Modifier\">";
     print "</form></p>";
-        
-    if ($action_id == 100) {
+    
+    //============ Location
+    print "<p><h3>Location after transition: <font color=\"blue\">";
+    if ($new_location != 0) {
+        print "New location: ";
+        $new_location_name = get_value_for_location_id("name", $new_location, $db);
+        print "$new_location_name ($new_location)</font></h3>";
+    } else {
+        print "Location remains the same.</font></h3>";
+    }
+    
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"change_new_loc\">";
+    print "&nbsp <select id=\"new_location\" name=\"new_location\">";
+    
+    $sql = "SELECT locations from stories where story_id='{$story_id}'";
+    $story_locations = select_sql_column($sql, "locations", $db);
+    $location_array = explode(",", $story_locations);
+    foreach ($location_array as $location) {
+        $location_name = get_value_for_location_id("name", $location, $db);
+        print "<option value=\"$location\">$location  ($location_name)</option>";
+    }
+    print "</select>";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change New Location\">";
+    print "</form></p>";
+
+    # $automaton = new story_automaton($story_id, $db);
+
+    print "<hr>";
+
+    //============ Travel Type
+    if ($action_id == 100 || $forced_travel) {
         print "<p><h3>Travel Type:<font color=\"blue\">";
         print " $travel_type";
         print "</font></h3>";
@@ -355,6 +370,21 @@
         }
         print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Travel Type\">";
         print "</form></p>";
+        
+        print "<p><h3>Is travel forced?: $forced_travel</h3>";
+        print "<form method=\"POST\">";
+        print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+        print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+        print "<input type=\"hidden\" name=\"task\" value=\"forced_travel\">";
+        $checked = "";
+        if ($forced_travel == "1") {
+            $checked = "checked";
+        }
+        print "<input type=\"radio\" id=\"forced_travel\" name=\"forced_travel\" $checked value=\"1\">Yes<br>";
+        
+        print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Travel Forced\">";
+        print "</form></p>";
+
   
     }
     
@@ -393,6 +423,24 @@
     print "</form></p>";
 
     print "<hr>";
+    
+    //============== Fight Lost
+    print "<p><h3>Was a fight Lost?: $fight_lost</h3>";
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"fight_lost\">";
+    $checked = "";
+    if ($fight_lost == "1") {
+        $checked = "checked";
+    }
+    print "<input type=\"radio\" id=\"fight_lost\" name=\"fight_lost\" $checked value=\"1\">Yes<br>";
+    
+    print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Fight Lost\">";
+    print "</form></p>";
+
+    print "<hr>";
+
     // ----------------------------------------------------------------------------------------------------------------
     
     print "<form method=\"POST\" action=\"edit_event.php\">";

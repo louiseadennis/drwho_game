@@ -96,6 +96,7 @@
         
         if ($description != '')
             {
+                $des = $description;
                 if (preg_match("/\\\$name/", $description) == 1) {
                     $affected = get_event_character($db);
                     $name = get_value_for_char_id("name", $affected, $db);

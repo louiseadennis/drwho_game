@@ -435,17 +435,21 @@
         
         print "<h2>Unhandled Transitions</h2>";
         
+        //print ($event_object->location_event_state_string_long());
+        
         print("<ul>");
-        foreach ($transition_labels as $label) {
-            print "<li>$label";
-            print "<form method=\"POST\" action=\"edit_event.php\">";
-            print "<input type=\"hidden\" name=\"transition_label\" value=\"$label\">";
-            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
-            print "<input type=\"hidden\" name=\"task\" value=\"empty_transition\">";
-            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
-            print "<input type=\"submit\" value=\"Add Empty Transition for Label\">";
-             
-            print "</form>";
+        if ($transition_labels != '') {
+            foreach ($transition_labels as $label) {
+                print "<li>$label";
+                print "<form method=\"POST\" action=\"edit_event.php\">";
+                print "<input type=\"hidden\" name=\"transition_label\" value=\"$label\">";
+                print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+                print "<input type=\"hidden\" name=\"task\" value=\"empty_transition\">";
+                print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+                print "<input type=\"submit\" value=\"Add Empty Transition for Label\">";
+                 
+                print "</form>";
+            }
         }
         print("</ul>");
     } else {

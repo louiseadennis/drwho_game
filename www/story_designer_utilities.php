@@ -1,10 +1,11 @@
 <?php
-    
+        
     class story_automaton
     {
         public $states = array();
         public $transition_function = array();
         public $events = array();
+        public $event_objects = array();
         
         function __construct($story_id, $db) {
             // These are all the events where someone is present
@@ -12,10 +13,13 @@
             
             $event_sets = array();
             foreach ($locations as $location) {
+                // Event 1 is the intial event at this story location
                 $event1 = get_initial_event($story_id, $location, $db);
                 // $event2 = get_not_present_initial_event($story_id, $location, $db);
                 // print("Events: $event1<br>");
-                array_push($this->events, $event1);
+                // array_push($this->events, $event1);
+                
+                // All this adds event 1 to the current event set (suspect overkill here from when I thought locations could have multiple initial events)
                 if (count($event_sets) == 0) {
                     $event_array1 = array($event1);
                     // $event_array2 = array($event2);
@@ -43,8 +47,7 @@
                 $state = new story_state($events, $story_id, $db, $this);
                 array_push($this->states, $state);
             }
-                        
-
+            
             
             // $initial_state = new story_state($initial_events, $story_id, $db, $this);
             // print $initial_state->story_state_string();
@@ -56,21 +59,22 @@
         function construct_automaton($state, $db) {
             $state->exploring();
             $state_string = $state->story_state_string();
-            // print "Finding next states for $state_string<br>";
+            //print "Finding next states for $state_string<br>";
             
             foreach ($state->events as $event) {
                 $event_state_string = $event->location_event_state_string($db);
                 // print "Finding next states for $event_state_string<br>";
+                //print $event->location_event_state_string_long();
                 while (!$state->fully_explored($event)) {
                     $next_transition = $state->next_unexplored_transition($event); // don't forget to remove unexplored transition from state
                     // Null transitions are no change
                     if ($next_transition != "null") {
                         $transition_string = $next_transition;
-                        // print("Next transition: $transition_string <br>");
+                        //print("Next transition: $transition_string <br>");
                         $new_state = $state->next_state($next_transition, $db);
                         // print("Got new state<br>");
                         $new_state_string = $new_state->story_state_string();
-                        // print "New state is $new_state_string<br>";
+                        //print "New state is $new_state_string<br>";
                         
                         if (!$this->state_member($new_state)) {
                             // print ("Pushing $new_state_string onto states<br>");
@@ -139,6 +143,30 @@
             }
         }
         
+        function get_event_print($event_id) {
+            return $this->get_event($event_id);
+        }
+
+        
+        function event_object_exists($event_id) {
+            foreach ($this->event_objects  as $event_object) {
+                if ($event_object->event_id == $event_id) {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+        
+        function get_event_object($event_id) {
+            foreach ($this->event_objects  as $event_object) {
+                if ($event_object->event_id == $event_id) {
+                    return $event_object;
+                }
+            }
+            print ("WARNING");
+            return null;
+        }
+        
         
     }
     
@@ -159,26 +187,43 @@
             }
         }
         
+        function get_location_event($event, $story_id, $db, $automaton) {
+            if ($automaton->event_object_exists($event)) {
+                return $automaton->get_event_object($event);
+            } else {
+                $event_object = new location_event_state($event, $story_id, $db);
+                array_push($automaton->event_objects, $event_object);
+                return $event_object;
+            }
+        }
+        
         function __construct4($event_list, $story_id, $db, $automaton) {
-            //print("A<br>");
             foreach ($event_list as $event) {
                 // print($event);
-                $location_event = new location_event_state($event, $story_id, $db);
+                // print(" A ");
+                $location_event = $this->get_location_event($event, $story_id, $db, $automaton);
                 array_push($this->events, $location_event);
-                // event_string = $location_event->location_event_state_string($db);
+                $event_string = $location_event->location_event_state_string($db);
                 // print ("Location Event: $event_string<br>");
                 
                 // Unexplored transitions are, at the start, all the transitions in the database for this event.
-                $this->unexplored_transitions[$event] = $location_event->transition_labels;
+                if ($event != 0) {
+                    $this->unexplored_transitions[$event] = $location_event->transition_labels;
+                }
                 $this->story_id = $story_id;
                 $this->automaton = $automaton;
-                if (!in_array($location_event, $automaton->events)) {
-                     array_push($automaton->events, $location_event);
-                }
-                $string = $this->story_state_string();
+                if (!in_array($event, $automaton->events)) {
+                    array_push($automaton->events, $location_event);
+                 }
+                //if (!in_array($location_event->$event_id, $automaton->events)) {
+                //     array_push($automaton->events, $location_event->$event_id);
+                //    array_push($automaton->event_objects, $location_event);
+                //}
+                //$string = $this->story_state_string();
              }
-            // print($this->story_state_string());
+            //print($this->story_state_string());
             $this->remove_transitions_that_dont_need_to_synchronise();
+
         }
         
         function __construct3($event_list, $story_id, $automaton) {
@@ -187,10 +232,15 @@
             $this->story_id = $story_id;
             foreach ($event_list as $event) {
                 // print($event->event_id);
+                // print(" B  ");
                 array_push($this->events, $event);
-                $this->unexplored_transitions[$event->event_id] = $event->transition_labels;
+                if ($event->event_id != 0) {
+                    $this->unexplored_transitions[$event->event_id] = $event->transition_labels;
+                }
                 if (!in_array($event, $automaton->events)) {
                     array_push($automaton->events, $event);
+                    //$automaton->get_event_print($event);
+                    //print("here2");
                 }
                 
              }
@@ -204,7 +254,7 @@
         function remove_transitions_that_dont_need_to_synchronise() {
             //print "REMOVING TRANSITIONS<br>";
             foreach($this->events as $event) {
-                foreach ($this->unexplored_transitions[$event->event_id] as $transition_label) {
+                foreach ($this->unexplored_transitions as $transition_label) {
                     $remove = 1;
                     foreach($this->events as $event2) {
                         foreach($event2->transitions as $transition) {
@@ -218,9 +268,9 @@
                     }
                     
                     // Remove a transition for this event only if no other event has a synchronised transition with that label
-                    if ($remove == 1) {
+                    if ($remove == 1  && $event->event_id != 0) {
                         //$string = $this->story_state_string();
-                        //print ("Removing $transition_label from $event->event_id in $string<br>");
+                        // print ("Removing $transition_label from $event->event_id in $string<br>");
                         //print_r ($this->unexplored_transitions[$event->event_id]);
                         $this->unexplored_transitions[$event->event_id] = array_diff($this->unexplored_transitions[$event->event_id], [$transition_label]);
                         //print_r ($this->unexplored_transitions[$event->event_id]);
@@ -276,6 +326,9 @@
         function fully_explored($event) {
             $event_id = $event->event_id;
             // print("hey $event_id<br>");
+            if ($event->event_id == 0) {
+                return 1;
+            }
             if (count($this->unexplored_transitions[$event_id]) == 0) {
                 return 1;
             } else {
@@ -303,7 +356,7 @@
             foreach ($this->events as $event) {
                 $next_event = $event->next_event($transition);
                 if (!$event->unhandled($transition)) {
-                    array_push($event_list, new location_event_state($next_event, $this->story_id, $db));
+                    array_push($event_list, $this->get_location_event($next_event, $this->story_id, $db, $this->automaton));
                     
                     // $boolean = in_array($transition, $this->unexplored_transitions[$event->event_id]);
                     if (in_array($transition, $this->unexplored_transitions[$event->event_id])) {
@@ -312,7 +365,7 @@
                     }
                     // print("Pushed $next_event onto event_list<br>");
                 } else {
-                    array_push($event_list, new location_event_state(0, $this->story_id, $db));
+                    array_push($event_list, $this->get_location_event(0, $this->story_id, $db, $this->automaton));
                     // print("Pushed 0 onto event list<br>");
                 }
             }
@@ -439,6 +492,18 @@
             return "$this->event_id ($text)";
         }
         
+        function location_event_state_string_long() {
+            //$sql = "SELECT text FROM story_events where story_id = '{$this->story_id}' AND story_number_id = '{$this->event_id}'";
+            //$text = select_sql_column($sql, "text", $db);
+            $string = "$this->event_id (--)";
+            foreach ($this->unhandled_transitions as $transition) {
+                $string = $string . "<br>" . $transition;
+            }
+            $string = $string . " END<br>";
+            return $string;
+        }
+
+        
         function exploring() {
             $exploring = 1;
         }
@@ -459,8 +524,11 @@
                     return $t->to;
                 }
             }
-            //print("$transition_string not handled");
-            array_push($this->unhandled_transitions, $transition);
+            //print("$transition_string not handled for $this->event_id<br>");
+            if (!in_array($transition, $this->unhandled_transitions)) {
+                array_push($this->unhandled_transitions, $transition);
+            }
+            //print($this->location_event_state_string_long());
         }
         
         function incomplete() {
@@ -599,7 +667,7 @@
         $event_id = select_sql_column($sql, "event_id", $db);
         $travel_type = select_sql_column($sql, "travel_type", $db);
 
-        $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db);
+        $total_prob = probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $label, $db);
          
         $sql = "SELECT text FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$outcome}'";
         $text = select_sql_column($sql, "text", $db);
@@ -693,9 +761,11 @@
         print(":<br>");
     }
     
-    function probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $db) {
-        if ($action_id != 100) {
+    function probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $label, $db) {
+        if ($action_id != 100 && $action_id != 0) {
             $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+        } else if ($action_id == 0) {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
         } else {
             $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and travel_type = '{$travel_type}'";
         }
@@ -731,8 +801,12 @@
     }
 
     
-    function probability_outcomes($story_id, $modifiers, $action_id, $event_id, $db) {
-         $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+    function probability_outcomes($story_id, $modifiers, $action_id, $event_id, $label, $db) {
+        if ($action_id != 0) {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+            } else {
+                $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
+            }
          //print $sql;
          $other_transitions = sql_return_to_array($sql, "transition_id", $db);
          $outcome_list = "";

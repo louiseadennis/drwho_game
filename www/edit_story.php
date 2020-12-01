@@ -15,6 +15,19 @@ if ($db -> connect_errno > 0) {
     
 $story_id = mysqlclean($_POST, "story_id", 15, $db);
 $story = get_value_for_story_id("title", $story_id, $db);
+$task = mysqlclean($_POST, "task", 3000, $db);
+    
+if ($task == "delete_event") {
+    $story_number_id = mysqlclean($_POST, "story_number_id", 15, $db);
+    //print "deleting event $story_number_id";
+    
+    $sql = "DELETE FROM story_events WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+    if (!$result = $db->query($sql))
+        showerror($db);
+    $sql = "DELETE FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id}'";
+    if (!$result = $db->query($sql))
+        showerror($db);
+}
     
 ?>
 <html>
@@ -61,7 +74,7 @@ $story = get_value_for_story_id("title", $story_id, $db);
             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event\">";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
             print "<input type=\"submit\" value=\"Edit $event ($text)\">";
-            if (is_null($automaton->get_event($event))) {
+            if (is_null($automaton->get_event_print($event))) {
                 print ("<span style=\"color:red\">NOT IN AUTOMATON!</span>");
             } elseif (($automaton->get_event($event)->incomplete() or $automaton->get_event($event)->unhandled_action() or
                 $automaton->get_event($event)->other_transition_issue) and !$automaton->get_event($event)->end_state) {
@@ -72,6 +85,14 @@ $story = get_value_for_story_id("title", $story_id, $db);
                 print "<br><b>Initial Event</b>";
             }
             print "</form>";
+            
+            print "<form method=\"POST\" action=\"edit_story.php\">";
+            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event\">";
+            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+            print "<input type=\"hidden\" name=\"task\" value=\"delete_event\">";
+            print "<input type=\"submit\" value=\"Delete $event ($text)\">";
+            print "</form>";
+
          }
     }
     

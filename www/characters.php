@@ -396,9 +396,12 @@
         $tardis_team = get_value_from_users("tardis_team", $connection);
         $location_team = [];
         $char_id_array = explode(",", $tardis_team);
+        //print("Location: $location_id ");
         foreach ($char_id_array as $char_id) {
+            //print ("Character: $char_id ");
             $char_location = character_location($char_id, $connection);
             if ($char_location == $location_id) {
+                //print ("IS AT LOCATION<br>");
                 array_push($location_team, $char_id);
             }
         }
