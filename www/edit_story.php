@@ -90,7 +90,7 @@ if ($task == "delete_event") {
             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event\">";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
             print "<input type=\"hidden\" name=\"task\" value=\"delete_event\">";
-            print "<input type=\"submit\" value=\"Delete $event ($text)\">";
+            print "<input type=\"submit\" style=\"color:red\" value=\"Delete $event ($text)\">";
             print "</form>";
 
          }
