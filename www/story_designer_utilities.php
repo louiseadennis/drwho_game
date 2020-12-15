@@ -252,33 +252,36 @@
         }
         
         function remove_transitions_that_dont_need_to_synchronise() {
-            //print "REMOVING TRANSITIONS<br>";
+            // print "REMOVING TRANSITIONS<br>";
             foreach($this->events as $event) {
-                foreach ($this->unexplored_transitions as $transition_label) {
-                    $remove = 1;
-                    foreach($this->events as $event2) {
-                        foreach($event2->transitions as $transition) {
-                            if ($transition->label == $transition_label) {
-                               // If a transition is not controlled then that means the action_id != 0 - i.e. it is not a synchronised transitions
-                               if ($transition->not_controlled == 0) {
-                                     $remove = 0;
-                                 }
+                // print $event->event_id;
+                if ($this->unexplored_transitions[$event->event_id] != null) {
+                    foreach ($this->unexplored_transitions[$event->event_id] as $transition_label) {
+                        $remove = 1;
+                        foreach($this->events as $event2) {
+                            foreach($event2->transitions as $transition) {
+                                if ($transition->label == $transition_label) {
+                                   // If a transition is not controlled then that means the action_id != 0 - i.e. it is not a synchronised transitions
+                                   if ($transition->not_controlled == 0) {
+                                         $remove = 0;
+                                     }
+                                }
                             }
                         }
+                        
+                        // Remove a transition for this event only if no other event has a synchronised transition with that label
+                        if ($remove == 1  && $event->event_id != 0) {
+                            $string = $this->story_state_string();
+                            // print ("Removing $transition_label from $event->event_id in $string<br>");
+                            //print_r ($this->unexplored_transitions[$event->event_id]);
+                            $this->unexplored_transitions[$event->event_id] = array_diff($this->unexplored_transitions[$event->event_id], [$transition_label]);
+                            //print_r ($this->unexplored_transitions[$event->event_id]);
+                        }
                     }
-                    
-                    // Remove a transition for this event only if no other event has a synchronised transition with that label
-                    if ($remove == 1  && $event->event_id != 0) {
-                        //$string = $this->story_state_string();
-                        // print ("Removing $transition_label from $event->event_id in $string<br>");
-                        //print_r ($this->unexplored_transitions[$event->event_id]);
-                        $this->unexplored_transitions[$event->event_id] = array_diff($this->unexplored_transitions[$event->event_id], [$transition_label]);
-                        //print_r ($this->unexplored_transitions[$event->event_id]);
-                    }
+                    //print ("$event->event_id : ");
+                    //print_r ($this->unexplored_transitions[$event->event_id]);
+                    //print ("<br>");
                 }
-                //print ("$event->event_id : ");
-                //print_r ($this->unexplored_transitions[$event->event_id]);
-                //print ("<br>");
             }
         }
         
