@@ -45,15 +45,6 @@
         print "<div class=\"action\">";
         $story = get_value_from_users("story", $mysql);
         
-       //  print "<p>STORY: $story</p>";
-        
-        
-        //if ($story != '0' && $story != '') {
-       //     if (in_end_state($story, $mysql)) {
-        //        // print("<p><b>END STATE</b></p>");
-       ///         $story = 0;
-       //     }
-       // }
         if ($story != '0' && $story != '') {
                 $story_name = get_value_for_story_id("title", $story, $mysql);
                 print "<b style=\"font-size:1.5em\">$story_name</b>";
@@ -64,17 +55,13 @@
         print_action($mysql);
         print_event($mysql);
         // critter_attack($mysql);
-        if ($story != '0' && $story != '') {
+        if ($story != '0' && $story != '' && !in_end_state($story, $mysql)) {
             $story_name = get_value_for_story_id("title", $story, $mysql);
             print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
             // print "<u style=\"font-size:2em;padding-top:2em\"><b>$story_name</b></u> &nbsp;";
             print "<input type=submit value=\"Abandon $story_name\"></form>";
         }
-       print "</div>";
-        // print "<div class=tardis>";
-        // print_tardis($mysql);
-        // print_wait($mysql);
-        // print "</div>";
+        print "</div>";
         print "</div>";
         
     }

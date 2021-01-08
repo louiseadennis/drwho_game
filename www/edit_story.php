@@ -81,8 +81,12 @@ if ($task == "delete_event") {
                  print ("<span style=\"color:red\">INCOMPLETE!</span>");
             }
             
+            if ($automaton->get_event($event)->end_state) {
+                print " <b>End State</b>";
+            }
+            
             if ($event == $initial_event) {
-                print "<br><b>Initial Event</b>";
+                print " <b>Initial Event</b>";
             }
             print "</form>";
             

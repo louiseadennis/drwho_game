@@ -35,6 +35,13 @@
             showerror($db);
     }
     
+    if ($task == "change_loc") {
+        $new_location = mysqlclean($_POST, "event_location", 3000, $db);
+        $sql = "UPDATE story_events SET event_location='{$new_location}' WHERE story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
+        if (!$result = $db->query($sql))
+            showerror($db);
+    }
+    
     if ($task == "add_critter") {
         $new_critter = mysqlclean($_POST, "new_critter", 1000, $db);
         if ($critter_list != "") {
@@ -196,6 +203,8 @@
     $modifier_array = explode(",", $modifier_list);
     $story_modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
     $story_modifier_array = explode(",", $story_modifier_list);
+    $event_location = select_sql_column($sql, "event_location", $db);
+
 
     $global_event_id = select_sql_column($sql, "global_event_id", $db);
 
@@ -247,6 +256,24 @@
     print "<input type=\"submit\" value=\"Change Event Description\">";
     print "</form>";
     
+    print "<h2>Current Location: $event_location</h2>";
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"change_loc\">";
+    $sql = "SELECT location_id from story_locations WHERE story_id='{$story_id}'";
+    if (!$result = $db->query($sql)) {
+        showerror($db);
+    }
+    print "<select name=\"event_location\">";
+    while ($row=$result->fetch_assoc()) {
+        $loc = $row["location_id"];
+        print "<option value=\"$loc\">$loc</option>";
+    }
+    print "</select>";
+    print "<input type=\"submit\" value=\"Change Location\">";
+    print "</form>";
+
     print "<h2>Critters</h2>";
     if ($critter_list != '') {
         foreach ($critter_array as $critter_id) {

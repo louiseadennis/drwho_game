@@ -163,15 +163,22 @@
         $user_id = get_user_id($connection);
         $location_id = get_location($connection);
         if (!in_array($char_id, $crew_array)) {
+            $empathy = get_value_for_char_id("empathy", $char_id, $connection);
+            $tech = get_value_for_char_id("tech", $char_id, $connection);
+            $running = get_value_for_char_id("running", $char_id, $connection);
+            $combat = get_value_for_char_id("combat", $char_id, $connection);
+            $willpower = get_value_for_char_id("willpower", $char_id, $connection);
+            $observation = get_value_for_char_id("observation", $char_id, $connection);
+
             $is_doctor = get_value_for_char_id("doctor", $char_id, $connection);
             if ($is_doctor) {
                 $current = current_doctor($connection);
                 if ($char_id != $current) {
-                     $new_char_id_list = $tardis_crew . "," . $char_id;
+                    $new_char_id_list = $tardis_crew . "," . $char_id;
                     update_users("tardis_team", $new_char_id_list, $connection);
                     leave_crew($current, $connection);
                     
-                    $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location) VALUES ('$char_id', '$user_id', '$location_id', '$location_id')";
+                    $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location, empathy, tech, running, combat, willpower, observation) VALUES ('$char_id', '$user_id', '$location_id', '$location_id', '$empathy', '$tech', '$running', '$combat', '$willpower', '$observation')";
                     if (!$connection->query($sql)) {
                         showerror($connection);
                     }
@@ -179,7 +186,7 @@
             } else {
                 $new_char_id_list = $tardis_crew . "," . $char_id;
                 update_users("tardis_team", $new_char_id_list, $connection);
-                $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location) VALUES ('$char_id', '$user_id', '$location_id', '$location_id')";
+                $sql = "INSERT INTO characters_in_play (char_id, user_id, location_id, prev_location, empathy, tech, running, combat, willpower, observation) VALUES ('$char_id', '$user_id', '$location_id', '$location_id', '$empathy', '$tech', '$running', '$combat', '$willpower', '$observation')";
                 if (!$connection->query($sql)) {
                     showerror($connection);
                 }
@@ -208,7 +215,7 @@
         $no_space_char_name = str_replace(" ", "_", $char_name);
         $game_url = default_url();
         $char_id = get_value_for_name_from("char_id", "characters", $char_name, $connection);
-        if (is_conscious($char_id)) {
+        if (is_conscious($char_id, $connection)) {
             print "<img src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
         } else {
             print "<img style=\"opacity:0.2\" src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
@@ -255,6 +262,9 @@
         $stat_value = get_value_for_char_in_play_id("$stat", $char_id, $connection);
         $total_value = get_value_for_char_id("$stat", $char_id, $connection);
         if ($total_value > $stat_value) {
+            print $total_value;
+            print " : " ;
+            print $stat_value;
             return 1;
         }
         return 0;
