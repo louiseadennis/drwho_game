@@ -90,12 +90,12 @@ if ($task == "delete_event") {
             }
             print "</form>";
             
-            print "<form method=\"POST\" action=\"edit_story.php\">";
+            print "<p><form method=\"POST\" action=\"edit_story.php\">";
             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event\">";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
             print "<input type=\"hidden\" name=\"task\" value=\"delete_event\">";
-            print "<input type=\"submit\" style=\"color:red\" value=\"Delete $event ($text)\">";
-            print "</form>";
+            print "<input type=\"submit\" style=\"color:red;float:right\" value=\"Delete $event ($text)\">";
+            print "</form></p><p style=\"clear:both\"><hr><p>";
 
          }
     }

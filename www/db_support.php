@@ -135,9 +135,11 @@
              update_users("critter_id_list", $critter_id, $connection);
           } else {
                 if (!in_array($critter_id, $critter_id_array)) {
-                     $new_critter_id_list = $critter_id_list . "," . $critter_id;
-             update_users("critter_id_list", $new_critter_id_list, $connection);
-            }
+                    $new_critter_id_list = $critter_id_list . "," . $critter_id;
+                    update_users("critter_id_list", $new_critter_id_list, $connection);
+                    $critter_name = get_value_for_critter_id("name", $critter_id, $connection);
+                    print ("<p>$critter_name added to collection - see your profile</p>");
+                }
           }
     }
     
@@ -153,6 +155,8 @@
                 if (!in_array($ally_id, $ally_id_array)) {
                     $new_ally_id_list = $ally_id_list . "," . $ally_id;
                     update_users("ally_id_list", $new_ally_id_list, $connection);
+                    $ally_name = get_value_for_ally_id("name", $ally_id, $connection);
+                    print ("<p>$ally_name added to collection - see your profile</p>");
             }
           }
     }
