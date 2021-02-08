@@ -359,6 +359,13 @@
         if ($incarcerated) {
             freed($char_id, $db);
         }
+        
+        $sql = "SELECT remove_message from story_modifiers where modifier_id ='$modifier'";
+        $char_name = get_value_for_char_id("name", $char_id, $db);
+        $remove_message = select_sql_column($sql, "remove_message", $db);
+        if (!is_null($remove_message) && ! $remove_message == 0) {
+            print ("$char_name: $remove_message<br>");
+        }
 
     }
     
