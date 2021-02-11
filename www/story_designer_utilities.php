@@ -739,6 +739,26 @@
         if ($no_transitions) {
             print "<form method=\"POST\" action=\"edit_event.php\">";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+            print "<input type=\"hidden\" name=\"task\" value=\"duplicate_transition\">";
+            print "<input type=\"hidden\" name=\"action_id\" value=\"$action_id\">";
+            print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
+            print "<input type=\"hidden\" name=\"location_id\" value=\"$event_location\">";
+            $sql = "SELECT transition_id from story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id}'";
+            if (!$result = $db->query($sql)) {
+                showerror($db);
+            }
+            print "<select name=\"copy_trans\">";
+            while ($row=$result->fetch_assoc()) {
+                $name = $row["transition_id"];
+                print "<option value=\"$name\">$name</option>";
+            }
+            print "</select>";
+            print "<input type=\"submit\" value=\"Duplicate Transition\">";
+            print "</form>";
+ 
+            
+            print "<form method=\"POST\" action=\"edit_event.php\">";
+            print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
             print "<input type=\"hidden\" name=\"task\" value=\"new_default_transition\">";
             print "<input type=\"hidden\" name=\"action_id\" value=\"$action_id\">";
             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";

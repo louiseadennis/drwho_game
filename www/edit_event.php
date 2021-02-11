@@ -182,6 +182,27 @@
  
     }
     
+    if ($task  == "duplicate_transition") {
+        $event_id=$story_number_id;
+        $action_id=mysqlclean($_POST, "action_id", 3000, $db);
+        $copy = mysqlclean($_POST, "copy_trans", 3000, $db);
+        $sql = "SELECT * from story_transitions where transition_id = '{$copy}'";
+        $transition_label = select_sql_column($sql, "transition_label", $db);
+        $modifiers = select_sql_column($sql, "modifiers", $db);
+        $probability = select_sql_column($sql, "probability", $db);
+        $outcome = select_sql_column($sql, "outcome", $db);
+        $outcome_text = select_sql_column($sql, "outcome_text", $db);
+        $random_char = select_sql_column($sql, "random_character_input", $db);
+        $old_location = select_sql_column($sql, "old_location", $db);
+        $new_location = select_sql_column($sql, "new_location", $db);
+        $force_travel = select_sql_column($sql, "force_travel", $db);
+        $lost_fight = select_sql_column($sql, "lost_fight", $db);
+        
+        $sql = "INSERT INTO story_transitions (location_id, event_id, story_id, action_id, transition_label, modifiers, probability, outcome, outcome_text, random_character_input, old_location, new_location, force_travel, lost_fight) VALUES  ('{$event_location}', '{$event_id}', '{$story_id}', '{$action_id}', '{$transition_label}', '{$modifiers}', '{$probability}', '{$outcome}', '{$outcome_text}', '{$random_char}', '{$old_location}', '{$new_location}', '{$force_travel}', '{$lost_fight}')";
+        if (!$result = $db->query($sql))
+            showerror($db);
+    }
+    
       if ($task == "empty_transition") {
            $event_id=$story_number_id;
            $transition_label=mysqlclean($_POST, "transition_label", 3000, $db);
