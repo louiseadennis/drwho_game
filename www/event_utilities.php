@@ -1,5 +1,6 @@
 <?php
     function print_event($db) {
+       //  print("A");
         $event = get_current_event($db);
         $text = get_event_text($event, $db);
         if ($text != '') {
@@ -7,6 +8,7 @@
         } else {
             print "<br>";
         }
+    //    print("B");
     }
     
     function print_event_long($db) {

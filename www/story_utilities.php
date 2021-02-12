@@ -490,21 +490,27 @@
             // Printing outcome of action
             $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
             $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
-            if ($random_character) {
-                $user_id = get_user_id($connection);
-                $location_id = get_location($connection);
-                $sql = "SELECT event_character FROM story_locations_in_play WHERE user_id = '$user_id' AND location_id = '$location_id'";
-                        // print $sql;
-                $char = select_sql_column($sql, "event_character", $connection);
-                // print("$random_character character: " . $char);
+            $transition_location = get_value_for_transition_id("location_id", $transition_id, $connection);
+            $location_id =get_location($connection);
+            if ($location_id == $transition_location) {
+                if ($random_character) {
+                    $user_id = get_user_id($connection);
+                    $location_id = get_location($connection);
+                    $sql = "SELECT event_character FROM story_locations_in_play WHERE user_id = '$user_id' AND location_id = '$location_id'";
+                            // print $sql;
+                    $char = select_sql_column($sql, "event_character", $connection);
+                    // print("$random_character character: " . $char);
+                            
+                            
+                    $char_name = get_value_for_char_id("name", $char, $connection);
+                    $outcome_text = $char_name . $outcome_text;
+                            // print($outcome_text);
+                }
                         
-                        
-                $char_name = get_value_for_char_id("name", $char, $connection);
-                $outcome_text = $char_name . $outcome_text;
-                        // print($outcome_text);
+                print("<p>$outcome_text</p>");
+            } else {
+                print "<p>  &nbsp;</p>";
             }
-                    
-            print("<p>$outcome_text</p>");
         } elseif ($action != '') {
                     
                 if (is_action($action, $connection)) {
