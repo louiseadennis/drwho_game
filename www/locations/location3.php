@@ -44,36 +44,7 @@
 <?php
     $event = get_current_event($db);
     print_event_long($db);
-     
-
-
-    if ($event == 6) {
-        if (first_visit($db)) {
-            foreach (characters_at_location(3, $db) as $char_id) {
-                if (get_value_for_char_in_play_id("prev_location", $char_id, $db) != 3) {
-                    modify_character($char_id, 1, $db);
-                }
-            }
-            visited($db);
-        }
-        
-        print("<i><p>The crew arrive on Voga with bombs strapped to their chests.</p></i>");
-    }
-    
-    if ($event == 12 || $event == 14) {
-        remove_modification(1, $db);
-        end_story(1, $db);
-        
-        print("<i><p>The Cybermen have been defeated!</p></i>");
-    }
-    
-    if ($event == 15) {
-        remove_modification(1, $db);
-        fail_story(1, $db);
-        
-        print("<i><p>Everyone Dies.  This story is over.</p></i>");
-    }
-    
+         
     print_tardis_team($db);
 ?>
 

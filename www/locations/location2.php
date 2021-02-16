@@ -45,15 +45,10 @@
     // print($event);
     print_event_long($db);
     if ($event == 10) {
-        remove_modification(1, $db);
         end_story(1, $db);
-        
-        print("<i><p>The Cybermen have been defeated!</p></i>");
+
     } else if ($event == 16) {
-        remove_modification(1, $db);
-        fail_story(1, $db);
-        
-        print("<i><p>Everyone Dies.  This story is over.</p></i>");
+         fail_story(1, $db);
     } 
     print_tardis_team($db);
 ?>

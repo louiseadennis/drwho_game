@@ -96,6 +96,17 @@
             lock_everyone_up($location_id, $db);
         }
         
+        $success_fail = get_event_success_fail($event, $db);
+        if ($success_fail == '0') {
+            $story = get_value_from_users("story", $db);
+            print("FAIL STORY");
+            fail_story($story, $db);
+        } else if ($success_fail == '2') {
+            $story = get_value_from_users("story", $db);
+            //print("SUCCEED STORY");
+            end_story($story, $db);
+        }
+        
         if ($description != '')
             {
                 $des = $description;
@@ -244,6 +255,15 @@
         }
 
     }
+    
+    function get_event_success_fail($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT success_fail from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        return  select_sql_column($sql, "success_fail", $connection);
+    }
+
     
     function get_story_modifiers_for_event_id($event, $db) {
         $story = get_value_from_users("story", $db);
