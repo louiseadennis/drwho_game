@@ -262,9 +262,9 @@
         $stat_value = get_value_for_char_in_play_id("$stat", $char_id, $connection);
         $total_value = get_value_for_char_id("$stat", $char_id, $connection);
         if ($total_value > $stat_value) {
-            print $total_value;
-            print " : " ;
-            print $stat_value;
+            //print $total_value;
+            //print " : " ;
+            //print $stat_value;
             return 1;
         }
         return 0;
