@@ -104,10 +104,12 @@
         }
     }
     
+    
+    // ??? Should this be in action_utilities?
     function print_action($connection) {
         $last_action = get_value_from_users("last_action", $connection);
         $pov_switch = 0;
-        if (is_travel($last_action, $connection)) {
+        if (is_travel_action($last_action, $connection)) {
             $travel_type = get_value_from_users("travel_type", $connection);
             if ($travel_type == "pov_switch") {
                 $pov_switch = 1;
@@ -120,7 +122,7 @@
             // print($last_transition);
             print_transition_outcome($last_transition, $last_action, $connection);
         } else {
-                if (is_action($last_action, $connection)) {
+                if (is_basic_action($last_action, $connection)) {
                     print_action_default($last_action, $connection);
                 } else {
                     print "<p>  &nbsp;</p>";

@@ -17,6 +17,7 @@ function authenticateUser($db, $username, $password)
 
  // Exactly one row? then we have found the user
  if ($result->num_rows != 1)
+     //print("A");
   return false;
  else {
     while($row = $result->fetch_assoc()) {

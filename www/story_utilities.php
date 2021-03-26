@@ -401,7 +401,7 @@
             $story_id = get_value_from_users("story", $connection);
             
             $action_id = 0;
-            if (is_travel($action, $connection)) {
+            if (is_travel_action($action, $connection)) {
                 $action_id = 100;
                 $prev_location = get_value_from_users("prev_location", $connection);
                 // Nothing interesting happening here, but maybe we came from somewhere with a transition to here.
@@ -419,7 +419,7 @@
             
             // $event is id wrt. current story (not unique)
             
-            if (is_action($action, $connection)) {
+            if (is_basic_action($action, $connection)) {
                 $action_id = get_value_for_name_from("action_id", "actions", $action, $connection);
             }
             
@@ -513,7 +513,7 @@
             }
         } elseif ($action != '') {
                     
-                if (is_action($action, $connection)) {
+                if (is_basic_action($action, $connection)) {
                     print_action_default($action, $connection);
                 } else {
                     print "<p>  &nbsp;</p>";
