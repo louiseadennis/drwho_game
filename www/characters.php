@@ -1,19 +1,19 @@
 <?php
-    
-    function check_for_character($character, $connection) {
-        $char_id_list = get_value_from_users("char_id_list", $connection);
-        
-        if ($char_id_list != 0 ) {
-            $char_id = get_value_for_name_from("char_id", "characters", $character, $connection);
-            $char_id_array = explode(",", $char_id_list);
-            if (in_array($char_id, $char_id_array)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
+    // Character exist both as templates in the characters table and as actual characters in play associated with a user
+
+    // GENERAL DB INTERFACE
+    function get_value_for_char_in_play_id($column, $char_id, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "SELECT {$column} FROM characters_in_play WHERE char_id = '{$char_id}' AND user_id = $user_id";
+         
+        return select_sql_column($sql, $column, $connection);
+
     }
+
+
     
+        
+    // ACQUIRING CHARACTERS
     function encountered_new_character($character, $connection) {
         $new_characters = get_value_from_users("new_character", $connection);
         $char_id = get_value_for_name_from("char_id", "characters", $character, $connection);
@@ -45,6 +45,10 @@
         }
     }
     
+    
+    
+    // USER CHARACTERS
+    // What characters does the user have and which are in play (the tardis crew/team)
     function tardis_crew_member($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
@@ -56,107 +60,19 @@
         $crew_array = explode(",", $tardis_crew);
         return count($crew_array);
     }
-    
-    function conscious_tardis_crew_size($connection) {
-        $location_team = conscious_tardis_crew($connection);
         
-        return count($location_team);
-    }
-    
-    function conscious_tardis_crew($connection) {
-        $tardis_crew = get_value_from_users("tardis_team", $connection);
-        $location_id = get_location($connection);
-        $location_team = [];
-        $char_id_array = explode(",", $tardis_crew);
+    function current_doctor($db) {
+        $char_id_list = get_value_from_users("tardis_team", $db);
+        $char_id_array = explode(",", $char_id_list);
         foreach ($char_id_array as $char_id) {
-            $char_location = character_location($char_id, $connection);
-            if ($char_location == $location_id && is_conscious($char_id, $connection)) {
-                array_push($location_team, $char_id);
+            $is_doctor = get_value_for_char_id("doctor", $char_id, $db);
+            if ($is_doctor) {
+                return $char_id;
             }
         }
-        return $location_team;
+
     }
 
-    function unconscious($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "UPDATE characters_in_play SET unconscious = 1 where char_id = '$char_id' and user_id = '$user_id'";
-        
-        if (!$db->query($sql)) {
-             showerror($db);
-        }
-    }
-    
-    function conscious($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "UPDATE characters_in_play SET unconscious = 0 where char_id = '$char_id' and user_id = '$user_id'";
-        
-        if (!$db->query($sql)) {
-             showerror($db);
-        }
-    }
-    
-    function is_conscious($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "SELECT unconscious from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
-        $unconscious = select_sql_column($sql, "unconscious", $db);
-        
-        return (!$unconscious);
-    }
-    
-    function  locked_up($char_id, $db) {
-        $user_id = get_user_id($db);
-         $sql = "UPDATE characters_in_play SET incarcerated = 1 where char_id = '$char_id' and user_id = '$user_id'";
-         
-         if (!$db->query($sql)) {
-              showerror($db);
-         }
-    }
-    
-    function freed($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "UPDATE characters_in_play SET incarcerated = 0 where char_id = '$char_id' and user_id = '$user_id'";
-        
-        if (!$db->query($sql)) {
-             showerror($db);
-        }
-    }
-
-    function is_locked_up($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "SELECT incarcerated from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
-        $locked_up = select_sql_column($sql, "incarcerated", $db);
-        
-        return ($locked_up);
-    }
-    
-    function  hypnotised($char_id, $db) {
-        $user_id = get_user_id($db);
-         $sql = "UPDATE characters_in_play SET hypnotised = 1 where char_id = '$char_id' and user_id = '$user_id'";
-         
-         if (!$db->query($sql)) {
-              showerror($db);
-         }
-    }
-    
-    function not_hypnotised($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "UPDATE characters_in_play SET hypnotised = 0 where char_id = '$char_id' and user_id = '$user_id'";
-        
-        if (!$db->query($sql)) {
-             showerror($db);
-        }
-    }
-
-    function is_hypnotised($char_id, $db) {
-        $user_id = get_user_id($db);
-        $sql = "SELECT hypnotised from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
-        $locked_up = select_sql_column($sql, "hypnotised", $db);
-        
-        return ($locked_up);
-    }
-
-
-    
     function join_crew($char_id, $connection) {
         $tardis_crew = get_value_from_users("tardis_team", $connection);
         $crew_array = explode(",", $tardis_crew);
@@ -210,66 +126,41 @@
     }
 
     
-    function print_character_image($char_name, $connection) {
-        $uchar = ucfirst($char_name);
-        $no_space_char_name = str_replace(" ", "_", $char_name);
-        $game_url = default_url();
-        $char_id = get_value_for_name_from("char_id", "characters", $char_name, $connection);
-        if (is_conscious($char_id, $connection)) {
-            print "<img src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
-        } else {
-            print "<img style=\"opacity:0.2\" src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
-        }
-    }
-    
-    function print_character_and_name($connection, $char_id) {
-        $char_name = get_value_for_char_id("name", $char_id, $connection);
-        $uchar = ucfirst($char_name);
-        $no_space_char_name = str_replace(" ", "_", $char_name);
-        print_character_image($char_name, $connection);
-        print "<p>$uchar";
+    function conscious_tardis_crew_size($connection) {
+        $location_team = conscious_tardis_crew($connection);
         
-        print_character_modifiers($connection, $char_id);
+        return count($location_team);
     }
     
-    function print_character_modifiers($connection, $char_id) {
-        $modifiers = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
-        if ($modifiers != '0' && $modifiers != '') {
-            $modifier_array = explode(",", $modifiers);
-            // print "hello";
-            foreach ($modifier_array as $modifier) {
-                // print $modifier;
-                $sql = "SELECT text from story_modifiers where modifier_id = '$modifier'";
-                // print $sql;
-                $text = select_sql_column($sql, "text", $connection);
-                print "<p>$text";
+    function conscious_tardis_crew($connection) {
+        $tardis_crew = get_value_from_users("tardis_team", $connection);
+        $location_id = get_location($connection);
+        $location_team = [];
+        $char_id_array = explode(",", $tardis_crew);
+        foreach ($char_id_array as $char_id) {
+            $char_location = character_location($char_id, $connection);
+            if ($char_location == $location_id && is_conscious($char_id, $connection)) {
+                array_push($location_team, $char_id);
             }
         }
+        return $location_team;
+    }
+    
+    // Is this one of the characters the user currently has in play?
+    function check_for_character($character, $connection) {
+        $char_id_list = get_value_from_users("char_id_list", $connection);
         
-        $stats = ["empathy", "tech", "combat", "willpower", "observation", "running"];
-        
-        foreach ($stats as $stat) {
-            $stat_status = check_stat($connection, $char_id, $stat);
-            if ($stat_status) {
-                print "<p>Injured: $stat is lower than usual";
+        if ($char_id_list != 0 ) {
+            $char_id = get_value_for_name_from("char_id", "characters", $character, $connection);
+            $char_id_array = explode(",", $char_id_list);
+            if (in_array($char_id, $char_id_array)) {
+                return 1;
+            } else {
+                return 0;
             }
         }
-        
-        
     }
-    
-    function check_stat($connection, $char_id, $stat) {
-        $stat_value = get_value_for_char_in_play_id("$stat", $char_id, $connection);
-        $total_value = get_value_for_char_id("$stat", $char_id, $connection);
-        if ($total_value > $stat_value) {
-            //print $total_value;
-            //print " : " ;
-            //print $stat_value;
-            return 1;
-        }
-        return 0;
-    }
-    
+
     function get_doctors($db) {
         $char_id_list = get_value_from_users("char_id_list", $db);
         $char_id_array = explode(",", $char_id_list);
@@ -282,19 +173,150 @@
         }
         return $doctor_array;
     }
-    
-    function current_doctor($db) {
-        $char_id_list = get_value_from_users("tardis_team", $db);
-        $char_id_array = explode(",", $char_id_list);
-        foreach ($char_id_array as $char_id) {
-            $is_doctor = get_value_for_char_id("doctor", $char_id, $db);
-            if ($is_doctor) {
-                return $char_id;
-            }
-        }
 
+
+    // CHARACTER STATUSES
+    
+    // Some Standard Modifications
+    //=============================
+    function unconscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET unconscious = 1 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
     }
     
+    function conscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET unconscious = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+    
+    function is_conscious($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT unconscious from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $unconscious = select_sql_column($sql, "unconscious", $db);
+        
+        return (!$unconscious);
+    }
+    
+    function  locked_up($char_id, $db) {
+        $user_id = get_user_id($db);
+         $sql = "UPDATE characters_in_play SET incarcerated = 1 where char_id = '$char_id' and user_id = '$user_id'";
+         
+         if (!$db->query($sql)) {
+              showerror($db);
+         }
+    }
+    
+    function freed($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET incarcerated = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+
+    function is_locked_up($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT incarcerated from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $locked_up = select_sql_column($sql, "incarcerated", $db);
+        
+        return ($locked_up);
+    }
+    
+    function lock_everyone_up($location_id, $connection) {
+        foreach (characters_at_location($location_id, $connection) as $char_id) {
+            locked_up($char_id, $connection);
+        }
+    }
+    
+    function free_everyone($location_id, $connection) {
+        foreach (characters_at_location($location_id, $connection) as $char_id) {
+            freed($char_id, $connection);
+        }
+    }
+
+    
+    function  hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+         $sql = "UPDATE characters_in_play SET hypnotised = 1 where char_id = '$char_id' and user_id = '$user_id'";
+         
+         if (!$db->query($sql)) {
+              showerror($db);
+         }
+    }
+    
+    function not_hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "UPDATE characters_in_play SET hypnotised = 0 where char_id = '$char_id' and user_id = '$user_id'";
+        
+        if (!$db->query($sql)) {
+             showerror($db);
+        }
+    }
+
+    function is_hypnotised($char_id, $db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT hypnotised from characters_in_play where char_id ='$char_id' and user_id = '$user_id'";
+        $locked_up = select_sql_column($sql, "hypnotised", $db);
+        
+        return ($locked_up);
+    }
+
+
+    
+    function check_stat($connection, $char_id, $stat) {
+        $stat_value = get_value_for_char_in_play_id("$stat", $char_id, $connection);
+        $total_value = get_value_for_char_id("$stat", $char_id, $connection);
+        if ($total_value > $stat_value) {
+            return 1;
+        }
+        return 0;
+    }
+    
+    function lost_fight($connection) {
+        $tardis_crew_size = conscious_tardis_crew_size($connection);
+        $dice = rand(0, $tardis_crew_size - 1);
+        $tardis_crew = conscious_tardis_crew($connection);
+        $char = $tardis_crew[$dice];
+
+        $dice = rand(0, 5);
+        if ($dice == 0) {
+            $stat = "empathy";
+        } elseif ($dice == 1) {
+                $stat = "tech";
+        } elseif ($dice == 2) {
+                $stat = "running";
+        } elseif ($dice == 3) {
+                $stat = "combat";
+        } elseif ($dice == 4) {
+                $stat = "willpower";
+        } elseif ($dice == 5) {
+                $stat = "observation";
+        }
+        
+        $user_id = get_user_id($connection);
+        $sql = "SELECT {$stat} FROM characters_in_play WHERE char_id = '{$char}' AND user_id = $user_id";
+        
+        $stat_value = select_sql_column($sql, "$stat", $connection);
+        if ($stat_value > 0) {
+            $stat_value = $stat_value - 1;
+        }
+        
+        $sql = "UPDATE characters_in_play SET {$stat} = '{$stat_value}' WHERE char_id = '{$char}' AND user_id = $user_id";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
+        
+    }
+        
     function modify_character($char_id, $modifier, $db) {
         $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $db);
         $modification_array = explode(",", $modification_list);
@@ -386,28 +408,24 @@
             }
         }
     }
-
     
+    function clear_all_modifiers_except_health($char_id, $connection) {
+        conscious($char_id, $connection);
+        freed($char_id, $connection);
+        not_hypnotised($char_id, $connection);
+        $user_id = get_user_id($connection);
+        $sql = "UPDATE characters_in_play SET modifiers = '' where char_id = '$char_id' and user_id = '$user_id'";
+        if (!$connection->query($sql)) {
+             showerror($connection);
+        }
+    }
+
+
+    // WHICH CHARACTERS ARE PRESENT AT THE CURRENT LOCATION?
     function character_location($char_id, $db) {
         $location_id = get_value_for_char_in_play_id("location_id", $char_id, $db);
         return $location_id;
-        //print $location_id;
-        //print "HELLO";
-        // return 2;
     }
-    
-    function lock_everyone_up($location_id, $connection) {
-        foreach (characters_at_location($location_id, $connection) as $char_id) {
-            locked_up($char_id, $connection);
-        }
-    }
-    
-    function free_everyone($location_id, $connection) {
-        foreach (characters_at_location($location_id, $connection) as $char_id) {
-            freed($char_id, $connection);
-        }
-    }
-
     
     function characters_at_location($location_id, $connection) {
         $tardis_team = get_value_from_users("tardis_team", $connection);
@@ -449,61 +467,54 @@
         return $locations;
 
     }
-    
-    function get_value_for_char_in_play_id($column, $char_id, $connection) {
-        $user_id = get_user_id($connection);
-        $sql = "SELECT {$column} FROM characters_in_play WHERE char_id = '{$char_id}' AND user_id = $user_id";
-        // print $sql;
         
-        return select_sql_column($sql, $column, $connection);
-
+    // PRINTING FUNCTIONALITY
+    function print_character_image($char_name, $connection) {
+        $uchar = ucfirst($char_name);
+        $no_space_char_name = str_replace(" ", "_", $char_name);
+        $game_url = default_url();
+        $char_id = get_value_for_name_from("char_id", "characters", $char_name, $connection);
+        if (is_conscious($char_id, $connection)) {
+            print "<img src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
+        } else {
+            print "<img style=\"opacity:0.2\" src=$game_url/assets/$no_space_char_name.png alt=\"$uchar.\">";
+        }
     }
     
-    function lost_fight($connection) {
-        $tardis_crew_size = conscious_tardis_crew_size($connection);
-        $dice = rand(0, $tardis_crew_size - 1);
-        $tardis_crew = conscious_tardis_crew($connection);
-        $char = $tardis_crew[$dice];
-
-        $dice = rand(0, 5);
-        if ($dice == 0) {
-            $stat = "empathy";
-        } elseif ($dice == 1) {
-                $stat = "tech";
-        } elseif ($dice == 2) {
-                $stat = "running";
-        } elseif ($dice == 3) {
-                $stat = "combat";
-        } elseif ($dice == 4) {
-                $stat = "willpower";
-        } elseif ($dice == 5) {
-                $stat = "observation";
-        }
+    function print_character_and_name($connection, $char_id) {
+        $char_name = get_value_for_char_id("name", $char_id, $connection);
+        $uchar = ucfirst($char_name);
+        $no_space_char_name = str_replace(" ", "_", $char_name);
+        print_character_image($char_name, $connection);
+        print "<p>$uchar";
         
-        $user_id = get_user_id($connection);
-        $sql = "SELECT {$stat} FROM characters_in_play WHERE char_id = '{$char}' AND user_id = $user_id";
-        
-        $stat_value = select_sql_column($sql, "$stat", $connection);
-        if ($stat_value > 0) {
-            $stat_value = $stat_value - 1;
-        }
-        
-        $sql = "UPDATE characters_in_play SET {$stat} = '{$stat_value}' WHERE char_id = '{$char}' AND user_id = $user_id";
-        if (!$connection->query($sql)) {
-            showerror($connection);
-        }
-        
+        print_character_modifiers($connection, $char_id);
     }
     
-    function clear_all_modifiers_except_health($char_id, $connection) {
-        conscious($char_id, $connection);
-        freed($char_id, $connection);
-        not_hypnotised($char_id, $connection);
-        $user_id = get_user_id($connection);
-        $sql = "UPDATE characters_in_play SET modifiers = '' where char_id = '$char_id' and user_id = '$user_id'";
-        if (!$connection->query($sql)) {
-             showerror($connection);
+    function print_character_modifiers($connection, $char_id) {
+        $modifiers = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
+        if ($modifiers != '0' && $modifiers != '') {
+            $modifier_array = explode(",", $modifiers);
+            // print "hello";
+            foreach ($modifier_array as $modifier) {
+                // print $modifier;
+                $sql = "SELECT text from story_modifiers where modifier_id = '$modifier'";
+                // print $sql;
+                $text = select_sql_column($sql, "text", $connection);
+                print "<p>$text";
+            }
         }
+        
+        $stats = ["empathy", "tech", "combat", "willpower", "observation", "running"];
+        
+        foreach ($stats as $stat) {
+            $stat_status = check_stat($connection, $char_id, $stat);
+            if ($stat_status) {
+                print "<p>Injured: $stat is lower than usual";
+            }
+        }
+        
+        
     }
     
 ?>
