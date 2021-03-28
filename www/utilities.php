@@ -5,7 +5,7 @@
     require('location_utilities.php');
     require('characters.php');
     require('tardis.php');
-    require('combat_utilities.php');
+    // require('combat_utilities.php');
     require('story_utilities.php');
     require('action_utilities.php');
     require('story_designer_utilities.php');
