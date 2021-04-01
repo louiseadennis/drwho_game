@@ -1,4 +1,10 @@
 <?php
+    
+    function get_tardis_location($connection) {
+        return get_value_from_users("tardis_location", $connection);
+    }
+
+
     function check_charge($recharge_start, $connection) {
         $unixOriginalDate = strtotime($recharge_start);
         $unixNowDate = strtotime('now');

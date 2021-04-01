@@ -4,6 +4,22 @@
         return 1;
     }
     
+    function story_number($connection) {
+        $sql = "SELECT * FROM stories";
+        
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        return $result->num_rows;
+    }
+
+    function get_value_for_story_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM story_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
+    
+    
     function start_story($story_id, $db) {
         if ($story_id != 0) {
             $story = get_value_from_users("story", $db);

@@ -1,4 +1,30 @@
 <?php
+    function get_value_for_event_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
+
+    function get_value_for_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
+
+    function unresolved_event($connection) {
+        $user_id = get_user_id($connection);
+        $location_id = get_location($connection);
+        $sql = "SELECT event_id FROM events WHERE user_id='$user_id' AND location_id='$location_id' AND resolved=0";
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($result->num_rows != 1)
+            return 0;
+        else {
+            return 1;
+        }
+    }
+    
     function print_event($db) {
        //  print("A");
         $event = get_current_event($db);

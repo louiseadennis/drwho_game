@@ -1,4 +1,16 @@
 <?php
+    
+    function get_value_for_location_id($column, $location_id, $connection) {
+        $sql = "SELECT {$column} FROM locations WHERE location_id = '{$location_id}'";
+        
+        return select_sql_column($sql, $column, $connection);
+     }
+
+    function get_location($connection) {
+        return get_value_from_users("location_id", $connection);
+    }
+
+    
     function print_header($connection) {
         print "<div class=header>";
         // collect_new_characters($connection);

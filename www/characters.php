@@ -10,6 +10,21 @@
 
     }
 
+    function update_character($char_id, $column, $value, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "UPDATE characters_in_play SET {$column}='{$value}' WHERE user_id='$user_id' AND char_id='$char_id'";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
+        return 1;
+
+    }
+
+    function get_value_for_char_id($column, $char_id, $connection) {
+        $sql = "SELECT {$column} FROM characters WHERE char_id = '{$char_id}'";
+        
+        return select_sql_column($sql, $column, $connection);
+    }
 
     
         

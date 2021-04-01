@@ -52,5 +52,14 @@
         }
     }
     
+    // GENERAL DB SUPPORT
+    function get_value_for_action_id($column, $action_id, $connection) {
+      $sql = "SELECT {$column} FROM actions WHERE action_id = '{$action_id}'";
+
+        return select_sql_column($sql, $column, $connection);
+    }
+
+
+    
  
     ?>
