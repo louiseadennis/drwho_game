@@ -2,7 +2,7 @@
 
     require_once('./config/accesscontrol.php');
 
-    // Set up/check session and get database password etc.
+    // Set up/check session and get database password etc.  Access database
     require_once('./config/MySQL.php');
     require_once('utilities.php');
     session_start();
@@ -13,10 +13,12 @@
        die('Unable to connect to database [' . $mysql_host . $mysql_user .  $mysql_password . $mysql_database . $db->connect_error . ']');
        }
         
+    // Extract post variables and other information
     $task = mysqlclean($_POST, "task", 25, $db);
     $story_id = mysqlclean($_POST, "story_id", 15, $db);
     $story = get_value_for_story_id("title", $story_id, $db);
     $story_number_id = mysqlclean($_POST, "story_number_id", 15, $db);
+    
     $sql = "SELECT * FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
     $event_location = select_sql_column($sql, "event_location", $db);
     // $event_id = select_sql_column($sql, "event_id", $db);
@@ -212,6 +214,8 @@
     
        }
     
+    
+    // UPdate event details
     $sql = "SELECT * FROM story_events where story_id = '{$story_id}' AND story_number_id = '{$story_number_id}'";
 
     $text = select_sql_column($sql, "text", $db);
@@ -225,8 +229,6 @@
     $story_modifier_list = select_sql_column($sql, "story_modifier_id_list", $db);
     $story_modifier_array = explode(",", $story_modifier_list);
     $event_location = select_sql_column($sql, "event_location", $db);
-
-
     $global_event_id = select_sql_column($sql, "global_event_id", $db);
 
 
@@ -247,7 +249,7 @@
 <body>
 <?php
     print_header_info_pages($db);
-    ?>
+?>
 
 
 
@@ -259,6 +261,9 @@
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
     print "<input type=\"submit\" value=\"Edit Story\">";
     print "</form>";
+    
+    
+    //-------------------------------------------------------------------------------------------
 
     print "<h1>$story_number_id: $text</h1>";
     print "<form method=\"POST\">";
@@ -269,6 +274,8 @@
     print "<input type=\"submit\" value=\"Change Event Title\">";
     print "</form>";
     
+    //-------------------------------------------------------------------------------------------
+
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
     print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
@@ -277,6 +284,8 @@
     print "<input type=\"submit\" value=\"Change Event Description\">";
     print "</form>";
     
+    //-------------------------------------------------------------------------------------------
+
     print "<h2>Current Location: $event_location</h2>";
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
@@ -294,6 +303,8 @@
     print "</select>";
     print "<input type=\"submit\" value=\"Change Location\">";
     print "</form>";
+
+    //-------------------------------------------------------------------------------------------
 
     print "<h2>Critters</h2>";
     if ($critter_list != '') {
@@ -329,6 +340,8 @@
     print "<input type=\"submit\" value=\"Add Critter\">";
     print "</form>";
     
+    //-------------------------------------------------------------------------------------------
+
     print "<h2>Allies</h2>";
     if ($ally_list != '') {
         foreach ($ally_array as $ally_id) {
@@ -362,6 +375,8 @@
     print "</select>";
     print "<input type=\"submit\" value=\"Add Ally\">";
     print "</form>";
+
+    //-------------------------------------------------------------------------------------------
 
     print "<h2>Modifications to Character Status when they encounter this Event</h2>";
     print "<h3>General Modifiers</h3>";
@@ -417,9 +432,6 @@
          }
          print "</ul>";
      }
-
-
-    
     
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
@@ -438,6 +450,8 @@
     print "</select>";
     print "<input type=\"submit\" value=\"Add Story Specific Modifier\">";
     print "</form>";
+    
+    //-------------------------------------------------------------------------------------------
 
 
     $automaton = new story_automaton($story_id, $db);
