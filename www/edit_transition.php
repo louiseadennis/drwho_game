@@ -25,12 +25,7 @@
         if (!$result = $db->query($sql))
             showerror($db);
         $transition_id = $db->insert_id;
-        
-        // $sql = "SELECT transition_id FROM story_transitions where story_id = '{$story_id}' AND transition_label = 'no label'";
-        // if (!$result = $db->query($sql))
-        //    showerror($db);
-        // $transition_id = select_sql_column($sql, "transition_id", $db);
-    } else {
+     } else {
         $transition_id = mysqlclean($_POST, "transition_id", 15, $db);
     }
     

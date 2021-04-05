@@ -384,7 +384,7 @@
     if ($modifier_list != '') {
         print "<ul>";
         foreach ($modifier_array as $modifier_id) {
-            $text = get_value_for_event_modifier_id("name", $modifier_id, $db);
+            $text = get_value_for_modifier_id("name", $modifier_id, $db);
             print "<form method=\"POST\">";
                       print "<li>$text";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
@@ -426,7 +426,7 @@
              print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
              print "<input type=\"hidden\" name=\"story_number_id\" value=\"$story_number_id\">";
              print "<input type=\"hidden\" name=\"task\" value=\"del_story_modifier\">";
-             print "<input type=\"submit\" value=\"Delete Specific Modifier\">";
+             print "<input type=\"submit\" value=\"Delete Story Specific Modifier\">";
              print "<input type=\"hidden\" name=\"modifier\" value=\"$modifier_id\">";
              print "</form><br></li>";
          }

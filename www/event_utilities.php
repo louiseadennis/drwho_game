@@ -1,32 +1,19 @@
 <?php
-    function get_value_for_event_modifier_id($column, $modifier_id, $connection) {
-         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
-         
-         return select_sql_column($sql, $column, $connection);
-     }
-
-    function get_value_for_modifier_id($column, $modifier_id, $connection) {
-         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
-         
-         return select_sql_column($sql, $column, $connection);
-     }
-
-    function unresolved_event($connection) {
-        $user_id = get_user_id($connection);
-        $location_id = get_location($connection);
-        $sql = "SELECT event_id FROM events WHERE user_id='$user_id' AND location_id='$location_id' AND resolved=0";
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($result->num_rows != 1)
-            return 0;
-        else {
-            return 1;
-        }
-    }
+    // Events are states in the FSM and are stored in the story_events table
+    // They are associated with two id numbers: story_event_id which is the primary key and unique to all events and story_number_id which is the ID number for the
+    // event within the story (this makes it easier when designing story FSMs).
     
+    //  Events have some short text (text) and some longer text (description)
+    //  A location (event_location)
+    //  They can indicate success or failure for the story (success_fail)
+    //  They can add allies (ally_id_list) or critters (critter_id_list)
+    //  And may modify character status (modifier_id_list - regular modifiers, story_modifier_id_list (modifiers specific to the story)
+    
+   
+    // =================Printing
+    
+    // Short message at top of screen
     function print_event($db) {
-       //  print("A");
         $event = get_current_event($db);
         $text = get_event_text($event, $db);
         if ($text != '') {
@@ -34,9 +21,9 @@
         } else {
             print "<br>";
         }
-    //    print("B");
     }
-    
+ 
+    // Longer info under location picture
     function print_event_long($db) {
         $event = get_current_event($db);
         $description = get_event_description($event, $db);
@@ -167,6 +154,7 @@
         
     }
 
+    //=====================  Getters for event stuff
     // This returns event_id wrt. story id
     function get_current_event($connection) {
         $story = get_value_from_users("story", $connection);
@@ -181,60 +169,6 @@
         }
     }
     
-    function get_hypnotised($event_id, $connection) {
-        $story = get_value_from_users("story", $connection);
-        
-        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
-        
-        $list = select_sql_column($sql, "modifier_id_list", $connection);
-        $array = explode(",", $list);
-        
-        $sql = "SELECT modifier_id from event_modifiers where name = 'hypnotised'";
-        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
-        
-        if (in_array($modifier_id, $array)) {
-            return 1;
-        }
-        return 0;
-        
-    }
-    
-    function get_locked_up($event_id, $connection) {
-        $story = get_value_from_users("story", $connection);
-        
-        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
-        
-        $list = select_sql_column($sql, "modifier_id_list", $connection);
-        $array = explode(",", $list);
-        
-        $sql = "SELECT modifier_id from event_modifiers where name = 'locked up'";
-        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
-        
-        if (in_array($modifier_id, $array)) {
-            return 1;
-        }
-        return 0;
-    }
-
-    
-    function get_unconscious($event_id, $connection) {
-        $story = get_value_from_users("story", $connection);
-        
-        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
-        
-        $list = select_sql_column($sql, "modifier_id_list", $connection);
-        $array = explode(",", $list);
-        
-        $sql = "SELECT modifier_id from event_modifiers where name = 'unconscious'";
-        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
-        
-        if (in_array($modifier_id, $array)) {
-            return 1;
-        }
-        return 0;
-   }
-
-
     function get_event_text($event_id, $connection) {
         $story = get_value_from_users("story", $connection);
         
@@ -321,7 +255,72 @@
         
     }
 
+    
+    //======================= Resolving modifiers
+    function get_hypnotised($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'hypnotised'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+        
+    }
+    
+    function get_locked_up($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'locked up'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+    }
 
+    
+    function get_unconscious($event_id, $connection) {
+        $story = get_value_from_users("story", $connection);
+        
+        $sql = "SELECT modifier_id_list from story_events where story_number_id = '{$event_id}' and story_id = '{$story}'";
+        
+        $list = select_sql_column($sql, "modifier_id_list", $connection);
+        $array = explode(",", $list);
+        
+        $sql = "SELECT modifier_id from event_modifiers where name = 'unconscious'";
+        $modifier_id = select_sql_column($sql, "modifier_id", $connection);
+        
+        if (in_array($modifier_id, $array)) {
+            return 1;
+        }
+        return 0;
+   }
+    
+    //function get_value_for_event_modifier_id($column, $modifier_id, $connection) {
+    //     $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
+    //
+    //     return select_sql_column($sql, $column, $connection);
+    // }
+
+    function get_value_for_modifier_id($column, $modifier_id, $connection) {
+         $sql = "SELECT {$column} FROM event_modifiers where modifier_id = '{$modifier_id}'";
+         
+         return select_sql_column($sql, $column, $connection);
+     }
 
 
 ?>

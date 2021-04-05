@@ -63,8 +63,6 @@ if ($task == "make_initial") {
     print_header_info_pages($db);
     ?>
 
-
-
 <div class=main style="padding:1em">
 
 <?php
