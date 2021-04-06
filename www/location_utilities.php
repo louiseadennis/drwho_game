@@ -1,5 +1,6 @@
 <?php
     
+    //====================  Getters
     function get_value_for_location_id($column, $location_id, $connection) {
         $sql = "SELECT {$column} FROM locations WHERE location_id = '{$location_id}'";
         
@@ -9,8 +10,29 @@
     function get_location($connection) {
         return get_value_from_users("location_id", $connection);
     }
-
     
+    function get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection) {
+        $sql = "SELECT location_id FROM locations WHERE planet = '{$dial1}' AND century = '{$dial2}' AND d1 = '{$dial3}' AND d2 = '{$dial4}'";
+        
+        return select_sql_column($sql, "location_id", $connection);
+    }
+    
+    //========= Don't let people move to locations there are not at according to the DB just by typing URLs into the browser bar
+    function check_location($location, $connection) {
+        $real_location = get_location($connection);
+    
+        if ($real_location == $location) {
+            return 1;
+        } else {
+            $location_string = "location" . $real_location;
+            header("Location: $location_string.php");
+            exit;
+        }
+    }
+    
+
+
+    //================= Printing functions
     function print_header($connection) {
         print "<div class=header>";
         // collect_new_characters($connection);
@@ -337,25 +359,6 @@
         }
     }
 
-    function check_location($location, $connection) {
-        $real_location = get_location($connection);
-    
-        if ($real_location == $location) {
-            return 1;
-        } else {
-            $location_string = "location" . $real_location;
-            header("Location: $location_string.php");
-            exit;
-        }
-    }
-    
-    
-    function get_location_from_coords($dial1, $dial2, $dial3, $dial4, $connection) {
-        $sql = "SELECT location_id FROM locations WHERE planet = '{$dial1}' AND century = '{$dial2}' AND d1 = '{$dial3}' AND d2 = '{$dial4}'";
-        
-        return select_sql_column($sql, "location_id", $connection);
-    }
-    
     function print_transmat($location_id, $db) {
         $start = get_location($db);
         print "<div class=transmat>";
