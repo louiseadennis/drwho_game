@@ -30,8 +30,6 @@
         }
     }
     
-
-
     //================= Printing functions
     function print_header($connection) {
         print "<div class=header>";

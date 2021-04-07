@@ -497,6 +497,14 @@
                 }
             }
         }
+        
+        $transition = get_value_from_users("last_transition", $connection);
+
+        $sql = "SELECT lost_fight from story_transitions where transition_id = '{$transition}'";
+        $lost_fight = select_sql_column($sql, "lost_fight", $connection);
+        if ($lost_fight) {
+            lost_fight($db);
+        }
     }
                     
     function print_transition_outcome($transition_id, $action, $connection) {
