@@ -1,4 +1,11 @@
 <?php
+    
+    function get_transition_id($event_id, $action_id, $story_id, $db) {
+        $sql = "SELECT transition_id FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id} AND action_id = '{$action_id}'";
+        return select_sql_column($sql, "transition_id", $db);
+    }
+
+    
     function side_effects($action, $connection) {
         $user_id = get_user_id($connection);
         $sql = "SELECT char_id FROM characters_in_play WHERE user_id = '$user_id'";

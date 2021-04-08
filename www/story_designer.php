@@ -30,8 +30,7 @@ print "<form method=\"POST\" action=\"new_story.php\">";
 print "<input type=\"submit\" value=\"New Story\">";
 print "</form>";
     
-    $story_array = get_stories($db);
-// print "<table>";
+$story_array = get_stories($db);
 sort ($story_array);
 foreach ($story_array as $entry) {
     // $badge = get_value_for_story_id("badge", $entry, $db);

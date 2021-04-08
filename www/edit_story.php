@@ -94,14 +94,14 @@ if ($task == "make_initial") {
             print "<input type=\"hidden\" name=\"story_number_id\" value=\"$event\">";
             print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
             print "<input type=\"submit\" value=\"Edit $event ($text)\">";
-            if (is_null($automaton->get_event_print($event))) {
+            if (is_null($automaton->get_event_object($event))) {
                 print ("<span style=\"color:red\">NOT IN AUTOMATON!</span>");
-            } elseif (($automaton->get_event($event)->incomplete() or $automaton->get_event($event)->unhandled_action() or
-                $automaton->get_event($event)->other_transition_issue) and !$automaton->get_event($event)->end_state) {
+            } elseif (($automaton->get_event_object($event)->incomplete() or $automaton->get_event_object($event)->unhandled_action() or
+                $automaton->get_event_object($event)->other_transition_issue) and !$automaton->get_event_object($event)->end_state) {
                  print ("<span style=\"color:red\">INCOMPLETE!</span>");
             }
             
-            if ($automaton->get_event($event)->end_state) {
+            if ($automaton->get_event_object($event)->end_state) {
                 print " <b>End State</b>";
             }
             
