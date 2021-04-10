@@ -1,11 +1,9 @@
 <?php
     
+    // Check that all the probability of the outcomes for this action at this event equal 1
     function transitions_complete_for_modifier_and_action($event_id, $action_id, $story_id, $modifiers, $db) {
-        // $modifiers = "test";
         if ($action_id != 100) {
             $sql = "SELECT probability FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$event_id}' AND action_id = '{$action_id}' AND modifiers = '{$modifiers}'";
-            //print($sql);
-            //print("<br>");
             if (!$result = $db->query($sql))
                 showerror($db);
             $total_probability = 0;
@@ -19,11 +17,9 @@
                 return 1;
             }
             return 0;
-        } else {
+        } else { // special case for travel transitions
             $sql = "SELECT probability, travel_type FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$event_id}' AND action_id = '{$action_id}' AND modifiers = '{$modifiers}'";
-            //print($sql);
-            //print("<br>");
-            if (!$result = $db->query($sql))
+             if (!$result = $db->query($sql))
                 showerror($db);
             $total_probability = 0;
             $any_travel_type = 0;
@@ -56,6 +52,64 @@
         }
     }
     
+    // What is the sum of the probability for this action at this event
+    function probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $label, $db) {
+        if ($action_id != 100 && $action_id != 0) {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+        } else if ($action_id == 0) { // Special case for synchronised actions controlled elsewhere
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
+        } else {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and travel_type = '{$travel_type}'";
+        }
+        $other_transitions = sql_return_to_array($sql, "transition_id", $db);
+        $total_prob = 0;
+         foreach ($other_transitions as $transition) {
+            $sql = "SELECT probability from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
+            $o_probability = select_sql_column($sql, "probability", $db);
+            $total_prob = $total_prob + $o_probability;
+        }
+        return $total_prob;
+    }
+    
+    //=== Does this event have a transition to handle random travel into it - e.g., by tardis or car or helicopter or whatever the story wasn't expecting?
+    function any_travel_type($story_id, $modifiers, $event_id, $db) {
+        $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = 100 and event_id = '{$event_id}'";
+        $other_transitions = sql_return_to_array($sql, "transition_id", $db);
+
+        // print $sql;
+        foreach ($other_transitions as $transition) {
+            $sql = "SELECT travel_type from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
+            $travel_type = select_sql_column($sql, "travel_type", $db);
+             
+            if ($travel_type == 'any') {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    //==== What possible outcomes are there for this action at this event
+    function probability_outcomes($story_id, $modifiers, $action_id, $event_id, $label, $db) {
+        if ($action_id != 0) {
+            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
+        } else { // Special case for synchronised actions controlled elsewhere
+                $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
+        }
+         $other_transitions = sql_return_to_array($sql, "transition_id", $db);
+         $outcome_list = "";
+         foreach ($other_transitions as $transition) {
+             $sql = "SELECT outcome, outcome_text, probability from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
+             $outcome = select_sql_column($sql, "outcome", $db);
+             $outcome_text = select_sql_column($sql, "outcome_text", $db);
+             $o_probability = select_sql_column($sql, "probability", $db);
+             $outcome_list = $outcome_list . "<li>$outcome: $outcome_text ($o_probability)</li>";
+         }
+         return $outcome_list;
+     }
+
+    
+    
+    //================== PRINTING FUNCTIONS
     function print_transition($transition_id, $story_id, $db) {
         $sql = "SELECT * FROM story_transitions WHERE transition_id = '{$transition_id}'";
         
@@ -182,64 +236,5 @@
         print(":<br>");
     }
     
-    function probability_sum($story_id, $modifiers, $action_id, $event_id, $travel_type, $label, $db) {
-        if ($action_id != 100 && $action_id != 0) {
-            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
-        } else if ($action_id == 0) {
-            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
-        } else {
-            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and travel_type = '{$travel_type}'";
-        }
-        //print $sql;
-        $other_transitions = sql_return_to_array($sql, "transition_id", $db);
-        $total_prob = 0;
-        // $outcome_list = "";
-        foreach ($other_transitions as $transition) {
-            $sql = "SELECT probability from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
-            $o_probability = select_sql_column($sql, "probability", $db);
-            // $outcome_list = $outcome_list . "<li>$outcome ($o_probability)</li>";
-            $total_prob = $total_prob + $o_probability;
-        }
-        return $total_prob;
-    }
-    
-    function any_travel_type($story_id, $modifiers, $event_id, $db) {
-        $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = 100 and event_id = '{$event_id}'";
-        $other_transitions = sql_return_to_array($sql, "transition_id", $db);
-
-        // print $sql;
-        foreach ($other_transitions as $transition) {
-            $sql = "SELECT travel_type from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
-            $travel_type = select_sql_column($sql, "travel_type", $db);
-            // print("::");
-            // print $travel_type;
-            
-            if ($travel_type == 'any') {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    
-    function probability_outcomes($story_id, $modifiers, $action_id, $event_id, $label, $db) {
-        if ($action_id != 0) {
-            $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}'";
-            } else {
-                $sql = "SELECT transition_id from story_transitions where story_id='{$story_id}' and modifiers = '{$modifiers}' and action_id = '{$action_id}' and event_id = '{$event_id}' and transition_label = '{$label}'";
-            }
-         //print $sql;
-         $other_transitions = sql_return_to_array($sql, "transition_id", $db);
-         $outcome_list = "";
-         foreach ($other_transitions as $transition) {
-             $sql = "SELECT outcome, outcome_text, probability from story_transitions where story_id='{$story_id}' and transition_id = '{$transition}'";
-             $outcome = select_sql_column($sql, "outcome", $db);
-             $outcome_text = select_sql_column($sql, "outcome_text", $db);
-             $o_probability = select_sql_column($sql, "probability", $db);
-             $outcome_list = $outcome_list . "<li>$outcome: $outcome_text ($o_probability)</li>";
-         }
-         return $outcome_list;
-     }
-
     
 ?>
