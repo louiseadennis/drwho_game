@@ -153,6 +153,32 @@
         
         
     }
+    
+    // If user is switching POVs etc, don't want to print modifier messages and so on each time they return to this location.
+    function first_visit($connection) {
+        $story = get_value_from_users("story", $connection);
+        if ($story != 0 && $story != '') {
+            $location_id = get_location($connection);
+            $user_id = get_user_id($connection);
+            
+            $sql = "SELECT first_visit from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$location_id}'";
+            
+            return select_sql_column($sql, "first_visit", $connection);
+        }
+    }
+    
+    function visited($connection) {
+        $story = get_value_from_users("story", $connection);
+        if ($story != 0 && $story != '') {
+            $location_id = get_location($connection);
+            $user_id = get_user_id($connection);
+
+            $sql = "UPDATE story_locations_in_play SET first_visit='0' where user_id = '$user_id' and location_id = '$location_id'";
+            if (!$connection->query($sql)) {
+                showerror($connection);
+            }
+        }
+    }
 
     //=====================  Getters for event stuff
     // This returns event_id wrt. story id
@@ -255,8 +281,43 @@
         
     }
 
+    function get_story_event_id($story_id, $event_id, $db) {
+        $sql = "SELECT story_event_id from story_events where story_id = '{$story_id}' and story_number_id = '{$event_id}'";
+        
+        return select_sql_column($sql, "story_event_id", $db);
+    }
+    
+    function get_event_character($connection) {
+        $user_id = get_user_id($connection);
+        $location_id = get_location($connection);
+        $sql = "SELECT event_character from story_locations_in_play WHERE user_id = '$user_id' and location_id = '$location_id'";
+        // print ($sql);
+        
+        return select_sql_column($sql, "event_character", $connection);
+    }
+    
     
     //======================= Resolving modifiers
+    function check_modifiers($modifiers, $connection) {
+        $modifier_array = explode(",", $modifiers);
+        if ($modifiers == '') {
+            return 1;
+        } else {
+             if ($modifiers == 'doctor present' || in_array('doctor present', $modifier_array)) {
+                if (!doctor_here($connection)) {
+                    return 0;
+                }
+                $doctor_id = current_doctor($connection);
+                if (!is_conscious($doctor_id, $connection)) {
+                    return 0;
+                }
+            }
+        }
+        
+        return 1;
+    }
+    
+    
     function get_hypnotised($event_id, $connection) {
         $story = get_value_from_users("story", $connection);
         
