@@ -2,7 +2,7 @@
     //================================== Making a transition (without travel parts)
 
     
-
+    //  Make a transition between two events (used for testing)
     function transition($from_event, $to_event, $story_id, $connection) {
         if ($from_event != $to_event) {
             $sql = "SELECT transition_id FROM story_transitions where event_id = '{$from_event}' and story_id = '{$story_id}' and outcome='{$to_event}'";
@@ -13,61 +13,39 @@
             }
         }
     }
-
     
-    
-    //  An action has been performed - what should happen
+    //  An action has been performed - what should happen?
     function story_transition($action, $connection) {
         if (having_adventure($connection)) {
-            // This is the current event _at this location_ if it equals 0 then this location currently has no event for this story
-            // Event_id is wrt. story_id
-            //$current_event = get_current_event($connection);
-            //$event = 0;
-            //if ($current_event != 0) {
-            //    $event = $current_event;
-            //}
-            
-            // This is the event at the characters current location before any travel takes place
+           // This is the event at the location the user is currently viewing
             $event = get_current_event($connection);
-            $location_id = get_location($connection);
-            $story_id = get_value_from_users("story", $connection);
-            $user_id = get_user_id($connection);
-            
+             $story_id = get_value_from_users("story", $connection);
+ 
             //  Get the action_id
             $action_id = 0;
             if (is_travel_action($action, $connection)) {
                 $action_id = 100;
                 $prev_location = get_value_from_users("prev_location", $connection);
-                // Nothing interesting happening here, but maybe we came from somewhere with a transition to here.
-                // Don't think this should happen any more -- locations of interest now have empty states if no one is there.
-                //if ($current_event == 0) {
-                    //$user_id = get_user_id($connection);
-                    // BUT prev_location is not a story location
-                    //$sql = "SELECT event_id from story_locations_in_play where user_id = '{$user_id}' and location_id = '{$prev_location}'";
-                    //$event = select_sql_column($sql, "event_id", $connection);
-                   // $event = 0;
-                    // print("Should we be in this bit of code?");
-                    // Apparently we get here if Tardis flying from a non story location.
-               // }
-            }
-            if (is_basic_action($action, $connection)) {
+            } elseif (is_basic_action($action, $connection)) {
                 $action_id = get_value_for_name_from("action_id", "actions", $action, $connection);
             }
             
             $transition_in_table = 1;
             
-            // Why might action_id = 0?
+            // Why might action_id = 0? Probably because of a bug.
             // In what circumstances is the event 0?  When travelling from a non-story location
             if ($action_id > 0 && $event != 0) {
-                // Work out which transition we are on
-                $travel_type = get_value_from_users("travel_type", $connection);
                 
-                // Check a transition will actually be happening here.
+                // Get all possible transitions for this action and event.
                 if ($action_id != 100) {
-                    $sql = "SELECT transition_label, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
+                    $sql = "SELECT transition_label, transition_id, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}'";
                 } else {
-                    $sql = "SELECT transition_label, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and travel_type = '{$travel_type}'";
+                    $travel_type = get_value_from_users("travel_type", $connection);
+
+                    $sql = "SELECT transition_label, transition_id, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and travel_type = '{$travel_type}'";
                 }
+                
+                // No transition....
                 if (!$result = $connection->query($sql)) {
                     // There wasn't a transition for this action id.
                     // showerror($connection);
@@ -96,14 +74,14 @@
                         if (check_modifiers($modifiers, $connection)) {
                             $probability = $probability + $row["probability"];
                             if ($dice <= $probability) {
-                                $transition_id = $row["transition_id"];
+                                $transition_label = $row["transition_label"];
                                 break;
                             }
                         }
                     }
             
                     
-                    make_transition($transition_id, $connection, $action_id);
+                    make_transition($transition_label, $connection, $action_id);
                 }
             }
         }
@@ -112,28 +90,25 @@
     
 
     // Transition ID is specific to location while transition label is cross location
-    function make_transition($transition_id, $connection, $action_id) {
+    function make_transition($transition_label, $connection, $action_id) {
         $user_id = get_user_id($connection);
- 
-        $sql = "UPDATE users SET last_transition='{$transition_id}' where user_id = '$user_id'";
-        if (!$connection->query($sql)) {
-            showerror($connection);
-        }
-        
+         
         // This will collect all the locations currently in play for this user
         $sql = "SELECT location_id FROM story_locations_in_play WHERE user_id ='{$user_id}'";
         if (!$result = $connection->query($sql))
             showerror($connection);
+        $location_id = get_location($connection);
             
         // Update the events at all the locations.
         while($row=$result->fetch_assoc()) {
             $story_location = $row["location_id"];
-            $transition_info = new transition_info($story_location, $transition_id, $connection, $action_id);
-            $new_event = $transition_info->outome_event;
+            $transition_info = new transition_info($story_location, $transition_label, $connection, $action_id);
+            $new_event = $transition_info->outcome_event;
             $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$story_location'";
-            if (!$connection->query($sql)) {
+             if (!$connection->query($sql)) {
                 showerror($connection);
             }
+            $transition_id = $transition_info->transition_id;
 
             //$sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$story_location'";
             //$story_path = select_sql_column($sql, "story_path", $connection);
@@ -144,43 +119,46 @@
             //    showerror($connection);
             //}
 
-            if ($story_location != $location_id)
+            // If we're not at the location where the action took place it is possible the characters are moved to this location.
+            if ($story_location != $location_id) {
                 
-                    if (forced_travel_transition($transition_info->transition_id, $connection)) {
-                        // print("A");
-                        $travel_info = new forced_travel_info($location_transition_id, $connection);
-                        $travel_info->force_travel($connection);
-                    }
+                if (forced_travel_transition($transition_info->transition_id, $connection)) {
+                    $travel_info = new forced_travel_info($location_transition_id, $connection);
+                    $travel_info->force_travel($connection);
                 }
-                          
+            } else {
+                $sql = "UPDATE users SET last_transition='{$transition_id}' where user_id = '$user_id'";
+                // print($sql);
+                if (!$connection->query($sql)) {
+                    showerror($connection);
+                }
+                
+                $sql = "SELECT lost_fight from story_transitions where transition_id = '{$transition_id}'";
+                $lost_fight = select_sql_column($sql, "lost_fight", $connection);
+                if ($lost_fight) {
+                    lost_fight($db);
+                }
+                
             }
-        }
-        
-        $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
-        //print ("A: $transition_id $random_character $transition_id");
-        if ($random_character) {
-            $tardis_crew_size = conscious_tardis_crew_size($connection);
-            $dice = rand(0, $tardis_crew_size - 1);
-            $tardis_crew = conscious_tardis_crew($connection);
-            $char = $tardis_crew[$dice];
-            //$outcome_text = $char_name . $outcome_text;
-            //print($outcome_text);
-            // THIS SEEMS TO UPDATE ALL LOCATIONS - I CAN SEE AN ARGUMENT FOR THIS BUT SUSPECT WILL CAUSE ISSUES
-            $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
-            //print $sql;
-            if (!$connection->query($sql)) {
-                showerror($connection);
-            }
-        }
-        
-        // ??? moved from story transition
-        $transition = get_value_from_users("last_transition", $connection);
 
-        $sql = "SELECT lost_fight from story_transitions where transition_id = '{$transition}'";
-        $lost_fight = select_sql_column($sql, "lost_fight", $connection);
-        if ($lost_fight) {
-            lost_fight($db);
+            $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
+            if ($random_character) {
+                $tardis_crew_size = conscious_tardis_crew_size($connection);
+                $dice = rand(0, $tardis_crew_size - 1);
+                $tardis_crew = conscious_tardis_crew($connection);
+                $char = $tardis_crew[$dice];
+                //$outcome_text = $char_name . $outcome_text;
+                //print($outcome_text);
+                // THIS SEEMS TO UPDATE ALL LOCATIONS - I CAN SEE AN ARGUMENT FOR THIS BUT SUSPECT WILL CAUSE ISSUES
+                $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
+                //print $sql;
+                if (!$connection->query($sql)) {
+                    showerror($connection);
+                }
+            }
+
         }
+        
 
     }
 
@@ -226,56 +204,13 @@
         return $modifier;
     }
 
-    function side_effects($action, $connection) {
-        $user_id = get_user_id($connection);
-        $sql = "SELECT char_id FROM characters_in_play WHERE user_id = '$user_id'";
-        if (!$result = $connection->query($sql))
-            showerror($connection);
-        
-        if ($action == "travel") {
-            $action = 100;
-        }
-        
-        while ($row=$result->fetch_assoc()) {
-            $char_id = $row["char_id"];
-            $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
-            $modification_array = explode(",", $modification_list);
-            foreach ($modification_array as $modifier) {
-                $sql = "SELECT remove from story_modifiers WHERE modifier_id = '$modifier'";
-                $remove = select_sql_column($sql, "remove", $connection);
-                if ($remove == $action) {
-                    $sql = "SELECT remove_modifier from story_modifiers WHERE modifier_id = '$modifier'";
-                    $remove_modifier = select_sql_column($sql, "remove_modifier", $connection);
-                    $value = 1;
-                    if ($remove_modifier != '') {
-                        $value = remove_modification_status($remove_modifier, $connection);
-                    }
-                    
-                    if ($value) {
-                        remove_modification_from_character($modifier, $char_id, $connection);
-                    }
-                 }
-            }
-        }
-    }
-
-    // Returns 1 if this modifier should be removed from al characteres
-    function remove_modification_status($modifier, $connection) {
-        if ($modifier == "transmat") {
-            $travel_type = get_value_from_users("travel_type", $connection);
-            if ($travel_type == "transmat") {
-                return 1;
-            }
-        }
-        return 0;
-    }
 
 
-
+    //============== Print Support
     function print_transition_outcome($transition_id, $action, $connection) {
         // print($action_id);
+        // print($transition_id);
         if ($transition_id != 0) {
-
             // Printing outcome of action
             $outcome_text = get_value_for_transition_id("outcome_text", $transition_id, $connection);
             $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
@@ -312,7 +247,7 @@
         }
     }
     
-    //==================================  Forced Travel
+    //==================================  Travel
     // Does this transition involve forced travel?
     function forced_travel_transition($transition, $db) {
         $sql = "SELECT action_id, force_travel from story_transitions where transition_id = '{$transition}'";
@@ -324,21 +259,6 @@
         return 0;
     }
 
-
-    //====================== DB support
-    function get_value_for_transition_id($column, $transition_id, $connection) {
-        $sql = "SELECT {$column} from story_transitions where transition_id = '{$transition_id}'";
-        
-        return select_sql_column($sql, $column, $connection);
-    }
-        
-
-    function get_transition_id($event_id, $action_id, $story_id, $db) {
-        $sql = "SELECT transition_id FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id} AND action_id = '{$action_id}'";
-        return select_sql_column($sql, "transition_id", $db);
-    }
-
-    
     function travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location) {
         $location_id = get_location($db);
         $travellers = [];
@@ -392,6 +312,22 @@
         
         return $location_id;
     }
+
+    //====================== DB support
+    function get_value_for_transition_id($column, $transition_id, $connection) {
+        $sql = "SELECT {$column} from story_transitions where transition_id = '{$transition_id}'";
+        
+        return select_sql_column($sql, $column, $connection);
+    }
+        
+
+    function get_transition_id($event_id, $action_id, $story_id, $db) {
+        $sql = "SELECT transition_id FROM story_transitions WHERE story_id = '{$story_id}' AND event_id = '{$story_number_id} AND action_id = '{$action_id}'";
+        return select_sql_column($sql, "transition_id", $db);
+    }
+
+    
+
     
     // ====================== Support classes
     class travel_info {
@@ -459,29 +395,30 @@
 
 
     // What does a transition do for this event at this location?
-    class transition_info() {
+    class transition_info {
         public $outcome_event;
         public $label;
         public $action_id;
         public $location_id;
         public $story_id;
-        public $transition_id:
+        public $transition_id;
         public $location_event;
         
         function __construct($location_id, $transition_label, $db, $action_id) {
             $this->label = $transition_label;
             $this->location_id =$location_id;
             if ($location_id == get_location($db)) {
-                $this->$action_id = $action_id;
+                $this->action_id = $action_id;
             } else {
-                $this->$action_id = 0;
+                $this->action_id = 0;
             }
-            $this->story_id = get_value_from_users("story", $connection);
-            $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$story_location'";
-            $this->location_event = select_sql_column($sql, "event_id", $connection);
+            $this->story_id = get_value_from_users("story", $db);
+            $user_id = get_user_id($db);
+            $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$location_id'";
+            $this->location_event = select_sql_column($sql, "event_id", $db);
             $sql = "SELECT outcome, transition_id FROM story_transitions WHERE story_id='$this->story_id' AND location_id='$this->location_id' AND transition_label = '$transition_label' AND action_id = '$this->action_id' AND event_id = '$this->location_event'";
-            $this->outcome_event = select_sql_column($sql, "outcome", $connection);
-            $this->transition_id = select_sql_column($sql, "transition_id", $connection);
+            $this->outcome_event = select_sql_column($sql, "outcome", $db);
+            $this->transition_id = select_sql_column($sql, "transition_id", $db);
             
          }
     }

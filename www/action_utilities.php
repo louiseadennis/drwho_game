@@ -31,6 +31,52 @@
         return false;
     }
     
+    // Action Side Effects =====================
+    function side_effects($action, $connection) {
+        $user_id = get_user_id($connection);
+        $sql = "SELECT char_id FROM characters_in_play WHERE user_id = '$user_id'";
+        if (!$result = $connection->query($sql))
+            showerror($connection);
+        
+        if ($action == "travel") {
+            $action = 100;
+        }
+        
+        while ($row=$result->fetch_assoc()) {
+            $char_id = $row["char_id"];
+            $modification_list = get_value_for_char_in_play_id("modifiers", $char_id, $connection);
+            $modification_array = explode(",", $modification_list);
+            foreach ($modification_array as $modifier) {
+                $sql = "SELECT remove from story_modifiers WHERE modifier_id = '$modifier'";
+                $remove = select_sql_column($sql, "remove", $connection);
+                if ($remove == $action) {
+                    $sql = "SELECT remove_modifier from story_modifiers WHERE modifier_id = '$modifier'";
+                    $remove_modifier = select_sql_column($sql, "remove_modifier", $connection);
+                    $value = 1;
+                    if ($remove_modifier != '') {
+                        $value = remove_modification_status($remove_modifier, $connection);
+                    }
+                    
+                    if ($value) {
+                        remove_modification_from_character($modifier, $char_id, $connection);
+                    }
+                 }
+            }
+        }
+    }
+
+    // Returns 1 if this modifier should be removed from al characteres
+    function remove_modification_status($modifier, $connection) {
+        if ($modifier == "transmat") {
+            $travel_type = get_value_from_users("travel_type", $connection);
+            if ($travel_type == "transmat") {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    //================= Print Spport
     // Basic actions have a default "result" that can be printed if there is no other message related to the transition for the action.<
     function print_action_default($action, $connection) {
         if (doctor_here($connection)) {
@@ -51,6 +97,35 @@
             }
         }
     }
+
+    function print_action($connection) {
+        $last_action = get_value_from_users("last_action", $connection);
+        $pov_switch = 0;
+        if (is_travel_action($last_action, $connection)) {
+            $travel_type = get_value_from_users("travel_type", $connection);
+            if ($travel_type == "pov_switch") {
+                $pov_switch = 1;
+            }
+        }
+        
+        if (having_adventure($connection) && !$pov_switch) {
+            $last_transition = get_value_from_users("last_transition", $connection);
+            print_transition_outcome($last_transition, $last_action, $connection);
+        } else {
+                if (is_basic_action($last_action, $connection)) {
+                    print_action_default($last_action, $connection);
+                } else {
+                    print "<p>  &nbsp;</p>";
+                }
+        }
+        side_effects($last_action, $connection);
+        $sql = "UPDATE users SET last_transition='0' where user_id = '$user_id'";
+        if (!$connection->query($sql)) {
+            showerror($connection);
+        }
+    }
+
+
     
     // GENERAL DB SUPPORT
     function get_value_for_action_id($column, $action_id, $connection) {

@@ -112,7 +112,7 @@
         $success_fail = get_event_success_fail($event, $db);
         if ($success_fail == '0') {
             $story = get_value_from_users("story", $db);
-            print("FAIL STORY");
+            print("FAIL STORY $event $story");
             fail_story($story, $db);
         } else if ($success_fail == '2') {
             $story = get_value_from_users("story", $db);

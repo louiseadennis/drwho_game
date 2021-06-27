@@ -42,8 +42,10 @@
 </center>
 
 <?php
-    $event = get_current_event($db);
-    print_event_long($db);
+    if (having_adventure($db)) {
+        $event = get_current_event($db);
+        print_event_long($db);
+    }
          
     print_tardis_team($db);
 ?>

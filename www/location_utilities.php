@@ -137,37 +137,7 @@
     }
     
     
-    // ??? Should this be in action_utilities?
-    function print_action($connection) {
-        $last_action = get_value_from_users("last_action", $connection);
-        $pov_switch = 0;
-        if (is_travel_action($last_action, $connection)) {
-            $travel_type = get_value_from_users("travel_type", $connection);
-            if ($travel_type == "pov_switch") {
-                $pov_switch = 1;
-            }
-        }
-        
-        
-        if (having_adventure($connection) && !$pov_switch) {
-            $last_transition = get_value_from_users("last_transition", $connection);
-            // print($last_transition);
-            print_transition_outcome($last_transition, $last_action, $connection);
-        } else {
-                if (is_basic_action($last_action, $connection)) {
-                    print_action_default($last_action, $connection);
-                } else {
-                    print "<p>  &nbsp;</p>";
-                }
-        }
-        side_effects($last_action, $connection);
-        $sql = "UPDATE users SET last_transition='0' where user_id = '$user_id'";
-        if (!$connection->query($sql)) {
-            showerror($connection);
-        }
-    }
-    
-    
+
     function print_tardis($connection) {
         $location_id = get_location($connection);
         $tardis_location = get_tardis_location($connection);

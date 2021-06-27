@@ -41,15 +41,11 @@
 </center>
 
 <?php
-    $event = get_current_event($db);
-    // print($event);
-    print_event_long($db);
-    if ($event == 10) {
-        end_story(1, $db);
-
-    } else if ($event == 16) {
-         fail_story(1, $db);
-    } 
+    if (having_adventure($db)) {
+        $event = get_current_event($db);
+        // print($event);
+        print_event_long($db);
+        }
     print_tardis_team($db);
 ?>
 
