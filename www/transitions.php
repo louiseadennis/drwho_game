@@ -19,7 +19,7 @@
         if (having_adventure($connection)) {
            // This is the event at the location the user is currently viewing
             $event = get_current_event($connection);
-             $story_id = get_value_from_users("story", $connection);
+            $story_id = get_value_from_users("story", $connection);
  
             //  Get the action_id
             $action_id = 0;
@@ -54,6 +54,7 @@
                 if ($result->num_rows == 0) {
                      $transition_in_table = 0;
                 }
+ 
             
                 // A transition will occur.  Figure out dice roll and use it to pick the relevant transition (where more than 1 option)
                 if ($transition_in_table) {
@@ -80,8 +81,21 @@
                         }
                     }
             
-                    
-                    make_transition($transition_label, $connection, $action_id);
+                    // Null if there is no transition for this action
+                    if ($transition_label != "null") {
+                        make_transition($transition_label, $connection, $action_id);
+                    } else {
+                        $user_id = get_user_id($connection);
+                        $location_id = get_location($connection);
+                        $sql = "SELECT transition_id FROM story_transitions WHERE story_id='$story_id' AND location_id='$location_id' AND transition_label = 'null' AND action_id = '$action_id' AND event_id = '$event'";
+                        // print($sql);
+                        $transition_id = select_sql_column($sql, "transition_id", $connection);
+                        $sql = "UPDATE users SET last_transition='{$transition_id}' where user_id = '$user_id'";
+                        // print($sql);
+                        if (!$connection->query($sql)) {
+                            showerror($connection);
+                        }
+                    }
                 }
             }
         }
@@ -136,7 +150,8 @@
                 $sql = "SELECT lost_fight from story_transitions where transition_id = '{$transition_id}'";
                 $lost_fight = select_sql_column($sql, "lost_fight", $connection);
                 if ($lost_fight) {
-                    lost_fight($db);
+                    print("plink");
+                    lost_fight($connection);
                 }
                 
             }
@@ -147,8 +162,6 @@
                 $dice = rand(0, $tardis_crew_size - 1);
                 $tardis_crew = conscious_tardis_crew($connection);
                 $char = $tardis_crew[$dice];
-                //$outcome_text = $char_name . $outcome_text;
-                //print($outcome_text);
                 // THIS SEEMS TO UPDATE ALL LOCATIONS - I CAN SEE AN ARGUMENT FOR THIS BUT SUSPECT WILL CAUSE ISSUES
                 $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
                 //print $sql;
@@ -417,6 +430,7 @@
             $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$location_id'";
             $this->location_event = select_sql_column($sql, "event_id", $db);
             $sql = "SELECT outcome, transition_id FROM story_transitions WHERE story_id='$this->story_id' AND location_id='$this->location_id' AND transition_label = '$transition_label' AND action_id = '$this->action_id' AND event_id = '$this->location_event'";
+            //  print($sql);
             $this->outcome_event = select_sql_column($sql, "outcome", $db);
             $this->transition_id = select_sql_column($sql, "transition_id", $db);
             

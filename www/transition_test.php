@@ -12,6 +12,18 @@ $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
 
 $uname = $_SESSION["loginUsername"];
 $location = get_location($db);
+
+$task = mysqlclean($_POST, "task", 3000, $db);
+if ($task == "move_chars") {
+    $location = mysqlclean($_POST, "new_location", 15, $db);
+    update_users("location_id", $location, $db);
+    $tardis_crew = get_value_from_users("tardis_team", $db);
+    $crew_array = explode(",", $tardis_crew);
+    foreach($crew_array as $char_id) {
+        update_character($char_id, "location_id", $location, $db);
+    }
+}
+
     
 ?>
 <html>
@@ -31,6 +43,26 @@ $location = get_location($db);
 
 
 <div class=main style="padding:1em">
+
+<h2>Move all Characters to Location</h2>
+
+<?php
+    print "<p>Current Location: $location</p>";
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"move_chars\">";
+    print "&nbsp <select id=\"new_location\" name=\"new_location\">";
+    
+    $sql = "SELECT location_id from locations";
+    $location_array = sql_return_to_array($sql, "location_id", $db);
+    foreach ($location_array as $nlocation) {
+        $location_name = get_value_for_location_id("name", $nlocation, $db);
+        print "<option value=\"$nlocation\">$nlocation  ($location_name)</option>";
+    }
+    print "</select>";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Move Characters to New Location\">";
+    print "</form></p>";
+
+?>
 
 <h2>Possible Transitions</h2>
 
