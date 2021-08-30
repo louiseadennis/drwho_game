@@ -136,8 +136,9 @@
             // If we're not at the location where the action took place it is possible the characters are moved to this location.
             if ($story_location != $location_id) {
                 
-                if (forced_travel_transition($transition_info->transition_id, $connection)) {
-                    $travel_info = new forced_travel_info($location_transition_id, $connection);
+                if (forced_travel_transition($transition_id, $connection)) {
+                    $travel_info = new forced_travel_info($transition_id, $connection);
+                    print("plonk");
                     $travel_info->force_travel($connection);
                 }
             } else {
@@ -150,7 +151,7 @@
                 $sql = "SELECT lost_fight from story_transitions where transition_id = '{$transition_id}'";
                 $lost_fight = select_sql_column($sql, "lost_fight", $connection);
                 if ($lost_fight) {
-                    print("plink");
+                    // print("plink");
                     lost_fight($connection);
                 }
                 
@@ -267,12 +268,13 @@
         $action_id = select_sql_column($sql, "action_id", $db);
         // Am I sure it's only 100 and 0?
         if ($action_id == 100 || $action_id == 0) {
+            // print(select_sql_column($sql, "force_travel", $db));
             return select_sql_column($sql, "force_travel", $db);
         }
         return 0;
     }
 
-    function travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location) {
+    function travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $transition) {
         $location_id = get_location($db);
         $travellers = [];
         

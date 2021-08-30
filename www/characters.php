@@ -320,12 +320,13 @@
         $user_id = get_user_id($connection);
         $sql = "SELECT {$stat} FROM characters_in_play WHERE char_id = '{$char}' AND user_id = $user_id";
         
-        $stat_value = select_sql_column($sql, "$stat", $connection);
+        $stat_value = select_sql_column($sql, $stat, $connection);
         if ($stat_value > 0) {
             $stat_value = $stat_value - 1;
         }
         
         $sql = "UPDATE characters_in_play SET {$stat} = '{$stat_value}' WHERE char_id = '{$char}' AND user_id = $user_id";
+        // print($sql);
         if (!$connection->query($sql)) {
             showerror($connection);
         }

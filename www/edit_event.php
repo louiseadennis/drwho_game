@@ -456,32 +456,32 @@
 
     $automaton = new story_automaton($story_id, $db);
 
-    if (!$automaton->get_event($story_number_id)->end_state) {
+    if (!$automaton->get_event_object($story_number_id)->end_state) {
         print "<h2>Action Transitions</h2>";
 
         // Print Transitions for Each Action
         
         print("<ul>");
-        print_action_header("EMPATHY", $automaton->get_event($story_number_id)->empathy_unhandled);
+        print_action_header("EMPATHY", $automaton->get_event_object($story_number_id)->empathy_unhandled);
         print_transitions_for_action(1, $story_id, $story_number_id, $event_location, $db);
         
         
-        print_action_header("TECH", $automaton->get_event($story_number_id)->tech_unhandled);
+        print_action_header("TECH", $automaton->get_event_object($story_number_id)->tech_unhandled);
         print_transitions_for_action(2, $story_id, $story_number_id, $event_location, $db);
 
-        print_action_header("RUNNING", $automaton->get_event($story_number_id)->running_unhandled);
+        print_action_header("RUNNING", $automaton->get_event_object($story_number_id)->running_unhandled);
         print_transitions_for_action(3, $story_id, $story_number_id, $event_location, $db);
 
-        print_action_header("COMBAT", $automaton->get_event($story_number_id)->combat_unhandled);
+        print_action_header("COMBAT", $automaton->get_event_object($story_number_id)->combat_unhandled);
         print_transitions_for_action(4, $story_id, $story_number_id, $event_location, $db);
 
-        print_action_header("WILLPOWER", $automaton->get_event($story_number_id)->willpower_unhandled);
+        print_action_header("WILLPOWER", $automaton->get_event_object($story_number_id)->willpower_unhandled);
         print_transitions_for_action(5, $story_id, $story_number_id, $event_location, $db);
 
-        print_action_header("OBSERVATION", $automaton->get_event($story_number_id)->observation_unhandled);
+        print_action_header("OBSERVATION", $automaton->get_event_object($story_number_id)->observation_unhandled);
         print_transitions_for_action(6, $story_id, $story_number_id, $event_location, $db);
         
-        print_action_header("TRAVEL", $automaton->get_event($story_number_id)->observation_unhandled);
+        print_action_header("TRAVEL", $automaton->get_event_object($story_number_id)->observation_unhandled);
         print("<p><b>NB:</b> a transition is triggered when someone leaves the location.  If someone travels in that should be handled by a synchronised transition.</p>");
         print_transitions_for_action(100, $story_id, $story_number_id, $event_location, $db);
         
@@ -492,7 +492,7 @@
         
         print_transitions_for_action(0, $story_id, $story_number_id, $event_location, $db);
         
-        $event_object = $automaton->get_event($story_number_id);
+        $event_object = $automaton->get_event_object($story_number_id);
         $transition_labels = $event_object->unhandled_transitions;
         
         print "<h2>Unhandled Transitions</h2>";

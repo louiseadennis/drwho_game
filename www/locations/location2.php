@@ -41,11 +41,11 @@
 </center>
 
 <?php
-    if (having_adventure($db)) {
-        $event = get_current_event($db);
+   // if (having_adventure($db)) {
+     //   $event = get_current_event($db);
         // print($event);
-        print_event_long($db);
-        }
+        // print_event_long($db);
+       // }
     print_tardis_team($db);
 ?>
 
@@ -59,6 +59,7 @@
     print_transmat(3, $db);
     ?>
 </div>
+
 <div class=action_sidebar>
 <h2>Actions</h2>
 

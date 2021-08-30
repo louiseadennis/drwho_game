@@ -10,8 +10,7 @@
 
     $db = connect_to_db( $mysql_host, $mysql_user, $mysql_password, $mysql_database);
     check_location(3, $db);
-    // check_location(3, $db);
-    
+   
 ?>
 <html>
 <head>
@@ -42,10 +41,10 @@
 </center>
 
 <?php
-    if (having_adventure($db)) {
-        $event = get_current_event($db);
-        print_event_long($db);
-    }
+   // if (having_adventure($db)) {
+   //     $event = get_current_event($db);
+  //      print_event_long($db);
+ //   }
          
     print_tardis_team($db);
 ?>

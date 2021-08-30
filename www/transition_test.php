@@ -12,6 +12,7 @@ $db = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_database);
 
 $uname = $_SESSION["loginUsername"];
 $location = get_location($db);
+$user_id = get_user_id($db);
 
 $task = mysqlclean($_POST, "task", 3000, $db);
 if ($task == "move_chars") {
@@ -22,6 +23,10 @@ if ($task == "move_chars") {
     foreach($crew_array as $char_id) {
         update_character($char_id, "location_id", $location, $db);
     }
+} elseif ($task == "change_event") {
+    $new_event = mysqlclean($_POST, "new_event", 15, $db);
+    $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$location'";
+    if (!$db->query($sql)) {showerror($db);}
 }
 
     
@@ -64,12 +69,37 @@ if ($task == "move_chars") {
 
 ?>
 
+<h2>Go to Event</h2>
+
+<?php
+
+$event = get_current_event($db);
+$story_id = get_value_from_users("story", $db);
+
+print "<p>Current Event: $event in story $story_id</p>";
+
+print "<form method=\"POST\">";
+print "<input type=\"hidden\" name=\"task\" value=\"change_event\">";
+print "&nbsp <select id=\"new_event\" name=\"new_event\">";
+
+$sql = "SELECT event_id from story_transitions where location_id = '{$location}' and story_id = '{$story_id}'";
+
+$event_array = sql_return_to_array($sql, "event_id", $db);
+foreach ($event_array as $event_id) {
+    $text = get_event_text($event_id, $db);
+    print "<option value=\"$event_id\">$event_id  ($text)</option>";
+}
+print "</select>";
+print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Event\">";
+print "</form></p>";
+
+?>
+
 <h2>Possible Transitions</h2>
 
 <?php
   
-    $event = get_current_event($db);
-    $story_id = get_value_from_users("story", $db);
+    
     
     if ($event != 0) {
         $sql = "SELECT transition_id, probability, outcome, action_id from story_transitions where event_id = '{$event}' and story_id = '{$story_id}'";

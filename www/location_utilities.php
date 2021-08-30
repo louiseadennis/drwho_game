@@ -43,6 +43,17 @@
         if (developer_mode()) {
             print "<a href=../transition_test.php>Test Rig</a>";
             print "<a href=../story_designer.php>Story Designer</a>";
+            
+            if (having_adventure($connection)) {
+                $story_id = get_value_from_users("story", $connection);
+                $locations = get_story_locations($story_id, $connection);
+                foreach($locations as $location) {
+                    $user_id = get_user_id($connection);
+                    $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$location'";
+                    $location_event = select_sql_column($sql, "event_id", $connection);
+                    print("<p>$location: $location_event<br>");
+                }
+            }
         }
         
         print "<hr>";
@@ -74,7 +85,7 @@
     
     function print_standard_start($mysql) {
         print "<div class=\"dynamic\">";
-        print "<div class=\"action\">";
+        //print "<div class=\"action\">";
         $story = get_value_from_users("story", $mysql);
         
         if ($story != '0' && $story != '') {
@@ -84,16 +95,21 @@
             print "<b style=\"font-size:1.5em\">&nbsp;</b>";
         }
         print_character_joined($mysql);
-        print_action($mysql);
         print_event($mysql);
+        print_action($mysql);
+         if (having_adventure($mysql)) {
+            // print "<div class=\"location\">";
+            print_event_long($mysql);
+            // print "</div>";
+        }
         // critter_attack($mysql);
         if ($story != '0' && $story != '' && !in_end_state($story, $mysql)) {
             $story_name = get_value_for_story_id("title", $story, $mysql);
-            print "<form method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
+            print "<form style=\"float:clear\" method=\"POST\" action=\"../main.php\"><input type=hidden name=\"quit_story\", value=\"$story\">";
             // print "<u style=\"font-size:2em;padding-top:2em\"><b>$story_name</b></u> &nbsp;";
             print "<input type=submit value=\"Abandon $story_name\"></form>";
         }
-        print "</div>";
+        //print "</div>";
         print "</div>";
         
     }

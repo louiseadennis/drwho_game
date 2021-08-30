@@ -81,7 +81,7 @@ if ($last_action == "travel" || $forced_travel) {
     $dial3 = mysqlclean($_POST, "dial3", 10, $db);
     $dial4 = mysqlclean($_POST, "dial4", 10, $db);
     $travel_info = new travel_info($location, $traveller1, $traveller2, $traveller3, $traveller4, $dial1, $dial2, $dial3, $dial4);
-    $location_id = travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location);
+    $location_id = travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $transition);
 }
     
 update_users("last_action", $last_action, $db);

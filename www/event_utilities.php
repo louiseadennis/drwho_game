@@ -17,7 +17,7 @@
         $event = get_current_event($db);
         $text = get_event_text($event, $db);
         if ($text != '') {
-            print "$text<br>";
+            print "<p><b>$text</b></p><br>";
         } else {
             print "<br>";
         }
@@ -36,7 +36,7 @@
                 
                 $icon = get_value_for_critter_id("icon", $critter_id, $db);
                 // print $icon;
-                print("<img src=../assets/$icon> ");
+                print("<img style=\"float:left\" src=../assets/$icon> ");
             }
         }
         
@@ -47,7 +47,7 @@
                 
                 $icon = get_value_for_ally_id("icon", $ally_id, $db);
                 // print $icon;
-                print("<img src=../assets/$icon> ");
+                print("<img style=\"float:left\" src=../assets/$icon> ");
             }
         }
         
@@ -144,7 +144,7 @@
                 }
                 
                 
-                print "$des<br>";
+                print "<div style=\"text-align:left\">$des</div><br>";
             }
         
         
