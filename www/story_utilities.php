@@ -152,16 +152,19 @@
     function in_end_state($story, $db) {
         $location_id = get_location($db);
         $event_id = get_current_event($db);
+        if ($event_id == '') {
+            return 1;
+        }
         
         $sql = "SELECT text from story_events where event_location = '{$location_id}' AND story_number_id = '{$event_id}' AND story_id = '{$story}'";
-        if ($result = $db->query($sql)) {
+         if ($result = $db->query($sql)) {
             if ($result->num_rows == 0) {
                 return 0;
             }
             
             
             $sql = "SELECT action_id from story_transitions where story_id = '{$story}' and event_id = '{$event_id}'";
-            if (!$result = $db->query($sql))
+             if (!$result = $db->query($sql))
                 showerror($db);
              
             if ($result->num_rows > 0) {
@@ -191,7 +194,11 @@
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, location_id) VALUES ($initial_event, $story_id, $user_id, $story_location)";
+                if (!$result = $db->query($sql))
+                    showerror($db);
+            
+                $sql = "UPDATE users SET story_path = '' WHERE user_id = '{$user_id}'";
                  
                 if (!$result = $db->query($sql))
                     showerror($db);
@@ -199,6 +206,7 @@
     }
     
     // Debugging function
+    // Not sure all of this makes sense
     function create_story_path_elsewhere($story_id, $db) {
         $location_id = get_location($db);
         
@@ -215,9 +223,13 @@
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                 
-                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, location_id) VALUES ($initial_event, $story_id, $user_id, $story_location)";
                 // print $sql;
                 
+                if (!$result = $db->query($sql))
+                    showerror($db);
+                
+                $sql = "UPDATE users SET story_path = '' WHERE user_id = '{$user_id}'";
                 if (!$result = $db->query($sql))
                     showerror($db);
                 
@@ -232,9 +244,13 @@
                 $initial_event = get_initial_event($story_id, $story_location, $db);
                 $user_id = get_user_id($db);
                     
-                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, story_path, location_id) VALUES ($initial_event, $story_id, $user_id, \"\", $story_location)";
+                $sql = "INSERT INTO story_locations_in_play (event_id, story_id, user_id, location_id) VALUES ($initial_event, $story_id, $user_id, $story_location)";
                     // print $sql;
                     
+                $sql = "UPDATE users SET story_path = '' WHERE user_id = '{$user_id}'";
+                if (!$result = $db->query($sql))
+                    showerror($db);
+            
                 if (!$result = $db->query($sql))
                     showerror($db);
                     
@@ -269,7 +285,43 @@
         $sql = "UPDATE users SET last_transition = NULL WHERE user_id = '{$user_id}'";
                if (!$result = $db->query($sql))
                     showerror($db);
-         }
+        
+        $sql = "UPDATE users SET story_path = '' WHERE user_id = '{$user_id}'";
+         
+        if (!$result = $db->query($sql))
+            showerror($db);
+    }
+
+    function update_path($sentence, $db) {
+        $story_path = get_value_from_users("story_path", $db);
+        
+        $path_array = explode(":::", $story_path);
+        
+        
+        $sentence = str_replace("\'", "'", $sentence);
+        $sentence = str_replace("'", "\'", $sentence);
+        
+        if (!in_array($sentence, $path_array)) {
+            if ($story_path != '') {
+                $story_path = $story_path . ":::" . $sentence;
+            } else {
+                $story_path = $sentence;
+            }
+        }
+        
+        //$sentence = str_replace("\'", "'", $sentence);
+        $story_path = str_replace("'", "\'", $story_path);
+
+        update_users("story_path", $story_path, $db);
+
+    }
+
+    function print_path($db) {
+        $user_id = get_user_id($db);
+        $sql = "SELECT story_path from users WHERE user_id = '{$user_id}'";
+        $story_path = select_sql_column($sql, "story_path", $db);
+        print($story_path);
+    }
 
     //=============== Logs
     function create_log($story_id, $db) {

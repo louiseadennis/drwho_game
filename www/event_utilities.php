@@ -27,6 +27,7 @@
     function print_event_long($db) {
         $event = get_current_event($db);
         $description = get_event_description($event, $db);
+        $path_sentence = "";
         print "<br>";
         
         $critters = get_event_critters($event, $db);
@@ -145,6 +146,8 @@
                 
                 
                 print "<div style=\"text-align:left\">$des</div><br>";
+                update_path($des, $db);
+                print_path($db);
             }
         
         

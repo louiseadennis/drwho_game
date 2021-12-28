@@ -109,6 +109,7 @@
         }
         
         if (having_adventure($connection) && !$pov_switch) {
+            // print("B print_action from action_utilities");
             $last_transition = get_value_from_users("last_transition", $connection);
             print_transition_outcome($last_transition, $last_action, $connection);
         } else {
