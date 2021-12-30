@@ -299,7 +299,7 @@
         
         
         $sentence = str_replace("\'", "'", $sentence);
-        $sentence = str_replace("'", "\'", $sentence);
+        //$sentence = str_replace("'", "\'", $sentence);
         
         if (!in_array($sentence, $path_array)) {
             if ($story_path != '') {
@@ -313,6 +313,34 @@
         $story_path = str_replace("'", "\'", $story_path);
 
         update_users("story_path", $story_path, $db);
+
+    }
+
+    function update_path_action($action_string, $db) {
+        $story_path = get_value_from_users("story_path", $db);
+        
+        $location_id = get_location($db);
+        foreach (characters_at_location($location_id, $db) as $char_id) {
+            $char_name = get_value_for_char_id("name", $char_id, $db);
+            $action_string = $char_name . "+" . $action_string;
+        }
+        
+        $path_array = explode(":::", $story_path);
+        
+        //print("A");
+        $sentence = str_replace("\'", "'", $action_string);
+        // $sentence = str_replace("'", "\'", $sentence);
+        // print ($sentence);
+        
+        
+        $story_path = $story_path . ":::" . $sentence;
+        
+        //$sentence = str_replace("\'", "'", $sentence);
+        $story_path = str_replace("'", "\'", $story_path);
+        // print($story_path);
+
+        update_users("story_path", $story_path, $db);
+        //print("B");
 
     }
 

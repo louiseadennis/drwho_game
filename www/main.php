@@ -41,13 +41,15 @@ $starting_location = get_location($db);
 if ($transition != "") {
     make_transition($transition, $db);
     
-    $sql = "SELECT action_id, force_travel, travel_type from story_transitions where transition_id = '{$transition}'";
-    $action_id = select_sql_column($sql, "action_id", $db);    
+    $sql = "SELECT action_id, force_travel, travel_type, outcome_text from story_transitions where transition_id = '{$transition}'";
+    $action_id = select_sql_column($sql, "action_id", $db);
+    $outcome_text = select_sql_column($sql, "outcome_text", $db);
     $forced_travel = select_sql_column($sql, "force_travel", $db);
     if ($action_id == 100 || $forced_travel) {
         $last_action = 'travel';
         $travel_type = select_sql_column($sql, "travel_type", $db);
     }
+    
 } elseif (having_adventure($db) && $travel_type != 'pov_switch'  && !$just_started) {
     // Make the transition apart from travel
     story_transition($last_action, $db);

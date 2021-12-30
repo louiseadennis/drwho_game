@@ -225,7 +225,7 @@
 
 
     //============== Print Support
-    function print_transition_outcome($transition_id, $action, $connection) {
+    function transition_outcome_string($transition_id, $action, $connection) {
         // print($action_id);
         // print($transition_id);
         if ($transition_id != 0) {
@@ -251,20 +251,24 @@
                             // print($outcome_text);
                 }
             
-                print("<p>$outcome_text</p>");
+                return ("<p>$outcome_text</p>");
             } else {
-                print("<p>$outcome_text</p>");
+                return ("<p>$outcome_text</p>");
                 // print "<p>  &nbsp;</p>";
             }
         } elseif ($action != '') {
             if (is_basic_action($action, $connection)) {
-                print_action_default($action, $connection);
+                return action_default_string($action, $connection);
             } else {
-                print "<p>  &nbsp;</p>";
+                return "<p>  &nbsp;</p>";
             }
         } else {
-            print ("<p>&nbsp;</p>");
+             return ("<p>&nbsp;</p>");
         }
+    }
+
+    function print_transition_outcome($transition_id, $action, $connection) {
+        print(transition_outcome_string($transition_id, $action, $connection));
     }
     
     //==================================  Travel

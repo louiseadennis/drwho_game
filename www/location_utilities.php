@@ -96,7 +96,20 @@
         }
         print_character_joined($mysql);
         print_event($mysql);
-        print_action($mysql);
+        $action_string = action_string($mysql);
+        update_path_action($action_string, $mysql);
+        print($action_string);
+        
+        // Not at all sure this should happen here...
+        // Calculates action side effects
+        // Clears last transition after last action been printed
+        $last_action = get_value_from_users("last_action", $mysql);
+        side_effects($last_action, $mysql);
+        $sql = "UPDATE users SET last_transition='0' where user_id = '$user_id'";
+        if (!$mysql->query($sql)) {
+            showerror($mysql);
+        }
+        
          if (having_adventure($mysql)) {
             // print "<div class=\"location\">";
             print_event_long($mysql);
