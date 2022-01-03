@@ -318,12 +318,17 @@
 
     function update_path_action($action_string, $db) {
         $story_path = get_value_from_users("story_path", $db);
+        if ($action_string == "") {
+            $action_string == " ";
+        }
         
         $location_id = get_location($db);
+        $location_name = get_value_for_location_id("name", $location_id, $db);
         foreach (characters_at_location($location_id, $db) as $char_id) {
             $char_name = get_value_for_char_id("name", $char_id, $db);
             $action_string = $char_name . "+" . $action_string;
         }
+        $action_string = $location_name . "+" . $action_string;
         
         $path_array = explode(":::", $story_path);
         
@@ -348,7 +353,42 @@
         $user_id = get_user_id($db);
         $sql = "SELECT story_path from users WHERE user_id = '{$user_id}'";
         $story_path = select_sql_column($sql, "story_path", $db);
-        print($story_path);
+        
+        $path_array = explode(":::", $story_path);
+        
+        $event = 1;
+        $story = "";
+        $location = "";
+        foreach ($path_array as $path_item) {
+                if ($event == 1) {
+                    $story = $story . $path_item;
+                    $event = 0;
+                    //print("A");
+                    //print($story);
+                } else {
+                    $event_info_array = explode("+", $path_item);
+                    if ($location != "" && $event_info_array[0] != $location) {
+                        $location = $event_info_array[0];
+                        $story = $story . "  Meanwhile at " . "$location where ";
+                        for ($chars = 1; $chars < count($event_info_array) - 1; $chars++) {
+                            if ($chars != 1) {
+                                $story = $story . " and ";
+                            }
+                            $story = $story . "$event_info_array[$chars]";
+                        }
+                        $story = $story . " are.  ";
+                    } else {
+                        $location = $event_info_array[0];
+                    }
+                    $story = $story . $event_info_array[count($event_info_array) - 1];
+                    $event = 1;
+                    //print("B");
+                    //print($story);
+                }
+        }
+        
+        print($story);
+        //print("LEAVING PRINT PATH");
     }
 
     //=============== Logs
