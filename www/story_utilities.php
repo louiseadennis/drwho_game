@@ -128,10 +128,13 @@
     function end_story($story_id, $db) {
         quit_story($story_id, $db);
         
+        $story_path = get_value_from_users("story_path", $db);
+        
         $user_id = get_user_id($db);
         $sql = "SELECT story_id_list FROM users where user_id = '{$user_id}'";
         $story_id_list = select_sql_column($sql, "story_id_list", $db);
         $story_array = explode(",", $story_id_list);
+        $story_id = $story_id . ";;;" . $story_path;
         if (empty($story_array)) {
             $sql = "UPDATE users SET story_id_list='{$story_id}' where user_id = '{$user_id}'";
             if (!$db->query($sql)) {
