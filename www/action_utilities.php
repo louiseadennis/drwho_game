@@ -108,11 +108,11 @@
         if (is_travel_action($last_action, $connection)) {
             $travel_type = get_value_from_users("travel_type", $connection);
             if ($travel_type == "pov_switch") {
-                $pov_switch = 1;
+                return ("pov_switch");
             }
         }
         
-        if (having_adventure($connection) && !$pov_switch) {
+        if (having_adventure($connection)) {
             // print("B print_action from action_utilities");
             $last_transition = get_value_from_users("last_transition", $connection);
             return transition_outcome_string($last_transition, $last_action, $connection);

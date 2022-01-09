@@ -325,6 +325,8 @@
             $action_string == " ";
         }
         
+        
+        
         $location_id = get_location($db);
         $location_name = get_value_for_location_id("name", $location_id, $db);
         foreach (characters_at_location($location_id, $db) as $char_id) {
@@ -353,6 +355,7 @@
     }
 
     function print_path($db) {
+        //print("START PRINT");
         $user_id = get_user_id($db);
         $sql = "SELECT story_path from users WHERE user_id = '{$user_id}'";
         $story_path = select_sql_column($sql, "story_path", $db);
@@ -370,7 +373,8 @@
                     //print($story);
                 } else {
                     $event_info_array = explode("+", $path_item);
-                    if ($location != "" && $event_info_array[0] != $location) {
+                    $length = count($event_info_array);
+                    if ($location != "" && $event_info_array[0] != $location  && $event_info_array[$length - 1] == "pov_switch") {
                         $location = $event_info_array[0];
                         $story = $story . "  Meanwhile at " . "$location where ";
                         for ($chars = 1; $chars < count($event_info_array) - 1; $chars++) {
@@ -383,7 +387,9 @@
                     } else {
                         $location = $event_info_array[0];
                     }
-                    $story = $story . $event_info_array[count($event_info_array) - 1];
+                    if ($event_info_array[$length - 1] != "pov_switch") {
+                        $story = $story . $event_info_array[count($event_info_array) - 1];
+                        }
                     $event = 1;
                     //print("B");
                     //print($story);
