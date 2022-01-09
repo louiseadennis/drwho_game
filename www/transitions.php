@@ -121,6 +121,8 @@
             $story_location = $row["location_id"];
             $transition_info = new transition_info($story_location, $transition_label, $connection, $action_id);
             $new_event = $transition_info->outcome_event;
+            
+            
             //  print("make transition: new event is $new_event");
             $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$story_location'";
             if (!$connection->query($sql)) {
@@ -172,6 +174,30 @@
                 //print $sql;
                 if (!$connection->query($sql)) {
                     showerror($connection);
+                }
+            }
+            
+            // print($new_event);
+            $story_modifier_array = get_story_modifiers_for_event_id($new_event, $connection);
+            //print("A");
+            
+            foreach ($story_modifier_array as $modifier_id) {
+                //print("A");
+                $who_affected = get_value_for_story_modifier_id("all_or_random_or_doctor", $modifier_id, $connection);
+                // print ($who_affected);
+                if ($who_affected == 0) {
+                    $characters = characters_at_location($story_location, $connection);
+                    foreach ($characters as $char_id) {
+                        modify_character($char_id, $modifier_id, $connection);
+                    }
+                } elseif ($who_affected == 1) {
+                    $who = get_event_character($connection);
+                    //if (first_visit($connection)) {
+                        modify_character($who, $modifier_id, $connection);
+                    //    visited($connection);
+                   // }
+                } else {
+                    // TODO: DOCTOR
                 }
             }
             

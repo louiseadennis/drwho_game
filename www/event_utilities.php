@@ -52,7 +52,7 @@
             }
         }
         
-        $story_modifier_array = get_story_modifiers_for_event_id($event, $db);
+        /* $story_modifier_array = get_story_modifiers_for_event_id($event, $db);
         foreach ($story_modifier_array as $modifier_id) {
             $who_affected = get_value_for_story_modifier_id("all_or_random_or_doctor", $modifier_id, $db);
             if ($who_affected == 0) {
@@ -66,7 +66,7 @@
             } else {
                 // TODO: DOCTOR
             }
-        }
+        } */
         
         $modifier_array = get_modifiers_for_event_id($event, $db);
         foreach ($modifier_array as $modifier_id) {
