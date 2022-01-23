@@ -44,7 +44,7 @@
 
                     $sql = "SELECT transition_label, transition_id, probability, modifiers from story_transitions where event_id = '{$event}' and story_id = '{$story_id}' and action_id = '{$action_id}' and travel_type = '{$travel_type}'";
                 }
-                
+                 
                 // No transition....
                 if (!$result = $connection->query($sql)) {
                     // There wasn't a transition for this action id.
@@ -89,7 +89,7 @@
                         $user_id = get_user_id($connection);
                         $location_id = get_location($connection);
                         $sql = "SELECT transition_id FROM story_transitions WHERE story_id='$story_id' AND location_id='$location_id' AND transition_label = 'null' AND action_id = '$action_id' AND event_id = '$event'";
-                        // print($sql);
+                        //print($sql);
                         $transition_id = select_sql_column($sql, "transition_id", $connection);
                         $sql = "UPDATE users SET last_transition='{$transition_id}' where user_id = '$user_id'";
                         // print($sql);
@@ -125,6 +125,8 @@
             
             //  print("make transition: new event is $new_event");
             $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$story_location'";
+            // print($sql);
+            // print($transition_label);
             if (!$connection->query($sql)) {
                 showerror($connection);
             }
@@ -468,7 +470,9 @@
             $sql = "SELECT event_id FROM story_locations_in_play WHERE user_id='{$user_id}' AND location_id='$location_id'";
             $this->location_event = select_sql_column($sql, "event_id", $db);
             $sql = "SELECT outcome, transition_id, modifiers FROM story_transitions WHERE story_id='$this->story_id' AND location_id='$this->location_id' AND transition_label = '$transition_label' AND action_id = '$this->action_id' AND event_id = '$this->location_event'";
+            //if ($location_id == 3) {
             // print($sql);
+            //    }
             $result = $db->query($sql); // This should succeed
             while ($row=$result->fetch_assoc()) {
                 $modifiers = $row["modifiers"];

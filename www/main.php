@@ -58,6 +58,7 @@ if ($transition != "") {
     
     //  If travel is forced - particularly if characters moved from another locaiton to here.
     $sql = "SELECT force_travel from story_transitions where transition_id = '{$transition}'";
+    // print($sql);
     $forced_travel = select_sql_column($sql, "force_travel", $db);
     if ($forced_travel) {
         $sql = "SELECT travel_type from story_transitions where transition_id = '{$transition}'";
