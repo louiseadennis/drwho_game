@@ -20,42 +20,44 @@ $pwd = mysqlclean($_POST, "loginPassword", 10, $db);
 $cpwd = mysqlclean($_POST, "cloginPassword", 10, $db);
 
 if ($uname=='' or $email=='' or $pwd == '' or $cpwd == '') {
-    $message = "One or more required fields were left blank";
+    $message = "<p style=\"color:red\">One or more required fields were left blank";
     header("Location: signup_form.php?msg=$message");
     exit;
 } else if ($pwd != $cpwd) {
-    $message = "Your passwords weren't equal.  Please check";
+    $message = "<p style=\"color:red\">Your passwords weren't equal.  Please check";
     header("Location: signup_form.php?msg=$message");
     exit;
 } else if (VerifyMailAddress($email)) {
     // Check for existing user with the new id
-    $sql = "SELECT * FROM users WHERE uname = $uname";
+    $sql = "SELECT * FROM users WHERE name = '$uname'";
     $result = $db->query($sql);
-    if (!$result) {	
+    $num = $result->num_rows;
+    if ($num == 0) {
         //  IIUC $pass contains both encrypted password and a randomly generated salt.
-	// Update: apparently not.  or at least salt is appended to password, not stored separatedy.
-	$pass = crypt($pwd);
-
-	$sql = "INSERT INTO users (name,email,password,salt,last_action) VALUES ('$uname', '$email', '$pass','kjhasfo2AWU',\"travel\")";
-	if (!$db->query($sql)) {
+        // Update: apparently not.  or at least salt is appended to password, not stored separatedy.
+        $pass = crypt($pwd);
+        
+        $sql = "INSERT INTO users (name,email,password,salt,last_action) VALUES ('$uname', '$email', '$pass','kjhasfo2AWU',\"travel\")";
+        if (!$db->query($sql)) {
             $message = "Database Error: " . $db->errno . " : " . $db->error;
-	    header("Location: signup_form.php?msg=$message");
-	    exit;
-	} else {	
-	    header("Location: login_form.php");
-	    exit;
+            header("Location: signup_form.php?msg=$message");
+            exit;
+        } else {
+            header("Location: login_form.php");
+            exit;
         }
     } else {
-      $message = "This user name is already taken";
-      header("Location: signup_form.php?msg=$message");
-      exit;
+         $message = "<p style=\"color:red\">This user name is already taken";
+        header("Location: signup_form.php?msg=$message");
+        exit;
     }
 
 } else {
-  $message = "This is not a valid Email Address $email";
-  header("Location: signup_form.php?msg=$message");
-  exit;
+    $message = "This is not a valid Email Address $email";
+    header("Location: signup_form.php?msg=$message");
+    exit;
 }
+
 
 function VerifyMailAddress($address) 
 {

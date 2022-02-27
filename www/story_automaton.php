@@ -77,9 +77,12 @@
             }
         }
         
-        function print_automaton() {
+        function print_automaton($db) {
             foreach ($this->transition_function as $transition) {
                 $transition->print_transition();
+                if ($transition->multiple_initiated($db)) {
+                    print ("<p style=\"color:red\">WARNING:  This transition initiated by multiple events</p>");
+                }
             }
         }
         
@@ -181,6 +184,7 @@
         public $under_exploration = 0;
         public $story_id;
         public $automaton;
+        public $transition_initiated_in_multiple_events = 0;
         
         // Create an empty story state
         function __construct()
@@ -230,7 +234,7 @@
 
         }
         
-        // Sometimes, when constructing a state, we have an event which is associated with a transition t where that event doesn't initiated t (i.e., the transition is associated with the event because of some other story state).  If no event in this story state actually initiates that transition then we want to prune it, because it is not relevant here.
+        // Sometimes, when constructing a state, we have an event which is associated with a transition where that event doesn't initiate that transition (i.e., the transition is associated with the event because of some other story state).  If no event in this story state actually initiates that transition then we want to prune it, because it is not relevant here.
         
         // Transitions are considered "controlled" by a particular event - i.e., that transition only takes place if the user makes an
         // action in the location assocated with that event.  Other events need a transition that synchronises with that one, but that
@@ -342,6 +346,21 @@
             return $out_string;
         }
         
+        // Are there any transitions initiated by more than one event?
+        function multiple_transitions($transition_label, $db) {
+            $count = 0;
+            foreach($this->events as $event) {
+                if ($event->transition_initiated_here($transition_label, $db)) {
+                    $count = $count + 1;
+                }
+            }
+            if ($count > 1) {
+                $this->transition_initiated_in_multiple_events = 1;
+                return 1;
+            }
+            return 0;
+        }
+        
     }
     
     // Class for events appearing in the automaton.
@@ -432,6 +451,16 @@
             
         }
         
+        function transition_initiated_here($transition_label, $db) {
+            $sql = "SELECT action_id FROM story_transitions WHERE event_id = '{$this->event_id}' and story_id = '{$this->story_id}' and transition_label = '{$transition_label}'";
+            //print($sql);
+            $action_id = select_sql_column($sql, "action_id", $db);
+            if ($action_id == 0) {
+                return 0;
+            }
+            return 1;
+        }
+        
         // One of the default actions is not associated with a transition for this event.
         function unhandled_action() {
             return ($this->empathy_unhandled or $this->tech_unhandled or $this->running_unhandled or $this->combat_unhandled or $this->willpower_unhandled or $this->observation_unhandled);
@@ -512,6 +541,13 @@
             print " -$this->label-> ";
             print $this->to->story_state_string();
             print "<br>";
+        }
+        
+        function multiple_initiated($db) {
+            if ($this->from->multiple_transitions($this->label, $db)) {
+                return 1;
+            }
+            return 0;
         }
         
     }

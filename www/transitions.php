@@ -317,7 +317,7 @@
         $travellers = [];
         
         // Figure out which characters are travelling
-        if ($forced_travel) {
+        if ($forced_travel == 1) {
              $travellers = characters_at_location($starting_location, $db);
         } else {
             $travellers = $travel_info->travellers;

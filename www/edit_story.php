@@ -147,7 +147,7 @@ if ($task == "make_initial") {
     
     print "<h1>Story Automaton</h1>";
     
-    $automaton->print_automaton();
+    $automaton->print_automaton($db);
     
     ?>
 
