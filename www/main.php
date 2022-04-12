@@ -61,10 +61,10 @@ if ($transition != "") {
     // print($sql);
     $forced_travel = select_sql_column($sql, "force_travel", $db);
     if ($forced_travel) {
-        $sql = "SELECT travel_type from story_transitions where transition_id = '{$transition}'";
+        $sql = "SELECT travel_type, old_location, force_travel_from from story_transitions where transition_id = '{$transition}'";
         $travel_type = select_sql_column($sql, "travel_type", $db);
-        $sql = "SELECT old_location from story_transitions where transition_id = '{$transition}'";
         $starting_location = select_sql_column($sql, "old_location", $db);
+        $force_travel_from = select_sql_column($sql, "force_travel_from", $db);
     }
 }
     
@@ -84,7 +84,7 @@ if ($last_action == "travel" || $forced_travel) {
     $dial3 = mysqlclean($_POST, "dial3", 10, $db);
     $dial4 = mysqlclean($_POST, "dial4", 10, $db);
     $travel_info = new travel_info($location, $traveller1, $traveller2, $traveller3, $traveller4, $dial1, $dial2, $dial3, $dial4);
-    $location_id = travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $transition);
+    $location_id = travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $force_travel_from, $transition);
 }
     
 update_users("last_action", $last_action, $db);

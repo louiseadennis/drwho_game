@@ -312,17 +312,30 @@
         return 0;
     }
 
-    function travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $transition) {
+    function travel_while_transition($db, $forced_travel, $travel_type, $travel_info, $starting_location, $force_travel_from, $transition) {
         $location_id = get_location($db);
         $travellers = [];
         
         // Figure out which characters are travelling
         if ($forced_travel == 1) {
-             $travellers = characters_at_location($starting_location, $db);
+            if ($force_travel_from != null && $force_travel_from != "") {
+                $location_array = explode(":", $force_travel_from);
+                foreach ($location_array as $location) {
+                    $travellers = array_merge(characters_at_location($location, $db), $travellers);
+                    foreach (characters_at_location($location_id, $db) as $char_id) {
+                        update_character($char_id, "prev_location", $location, $db);
+                    }
+                }
+            } else {
+                $travellers = characters_at_location($starting_location, $db);
+                foreach (characters_at_location($location_id, $db) as $char_id) {
+                    update_character($char_id, "prev_location", $starting_location, $db);
+                }
+            }
         } else {
             $travellers = $travel_info->travellers;
         }
-
+ 
         // Find new location
         if (!empty($travellers) || $travel_type == "pov_switch") {
             // New location was part of $_POST information
@@ -332,8 +345,12 @@
             
             // New location is baked into the transition
             if ($forced_travel) {
-                $sql = "SELECT new_location from story_transitions where transition_id = '{$transition}'";
-                $location_id = select_sql_column($sql, "new_location", $db);
+                 if ($force_travel_from != null && $force_travel_from != "") {
+                     // don't change location
+                    } else {
+                        $sql = "SELECT new_location from story_transitions where transition_id = '{$transition}'";
+                        $location_id = select_sql_column($sql, "new_location", $db);
+                }
             }
         
             // New location depends upon Tardis control
@@ -351,9 +368,9 @@
             update_users("travel_type", $travel_type, $db);
             update_users("action_done", 0, $db);
             
-            foreach (characters_at_location($location_id, $db) as $char_id) {
-                update_character($char_id, "prev_location", $location_id, $db);
-            }
+            //foreach (characters_at_location($location_id, $db) as $char_id) {
+            //    update_character($char_id, "prev_location", $location_id, $db);
+            //}
             
             foreach($travellers as $char_id) {
                 update_character($char_id, "location_id", $location_id, $db);

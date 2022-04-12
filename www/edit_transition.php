@@ -120,7 +120,41 @@
         if (!$result = $db->query($sql))
             showerror($db);
 
-    }
+    } elseif ($task == "force_travel_from") {
+        $sql = "SELECT force_travel_from FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        $force_travel_from = select_sql_column($sql, "force_travel_from", $db);
+       
+        $new_from_location=mysqlclean($_POST, "from_location", 3000, $db);
+        if ($force_travel_from == "") {
+            $force_travel_from = $new_from_location;
+        } else {
+            $force_travel_from = $force_travel_from . ":" . "$new_from_location";
+            }
+        $force_travel = 1;
+        
+        $sql = "UPDATE story_transitions set force_travel_from='{$force_travel_from}', force_travel = '{$force_travel}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        if (!$result = $db->query($sql))
+            showerror($db);
+    } elseif ($task == "force_travel_from_de") {
+        $sql = "SELECT force_travel_from FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        $force_travel_from = select_sql_column($sql, "force_travel_from", $db);
+        $location_array = explode(":", $force_travel_from);
+    
+       
+        $old_from_location=mysqlclean($_POST, "from_location", 3000, $db);
+        $offset = array_search($old_from_location, $location_array);
+        array_splice($location_array, $offset, 1);
+        $force_travel_from = implode(":", $location_array);
+        if ($force_travel_from == "") {
+            $force_travel = 0;
+        } else {
+                $force_travel = 1;
+        }
+        
+        $sql = "UPDATE story_transitions set force_travel_from='{$force_travel_from}', force_travel = '{$force_travel}' WHERE story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
+        if (!$result = $db->query($sql))
+            showerror($db);
+        }
     
     $sql = "SELECT * FROM story_transitions where story_id = '{$story_id}' AND transition_id = '{$transition_id}'";
 
@@ -135,6 +169,7 @@
     $person_affected = select_sql_column($sql, "random_character_input", $db);
     $forced_travel = select_sql_column($sql, "force_travel", $db);
     $fight_lost = select_sql_column($sql, "lost_fight", $db);
+    $force_travel_from = select_sql_column($sql, "force_travel_from", $db);
     
     if ($action_id == 100 || $forced_travel) {
         $travel_type = select_sql_column($sql, "travel_type", $db);
@@ -384,7 +419,50 @@
     }
     
     print "<hr>";
-    
+
+    //============= Force travel to here
+    print "<p><h3>Travel forced to this location from: <font color=\"blue\">";
+    if ($force_travel_from != null && $force_travel_from != "") {
+        print "<form method=\"POST\">";
+        print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+        print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+        print "<input type=\"hidden\" name=\"task\" value=\"force_travel_from_de\">";
+        print "&nbsp <select id=\"from_location\" name=\"from_location\">";
+        $sql = "SELECT locations from stories where story_id='{$story_id}'";
+            $location_array = explode(":", $force_travel_from);
+            foreach ($location_array as $location) {
+                $new_location_name = get_value_for_location_id("name", $location, $db);
+                print "<option value=\"$location\">$new_location_name ($location)</option> ";
+            }
+        print "</select>";
+        print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Delete Location where Travel is Forced from\">";
+        print "</form></p>";
+
+            print "</font></h3>";
+    } else {
+        
+        print " No one is bought here.</font></h3>";
+    }
+
+    print "<form method=\"POST\">";
+    print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
+    print "<input type=\"hidden\" name=\"transition_id\" value=\"$transition_id\">";
+    print "<input type=\"hidden\" name=\"task\" value=\"force_travel_from\">";
+    print "&nbsp <select id=\"from_location\" name=\"from_location\">";
+    $sql = "SELECT locations from stories where story_id='{$story_id}'";
+    $story_locations = select_sql_column($sql, "locations", $db);
+    $location_array = explode(",", $story_locations);
+    print "<option value=\"0\">No Location</option>";
+    foreach ($location_array as $location) {
+        $location_name = get_value_for_location_id("name", $location, $db);
+        print "<option value=\"$location\">$location  ($location_name)</option>";
+    }
+    print "</select>";
+    print "</p><p><input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Add Location where Travel is Forced from\">";
+    print "</form></p>";
+
+    print "<hr>";
+
 
     //============== Affected
     print "<p><h3>Who Does the Transition Affect?: $person_affected</h3>";
