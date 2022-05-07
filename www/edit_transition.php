@@ -319,7 +319,7 @@
     
     
     print "<hr>";
-    //======== Modifiers
+    //======== Modifiers  (These are actually prerequisites for this transition to take place!!!
     print "<p><h3>Modifiers:<font color=\"blue\">";
     $modifier_array = explode(",", $modifiers);
     print "</font></h3><ul>";
@@ -464,7 +464,7 @@
     print "<hr>";
 
 
-    //============== Affected
+    //============== Affected (Should be in edit_event and mysql tables updated accordingly)
     print "<p><h3>Who Does the Transition Affect?: $person_affected</h3>";
     print "<form method=\"POST\">";
     print "<input type=\"hidden\" name=\"story_id\" value=\"$story_id\">";
@@ -474,7 +474,7 @@
     if ($person_affected == "0") {
         $checked = "checked";
     }
-    print "<input type=\"radio\" id=\"nobody\" name=\"who_effect\" $checked value=\"0\"><label for=\"nobody\">0.  No One</label><br>";
+    print "<input type=\"radio\" id=\"nobody\" name=\"who_effect\" $checked value=\"0\"><label for=\"nobody\">0.  No One/All Characters</label><br>";
     $checked = "";
     if ($person_affected == "1") {
          $checked = "checked";
@@ -488,10 +488,20 @@
         print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"2\"><label for=\"random\">Character with Sonic</label><br>";
 
     }
+    $checked = "";
+    if ($person_affected == "3") {
+        $checked = "checked";
+    }
     if (in_array("doctor present", $modifier_array)) {
         print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"3\"><label for=\"random\">The Doctor</label><br>";
 
     }
+    $checked = "";
+    if ($person_affected == "4") {
+        $checked = "checked";
+    }
+    print "<input type=\"radio\" id=\"random\" name=\"who_effect\" $checked value=\"4\"><label for=\"random\">4.  All Characters forced to Travel</label><br>";
+    $checked = "";
     print "<input style=\"background-color:#262DFA;font-size: 16px;color: white;text-align: center;\" type=\"submit\" value=\"Change Affected\">";
     print "</form></p>";
 

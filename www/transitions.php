@@ -121,33 +121,30 @@
             $story_location = $row["location_id"];
             $transition_info = new transition_info($story_location, $transition_label, $connection, $action_id);
             $new_event = $transition_info->outcome_event;
-            
-            
-            //  print("make transition: new event is $new_event");
+            $story_modifier_array = get_story_modifiers_for_event_id($new_event, $connection);
+            $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
+
             $sql = "UPDATE story_locations_in_play SET event_id='{$new_event}' where user_id = '$user_id' and location_id = '$story_location'";
-            // print($sql);
-            // print($transition_label);
             if (!$connection->query($sql)) {
                 showerror($connection);
             }
             $transition_id = $transition_info->transition_id;
 
-            //$sql = "SELECT story_path from story_locations_in_play WHERE user_id = '{$user_id}' and location_id = '$story_location'";
-            //$story_path = select_sql_column($sql, "story_path", $connection);
-            // $story_path = $story_path . "," . $new_event;
-            // $story_path = $story_path . "," . $new_location_event;
-            //$sql = "UPDATE story_locations_in_play SET story_path='{$story_path}' where user_id = '$user_id' and location_id = '$location_id'";
-            //if (!$connection->query($sql)) {
-            //    showerror($connection);
-            //}
-
-            // If we're not at the location where the action took place it is possible the characters are moved to this location.
             if ($story_location != $location_id) {
                 
                 if (forced_travel_transition($transition_id, $connection)) {
                     $travel_info = new forced_travel_info($transition_id, $connection);
-                    // print("plonk");
                     $travel_info->force_travel($connection);
+                    if ($random_character == 4) {
+                        foreach ($story_modifier_array as $modifier_id) {
+                            // $travel_info->print_travel_info();
+                            $character_array = $travel_info->characters();
+                            foreach ($character_array as $char_id) {
+                                modify_character($char_id, $modifier_id, $connection);
+                            }
+                        }
+                    }
+
                 }
             } else {
                 $sql = "UPDATE users SET last_transition='{$transition_id}' where user_id = '$user_id'";
@@ -165,42 +162,24 @@
                 
             }
 
-            $random_character = get_value_for_transition_id("random_character_input", $transition_id, $connection);
-            if ($random_character) {
-                $tardis_crew_size = conscious_tardis_crew_size($connection);
-                $dice = rand(0, $tardis_crew_size - 1);
-                $tardis_crew = conscious_tardis_crew($connection);
-                $char = $tardis_crew[$dice];
-                // THIS SEEMS TO UPDATE ALL LOCATIONS - I CAN SEE AN ARGUMENT FOR THIS BUT SUSPECT WILL CAUSE ISSUES
-                $sql = "UPDATE story_locations_in_play SET event_character = '{$char}' where user_id = '$user_id'";
-                //print $sql;
-                if (!$connection->query($sql)) {
-                    showerror($connection);
-                }
-            }
-            
-            // print($new_event);
-            $story_modifier_array = get_story_modifiers_for_event_id($new_event, $connection);
-            //print("A");
-            
             foreach ($story_modifier_array as $modifier_id) {
-                //print("A");
-                $who_affected = get_value_for_story_modifier_id("all_or_random_or_doctor", $modifier_id, $connection);
-                // print ($who_affected);
-                if ($who_affected == 0) {
+
+                // $random_character really should be who_affected
+                if ($random_character === 1) {
+                    $tardis_crew_size = conscious_tardis_crew_size($connection);
+                    $dice = rand(0, $tardis_crew_size - 1);
+                    $tardis_crew = conscious_tardis_crew($connection);
+                    $char = $tardis_crew[$dice];
+                    modify_character($who, $modifier_id, $connection);
+                } elseif ($random_character == 0) {
                     $characters = characters_at_location($story_location, $connection);
                     foreach ($characters as $char_id) {
                         modify_character($char_id, $modifier_id, $connection);
                     }
-                } elseif ($who_affected == 1) {
-                    $who = get_event_character($connection);
-                    //if (first_visit($connection)) {
-                        modify_character($who, $modifier_id, $connection);
-                    //    visited($connection);
-                   // }
-                } else {
+                } elseif ($random_character == 3) {
                     // TODO: DOCTOR
-                }
+                } // 4 done in forced travel section
+    
             }
             
         }
@@ -442,11 +421,18 @@
         public $travel_type;
         
         function __construct($transition_id, $db) {
-            $sql = "SELECT travel_type, location_id, new_location from story_transitions where transition_id = '{$transition_id}'";
+            $sql = "SELECT travel_type, location_id, new_location, force_travel_from from story_transitions where transition_id = '{$transition_id}'";
             $this->travel_type = select_sql_column($sql, "travel_type", $db);
-            $this->from_location = select_sql_column($sql, "location_id", $db);
+            if ($force_travel_from == "") {
+                $this->from_location = select_sql_column($sql, "location_id", $db);
+                $this->to_location = select_sql_column($sql, "new_location", $db);
+            } else {
+                // TODO: Multiple from locations
+                $this->from_location = select_sql_column($sql, "force_travel_from", $db);
+                $this->to_location = select_sql_column($sql, "location_id", $db);
+            }
             $this->characters = characters_at_location($this->from_location, $db);
-            $this->to_location = select_sql_column($sql, "new_location", $db);
+            
          }
         
         function force_travel($db) {
